@@ -90,13 +90,13 @@ const onSubmit = (values: TLoginPayload) => {
     onSuccess: (res) => {
       console.log(res)
       toast.success("Your login was successful...")
-      // const { access, refresh, ...user } = res.data || {}
-      // authStore.setTokens({ accessToken: access, refreshToken: refresh })
-      // authStore.setAuthUser({ ...user, email: values.email })
-      // toast.success("Your login was successful...")
-      // // check for redirect query param
-      // const redirectPath = router.currentRoute.value.query.redirect as string
-      // router.push(redirectPath || "/dashboard")
+      const { access, refresh, ...user } = res.data || {}
+      authStore.setTokens({ accessToken: access, refreshToken: refresh })
+      authStore.setAuthUser({ ...user, email: values.email })
+      toast.success("Your login was successful...")
+      // check for redirect query param
+      const redirectPath = router.currentRoute.value.query.redirect as string
+      router.push(redirectPath || "/dashboard")
     },
     onError: displayError,
   })
