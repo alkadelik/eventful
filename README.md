@@ -1,33 +1,34 @@
-# Leyyow Suite v2
+# Eventful by Leyyow
 
-A comprehensive business management web application built with Vue3, TypeScript, Tailwindv4 and Vite.
+A comprehensive event management platform for popup event organizers
 
-> Leyyow improves business operational efficiency, - collects data and process them to help businesses make informed decisions.
+> Streamline your popup event organization with powerful tools for planning, managing attendees, and tracking event success.
 
 ## 🚀 Features
 
-- **Modular Architecture**: Clean, organized modules for different business functions
-- **Core Stack**: Vue 3 with Composition API, TypeScript, and Vite
-- **Styling Design**: Responsive mobile friendly design using Tailwind CSS v4
+- **Event Management**: Complete toolkit for creating, organizing, and managing popup events
+- **Attendee Management**: Track registrations, check-ins, and engagement
+- **Real-time Analytics**: Monitor event performance and attendee insights
+- **Modular Architecture**: Clean, organized modules for different event management functions
+- **Modern Tech Stack**: Vue 3 with Composition API, TypeScript, and Vite
+- **Responsive Design**: Mobile-friendly design using Tailwind CSS v4
 
 ## 🏗️ Architecture
 
-The application follows a modular architecture with separate modules for different parent features:
+Eventful by Leyyow follows a modular architecture with separate modules for different event management features:
 
 ### Core Modules
 
 - **🔐 [Auth Module](src/modules/auth/README.md)** - User authentication and authorization
-- **👥 [Customers Module](src/modules/customers/README.md)** - Customer relationship management
-- **📦 [Inventory Module](src/modules/inventory/README.md)** - Product and stock management
-- **🛒 [Orders Module](src/modules/orders/README.md)** - Order processing and fulfillment
-- **💬 [Popups Module](src/modules/popups/README.md)** - Popup Events management
-- **🏡 [Landing Module](src/modules/landing/README.md)** - Landing Page and other public pages
+- **🎪 [Shared Module](src/modules/shared/README.md)** - Popup event creation and management
+- **🏡 [Landing Module](src/modules/landing/README.md)** - Landing pages and public content
+- **⚙️ [Settings Module](src/modules/settings/README.md)** - User and event configuration
 
 ### Layouts
 
-- **LandingLayout** - Landing pages and public content
-- **AuthLayout** - Authentication pages (login, register, signup)
-- **MainLayout** - Main application interface for authenticated users
+- **LandingLayout** - Public pages and event landing pages
+- **AuthLayout** - Authentication pages (login, register, forgot password)
+- **MainLayout** - Main application interface for event organizers
 
 ## 🛠️ Tech Stack
 
@@ -43,21 +44,20 @@ The application follows a modular architecture with separate modules for differe
 ## 📁 Project Structure
 
 ```
-suite-v2/
-├── public/                 # Static assets
+eventful-by-leyyow/
+├── public/                 # Static assets and logos
 ├── src/
 │   ├── assets/            # Images, fonts, and styles
-│   ├── components/        # Shared components
+│   ├── components/        # Shared UI components
 │   ├── layouts/           # Application layouts
 │   ├── modules/           # Feature modules
-│   │   ├── auth/          # Authentication
-│   │   ├── customers/     # Customer management
-│   │   ├── inventory/     # Inventory management
-│   │   ├── orders/        # Order processing
-│   │   ├── popups/        # Popup events management
-│   │   └── landing/       # Landing pages (home, privacy policy, etc)
+│   │   ├── auth/          # Authentication and user management
+│   │   ├── shared/        # Event creation and management
+│   │   ├── settings/      # User and system settings
+│   │   └── landing/       # Public pages and landing
 │   ├── router/            # Routing configuration
-│   ├── utils/             # Utility functions
+│   ├── utils/             # Utility functions and helpers
+│   ├── composables/       # Vue composables and API calls
 │   ├── App.vue           # Root component
 │   └── main.ts           # Application entry point
 ├── package.json
@@ -79,7 +79,7 @@ suite-v2/
 
 ```bash
 git clone [repository-url]
-cd suite-v2
+cd eventful
 ```
 
 2. Install dependencies:
@@ -106,42 +106,45 @@ npm run dev
 
 ## 🎨 Styling
 
-The application uses Tailwind CSS v4 for styling with a custom design system:
+Eventful by Leyyow uses Tailwind CSS v4 for styling with a custom design system:
 
 - **Typography**: Custom Sato font family (Light, Regular, Medium, Semi, Bold, Heavy)
-- **Theme**: Customizable color scheme and spacing - assets/css/theme.css
-- **Components**: Consistent base styling across all modules
+- **Theme**: Event-focused color scheme and spacing defined in `assets/css/theme.css`
+- **Components**: Consistent UI components optimized for event management workflows
 
 ## 🔧 Development
 
 ### Module Development
 
-Each module is self-contained with its own:
+Each module in Eventful by Leyyow is self-contained with its own:
 
 - Routes configuration
-- Components
-- Views
-- README documentation
+- Components specific to the feature
+- Views and page layouts
+- API composables and data management
+- Documentation
 
-When adding new features:
+When adding new event management features:
 
 1. Choose the appropriate module or create a new one
-2. Follow the established patterns
+2. Follow the established patterns and conventions
 3. Update module documentation
 4. Ensure proper TypeScript typing
+5. Test with real event scenarios
 
 ### Code Quality
 
-The project enforces code quality through:
+Eventful by Leyyow enforces high code quality standards through:
 
-- **TypeScript**: Strong typing for better development experience
-- **ESLint**: Code linting with Vue and TypeScript rules
-- **Prettier**: Consistent code formatting
-- **Vue 3 Standards**: Modern Vue.js best practices
+- **TypeScript**: Strong typing for better development experience and fewer runtime errors
+- **ESLint**: Code linting with Vue 3 and TypeScript rules
+- **Prettier**: Consistent code formatting across the entire codebase
+- **Vue 3 Standards**: Modern Vue.js best practices and Composition API patterns
+- **Conventional Commits**: Standardized commit messages for better project history
 
 ## 🚀 Deployment
 
-The application is configured for deployment on Vercel with the included `vercel.json` configuration. You can also deploy to any static hosting service by running:
+Eventful by Leyyow is configured for deployment on Vercel with the included `vercel.json` configuration. You can also deploy to any static hosting service by running:
 
 ```bash
 npm run build
@@ -150,6 +153,8 @@ npm run build
 The built files will be in the `dist/` directory.
 
 ## 🤝 Contributing
+
+We welcome contributions to make Eventful by Leyyow even better for event organizers!
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -183,31 +188,6 @@ This project enforces [Conventional Commits](https://www.conventionalcommits.org
 - `chore` - Other changes that don't modify src or test files
 - `revert` - Reverts a previous commit
 
-**Examples:**
+## 🔗 Links
 
-- `feat: add user authentication system`
-- `feat(auth): implement login with OAuth`
-- `fix: resolve inventory calculation bug`
-- `fix(orders): correct total price calculation`
-- `docs: update installation instructions`
-- `docs(api): add endpoint documentation`
-- `style: format code with prettier`
-- `style(components): fix indentation in ProductCard`
-- `refactor: restructure auth module`
-- `refactor(utils): simplify currency formatting function`
-- `perf: optimize database queries`
-- `perf(inventory): cache product search results`
-- `test: add unit tests for auth service`
-- `test(orders): add integration tests`
-- `build: update vite to version 5.0`
-- `build(deps): bump vue from 3.3.0 to 3.4.0`
-- `ci: add automated deployment workflow`
-- `ci(github): update node version in actions`
-- `chore: update gitignore`
-- `chore(deps): update development dependencies`
-- `revert: revert "feat: add experimental feature"`
-
-## 🔗 Preview Links
-
-- Production: [https://suite-v2.vercel.app](https://suite-v2.vercel.app)
-- Staging: [https://staging-suite-v2.vercel.app](https://staging-suite-v2.vercel.app)
+- **Preview**: [leyyow.com](https://leyyow.com)
