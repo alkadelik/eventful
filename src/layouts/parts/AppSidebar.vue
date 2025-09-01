@@ -28,12 +28,10 @@
     <div class="space-y-1 px-4 py-2">
       <SidebarLink icon="house" label="Dashboard" to="/dashboard" />
       <SidebarLink icon="calendar-tick" label="Events" to="/events" />
-      <div class="mt-20">
-        <SidebarLink icon="life-buoy" label="Support" to="/support" />
-      </div>
     </div>
 
-    <section class="mt-auto px-4 pb-4">
+    <section class="mt-auto space-y-2 px-4 pb-4">
+      <SidebarLink icon="life-buoy" label="Support" to="/support" />
       <button @click="$emit('logout', true)" type="button" class="w-full">
         <SidebarLink icon="signout" label="Logout" to="#" />
       </button>
@@ -48,10 +46,7 @@ import { useMediaQuery } from "@vueuse/core"
 import Avatar from "@components/Avatar.vue"
 import SidebarLink from "./SidebarLink.vue"
 
-defineProps<{
-  mobileSidebarOpen: boolean
-  salesSuites: Array<{ icon: string; label: string; to: string }>
-}>()
+defineProps<{ mobileSidebarOpen: boolean }>()
 
 defineEmits<{ logout: [value: boolean] }>()
 

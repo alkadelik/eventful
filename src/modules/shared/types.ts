@@ -1,8 +1,11 @@
 export type TEvent = {
-  id: string
+  id: number
   title: string
   start: Date
   end: Date
+  price?: number
+  merchants?: number
+  revenue?: number
   location: string
   description: string
 }

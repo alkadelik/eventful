@@ -7,9 +7,9 @@ const sharedRoutes: RouteRecordRaw[] = [
     component: () => import("./views/dashboard.vue"),
   },
   {
-    path: "/onboarding",
-    name: "Onboarding",
-    component: () => import("./views/onboarding.vue"),
+    path: "/events",
+    name: "Events",
+    component: () => import("./views/events.vue"),
   },
   {
     path: "/notifications",

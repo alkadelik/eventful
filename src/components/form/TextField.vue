@@ -178,7 +178,7 @@ const inputClasses = computed(() => {
 
 const prefixClasses = computed(() => {
   const baseClasses =
-    "border-core-100 bg-core-25 mr-2 flex items-center border-r px-3 text-gray-400"
+    "border-core-100 bg-core-25 mr-2 flex items-center border-r px-3 text-gray-600"
 
   const sizeClasses = {
     sm: "py-2 text-sm",
@@ -191,7 +191,7 @@ const prefixClasses = computed(() => {
 
 const suffixClasses = computed(() => {
   const baseClasses =
-    "border-core-100 bg-core-25 ml-2 flex items-center border-l px-3 text-gray-400"
+    "border-core-100 bg-core-25 ml-2 flex items-center border-l px-3 text-gray-600"
 
   const sizeClasses = {
     sm: "py-2 text-sm",

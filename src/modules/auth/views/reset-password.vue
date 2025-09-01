@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col gap-8">
-    <BackButton icon="back-arrow" label="Back to Login" to="/login" class="!text-core-700" />
+    <BackButton icon="arrow-left-square" label="Back to Login" to="/login" class="!text-core-700" />
 
     <StepperWizard
       v-model="activeStep"

@@ -12,10 +12,10 @@
     </div>
 
     <!-- Right Side -->
-    <div class="flex flex-1 justify-center overflow-auto p-4">
-      <div class="w-full px-4 py-12 md:px-24">
-        <div class="mb-5 flex items-center gap-2 md:mb-10">
-          <h3 class="text-xl font-bold">Eventful by</h3>
+    <div class="flex-1 overflow-auto">
+      <div class="w-full px-6 py-10 md:px-24 md:py-12">
+        <div class="mb-10 flex items-center gap-2 md:mb-10">
+          <h3 class="text-lg font-bold">Eventful by</h3>
           <img src="/images/logos/leyyow-logo-2.svg?url" alt="leyyow logo" class="h-8" />
         </div>
         <router-view />

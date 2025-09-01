@@ -1,5 +1,5 @@
 <template>
-  <section class="mx-auto flex min-h-[80vh] max-w-screen-xl items-center py-20">
+  <section class="mx-auto flex min-h-[80vh] max-w-screen-xl items-center px-6 py-20">
     <div class="mx-auto max-w-2xl space-y-8 text-center">
       <div class="space-y-4">
         <div
@@ -35,7 +35,7 @@
       </div>
 
       <!-- Helpful links -->
-      <div class="border-t border-gray-200 pt-8">
+      <!-- <div class="border-t border-gray-200 pt-8">
         <p class="mb-4 text-sm text-gray-500">Or try these helpful links:</p>
         <nav class="flex flex-wrap justify-center gap-6 text-sm">
           <RouterLink
@@ -63,7 +63,7 @@
             Popups
           </RouterLink>
         </nav>
-      </div>
+      </div> -->
     </div>
   </section>
 </template>

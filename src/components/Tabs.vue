@@ -119,7 +119,7 @@ const getTabClasses = (tab: TabItem) => {
   const variants = {
     default: {
       base: "border-b-2 border-transparent",
-      active: "border-primary-500 text-primary-600",
+      active: "!border-primary-500 text-primary-600 bg-primary-100",
       inactive: "text-core-800 hover:text-primary-700",
     },
     tonal: {

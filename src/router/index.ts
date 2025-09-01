@@ -9,12 +9,8 @@ import MainLayout from "@/layouts/MainLayout.vue"
 import AuthLayout from "@/layouts/AuthLayout.vue"
 
 // Module route imports
-import inventoryRoutes from "@modules/inventory/routes"
 import authRoutes from "@modules/auth/routes"
-import customersRoutes from "@modules/customers/routes"
 import landingRoutes from "@modules/landing/routes"
-import popupsRoutes from "@modules/popups/routes"
-import ordersRoutes from "@modules/orders/routes"
 import settingsRoutes from "@modules/settings/routes"
 import sharedRoutes from "@modules/shared/routes"
 
@@ -38,14 +34,7 @@ const routes: RouteRecordRaw[] = [
     path: "/",
     component: MainLayout,
     meta: { requiresAuth: true },
-    children: [
-      ...inventoryRoutes,
-      ...customersRoutes,
-      ...ordersRoutes,
-      ...popupsRoutes,
-      ...settingsRoutes,
-      ...sharedRoutes,
-    ],
+    children: [...settingsRoutes, ...sharedRoutes],
   },
   {
     path: "/",
@@ -80,7 +69,12 @@ const router = createRouter({
  * ======= Navigation guards =======
  *  */
 router.beforeEach((to, _from, next) => {
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, user } = useAuthStore()
+  // user is authenticated but email is not confirmed ==> confirm email page
+  if (isAuthenticated && user && !user.email_confirmed && to.path !== "/confirm-email") {
+    return next({ path: "/confirm-email" })
+  }
+
   // route requiresAuth but user is not authenticated ==> login page
   if (to.meta.requiresAuth && !isAuthenticated) {
     return next({ path: "/login", query: { redirect: to.fullPath } })

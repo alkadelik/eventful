@@ -9,11 +9,7 @@
 
     <div class="flex">
       <!-- Sidebar -->
-      <AppSidebar
-        :sales-suites="SALES_SUITES"
-        :mobile-sidebar-open="mobileSidebarOpen"
-        @logout="logout = true"
-      />
+      <AppSidebar :mobile-sidebar-open="mobileSidebarOpen" @logout="logout = true" />
 
       <!-- Main column -->
       <div
@@ -37,13 +33,13 @@
           class="fixed right-0 bottom-0 left-0 z-30 border-t border-gray-200 bg-white"
         >
           <div class="flex items-center justify-around px-2 py-2">
-            <SidebarLink v-for="link in SALES_SUITES.slice(0, 2)" :key="link.label" v-bind="link" />
+            <SidebarLink label="Dashboard" icon="box" to="/dashboard" />
             <AppButton
               size="sm"
               class="!ring-primary-200 !rounded-full !ring-4"
               icon="add-circle"
             />
-            <SidebarLink v-for="link in SALES_SUITES.slice(2)" :key="link.label" v-bind="link" />
+            <SidebarLink label="Events" icon="calendar-tick" to="/events" />
           </div>
         </nav>
       </div>
@@ -69,11 +65,4 @@ const mobileSidebarOpen = ref(false)
 const logout = ref(false)
 
 const sidebarPadding = computed(() => (isMobile.value ? "lg:pl-72" : "pl-72"))
-
-const SALES_SUITES = [
-  { icon: "box", label: "Orders", to: "/orders" },
-  { icon: "folder", label: "Inventory", to: "/inventory" },
-  { icon: "calendar-tick", label: "Popups", to: "/popups" },
-  { icon: "people", label: "Customers", to: "/customers" },
-]
 </script>

@@ -1,8 +1,18 @@
 <template>
   <div>
-    <!-- table header and title -->
-    <div v-if="props.title" class="flex items-center justify-between px-1 py-4">
-      <h2 class="text-lg font-semibold">{{ props.title }}</h2>
+    <!-- Table header and title -->
+    <div
+      v-if="$slots.title || props.title || $slots.action"
+      class="flex items-center justify-between px-3 py-4"
+    >
+      <div class="flex-1">
+        <slot name="title">
+          <h2 v-if="props.title" class="text-core-800 text-lg font-semibold">{{ props.title }}</h2>
+        </slot>
+      </div>
+      <div v-if="$slots.action" class="flex items-center gap-2">
+        <slot name="action" />
+      </div>
     </div>
     <!--  -->
     <div class="w-full overflow-x-auto px-px">
@@ -94,16 +104,21 @@
       </div>
     </div>
 
-    <!-- empty table -->
+    <!-- Empty table state -->
     <div v-if="!data.length" class="mx-auto flex w-full items-center justify-center px-4 py-16">
       <div v-if="loading" class="flex items-center justify-center">
         <Icon name="loader" size="80" class="text-primary-500 animate-spin" />
       </div>
-      <div v-else class="flex max-w-screen-sm flex-col items-center">
-        <Icon name="box" size="64" class="mb-3" />
-        <h4 class="text-base font-semibold">No Data Available</h4>
-        <p class="text-core-600 text-sm">There are currently no records to display.</p>
-      </div>
+      <EmptyState
+        v-else
+        :icon="props.emptyState?.icon || 'box'"
+        :title="props.emptyState?.title || 'No Data Available'"
+        :description="props.emptyState?.description || 'There are currently no records to display.'"
+        :action-label="props.emptyState?.actionLabel"
+        :action-icon="props.emptyState?.actionIcon"
+        size="md"
+        @action="$emit('empty-action')"
+      />
     </div>
 
     <!--  -->
@@ -220,6 +235,7 @@ import {
 import { computed, h, onMounted, ref, useSlots, watch, type VNode } from "vue"
 import Icon from "./Icon.vue"
 import AppButton from "./AppButton.vue"
+import EmptyState from "./EmptyState.vue"
 
 // Type definitions
 export interface TableColumn<T = Record<string, unknown>> {
@@ -270,6 +286,14 @@ interface Props {
   totalItemsCount?: number
   /** Table layout style */
   layout?: "table-auto" | "table-fixed"
+  /** Custom empty state props */
+  emptyState?: {
+    icon?: string
+    title?: string
+    description?: string
+    actionLabel?: string
+    actionIcon?: string
+  }
 }
 
 // Define emits
@@ -280,9 +304,16 @@ interface Emits {
   "row-click": [row: T]
   /** Emitted when pagination changes */
   "pagination-change": [params: PaginationChangeParams]
+  /** Emitted when empty state action is clicked */
+  "empty-action": []
 }
 
 interface DataTableSlots<T> {
+  /** Custom header content */
+  title?: () => VNode[]
+  /** Action buttons or controls for the table header */
+  action?: () => VNode[]
+  /** Dynamic cell slots for custom cell rendering */
   [name: `cell:${string}`]: (props: {
     value: string | number | boolean | null | undefined | Record<string, unknown>
     item: T

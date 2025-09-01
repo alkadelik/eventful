@@ -1,18 +1,35 @@
 <template>
   <div class="text-core-800">
     <SectionHeader
-      title="Let's get started"
-      subtitle="Create your free Leyyow account and get your store online today."
-      class="mb-4"
+      title="Create Your Organizer Account"
+      subtitle="Quickly get started to create and manage your events."
+      class="mb-6 md:mb-10"
     />
 
-    <AppForm :schema="validationSchema" @submit="onSubmit" v-slot="{ meta }" class="space-y-5">
-      <div class="grid grid-cols-2 gap-5">
+    <AppForm :schema="validationSchema" @submit="onSubmit" v-slot="{ meta }" class="space-y-6">
+      <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
         <FormField name="first_name" label="First Name" placeholder="e.g. John" required />
-        <FormField name="last_name" label="Last Name" placeholder="e.g. Doe" />
+        <FormField name="last_name" label="Last Name" placeholder="e.g. Doe" required />
       </div>
 
-      <FormField name="email" label="Email Address" placeholder="example@gmail.com" required />
+      <FormField
+        name="company_name"
+        label="Company/Trade Name"
+        placeholder="e.g. Acme Corp"
+        required
+      />
+
+      <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+        <FormField name="email" label="Email Address" placeholder="example@gmail.com" required />
+
+        <FormField
+          name="phone"
+          label="Phone Number"
+          prefix="+234"
+          placeholder="8012345678"
+          required
+        />
+      </div>
 
       <div>
         <FormField
@@ -34,15 +51,15 @@
         required
       />
 
-      <p class="text-center text-sm">
-        By signing up, I agree to the Leyyow
+      <p class="text-core-600 text-center text-base">
+        By creating account, you agree to our
         <a
           href="https://leyyow.notion.site/Refund-policy-162f3934f3148085a337fc0d3cbffb99?pvs=4"
           target="_blank"
           rel="noopener noreferrer"
           class="text-primary-600"
         >
-          Privacy Policy
+          Terms of Service
         </a>
         and
         <a
@@ -51,7 +68,7 @@
           rel="noopener noreferrer"
           class="text-primary-600"
         >
-          Terms of Services
+          Privacy Policy
         </a>
       </p>
 
@@ -60,18 +77,18 @@
         :loading="isPending"
         label="Create Account"
         class="w-full"
-        :disabled="!meta.valid"
+        :class="{ 'cursor-not-allowed opacity-50': !meta.valid }"
       />
     </AppForm>
 
     <div class="mt-5 pb-4">
-      <p class="text-center text-sm font-normal text-gray-500">
+      <p class="text-core-600 text-center text-base font-normal">
         Already have an account?
         <RouterLink
           to="/login"
-          class="text-primary-600 text-sm font-semibold transition-colors duration-200 hover:underline"
+          class="text-primary-600 font-semibold transition-colors duration-200 hover:underline"
         >
-          Sign In
+          Sign in
         </RouterLink>
       </p>
     </div>
@@ -100,8 +117,10 @@ const router = useRouter()
 
 const validationSchema = yup.object().shape({
   first_name: yup.string().required("First name is required"),
-  last_name: yup.string(),
+  last_name: yup.string().required("Last name is required"),
   email: yup.string().email("Enter a valid email address").required("Email is required"),
+  company_name: yup.string().required("Company/Trade name is required"),
+  phone: yup.string().required("Phone number is required").length(10, "Enter a valid phone number"),
   password: passwordSchema,
   confirm_password: yup
     .string()
@@ -112,15 +131,18 @@ const validationSchema = yup.object().shape({
 const currentPassword = ref("")
 
 const onSubmit = (values: TSignupPayload) => {
-  signupFn(values, {
-    onSuccess: (res) => {
-      const { access, refresh, ...user } = res.data?.data || {}
-      authStore.setTokens({ accessToken: access, refreshToken: refresh })
-      authStore.setAuthUser({ ...user, email: values.email })
-      toast.success("Signup successful!")
-      router.push("/dashboard")
+  signupFn(
+    { ...values, phone: "+234" + values.phone, is_organizer: true },
+    {
+      onSuccess: (res) => {
+        const { access, refresh, ...user } = res.data?.data || {}
+        authStore.setTokens({ accessToken: access, refreshToken: refresh })
+        authStore.setAuthUser({ ...user, email: values.email })
+        toast.success("Signup successful!")
+        router.push("/confirm-email")
+      },
+      onError: displayError,
     },
-    onError: displayError,
-  })
+  )
 }
 </script>

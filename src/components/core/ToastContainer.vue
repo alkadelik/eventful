@@ -1,6 +1,6 @@
 <template>
   <Teleport to="body">
-    <div class="fixed top-5 right-5 z-[9999] max-w-md space-y-2">
+    <div class="fixed top-5 right-5 z-[9999] max-w-md min-w-72 space-y-2">
       <TransitionGroup name="toast" tag="div" class="space-y-2">
         <div
           v-for="toast in toasts"
@@ -27,7 +27,7 @@
           <button
             type="button"
             @click="removeToast(toast.id)"
-            class="ml-2 flex-shrink-0 rounded-lg transition-colors focus:ring-2 focus:outline-none"
+            class="ml-2 flex-shrink-0 rounded-lg transition-colors focus:ring-0 focus:outline-none"
             :aria-label="`Close ${toast.type} notification`"
           >
             <svg

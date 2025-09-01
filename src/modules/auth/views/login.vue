@@ -1,32 +1,37 @@
 <template>
   <div>
-    <Chip color="primary" size="md" label="Are you a Merchant?" class="mb-4 !pr-1">
+    <Chip color="primary" size="md" label="Are you a Merchant?" class="!pr-1">
       <template #append>
         <a href="https://www.leyyow.com/auth/signin" target="_blank" rel="noopener">
-          <Chip label="Sign In Here" color="warning" icon="arrow-left" class="flex-row-reverse" />
+          <Chip label="Sign In Here" color="warning" icon="arrow-right" class="flex-row-reverse" />
         </a>
       </template>
     </Chip>
 
     <SectionHeader
-      title="Organizer Login"
+      title="Organizer Log In"
       subtitle="Good to see you again—pick up right where you left off"
-      class="mb-10"
+      class="my-6 md:my-10"
     />
 
-    <AppForm :schema="loginSchema" @submit="onSubmit" v-slot="{ meta }" class="space-y-8">
+    <AppForm
+      :schema="loginSchema"
+      @submit="onSubmit"
+      v-slot="{ meta }"
+      class="space-y-6 md:space-y-8"
+    >
       <FormField name="email" label="Email Address" placeholder="example@gmail.com" required />
 
-      <FormField name="password" type="password" label="Password" required />
+      <FormField name="password" type="password" label="Password" placeholder="*****" required />
 
       <div class="flex items-center justify-between">
-        <label class="flex cursor-pointer items-center gap-1.5 text-sm">
+        <label class="text-core-600 flex cursor-pointer items-center gap-1.5 text-sm">
           <input v-model="rememberMe" type="checkbox" class="accent-primary-600 h-4 w-4" />
           Remember me
         </label>
         <RouterLink
           to="/forgot-password"
-          class="text-primary-600 text-sm font-medium transition-colors duration-200 hover:underline"
+          class="text-primary-600 text-base font-medium transition-colors duration-200 hover:underline"
         >
           Forgot Password?
         </RouterLink>
@@ -37,16 +42,16 @@
         :loading="isPending"
         label="Log In"
         class="w-full"
-        :disabled="!meta.valid"
+        :class="{ 'cursor-not-allowed opacity-50': !meta.valid }"
       />
     </AppForm>
 
     <div class="mt-5 pb-4">
-      <p class="text-center text-sm font-normal text-gray-500">
+      <p class="text-core-600 text-center font-normal">
         I don't have an account?
         <RouterLink
           to="/signup"
-          class="text-primary-600 text-sm font-semibold transition-colors duration-200 hover:underline"
+          class="text-primary-600 font-semibold transition-colors duration-200 hover:underline"
         >
           Sign Up
         </RouterLink>
@@ -59,7 +64,7 @@
 import { useRouter } from "vue-router"
 import { useLogin } from "../api"
 import * as yup from "yup"
-// import { displayError } from "@/utils/error-handler"
+import { displayError } from "@/utils/error-handler"
 import { useAuthStore } from "../store"
 import { TLoginPayload } from "../types"
 import { toast } from "@/composables/useToast"
@@ -81,24 +86,19 @@ const loginSchema = yup.object({
 })
 
 const onSubmit = (values: TLoginPayload) => {
-  // loginFn(values, {  //   onSuccess: (res) => {
-  //     const { access, refresh, ...user } = res.data?.data || {}
-  //     authStore.setTokens({ accessToken: access, refreshToken: refresh })
-  //     authStore.setAuthUser({ ...user, email: values.email })
-  authStore.setTokens({ accessToken: "12345678token", refreshToken: "" })
-  authStore.setAuthUser({
-    first_name: "Adanna",
-    last_name: "Gold",
-    is_email_verified: true,
-    email: values.email,
+  loginFn(values, {
+    onSuccess: (res) => {
+      console.log(res)
+      toast.success("Your login was successful...")
+      // const { access, refresh, ...user } = res.data || {}
+      // authStore.setTokens({ accessToken: access, refreshToken: refresh })
+      // authStore.setAuthUser({ ...user, email: values.email })
+      // toast.success("Your login was successful...")
+      // // check for redirect query param
+      // const redirectPath = router.currentRoute.value.query.redirect as string
+      // router.push(redirectPath || "/dashboard")
+    },
+    onError: displayError,
   })
-  toast.success("Your login was successful...")
-  console.log("LoginFn", loginFn)
-  // check for redirect query param
-  const redirectPath = router.currentRoute.value.query.redirect as string
-  router.push(redirectPath || "/dashboard")
-  //   },
-  //   onError: displayError,
-  // })
 }
 </script>

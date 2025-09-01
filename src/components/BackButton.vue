@@ -2,7 +2,7 @@
   <button
     @click="to ? $router.push(to) : $router.back()"
     :class="[
-      'text-primary-700 flex items-center gap-2 text-sm font-medium hover:underline',
+      'text-primary-700 flex max-w-max items-center gap-2 text-sm font-medium hover:underline',
       props.class,
     ]"
   >

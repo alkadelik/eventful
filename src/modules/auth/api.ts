@@ -1,12 +1,12 @@
-import baseApi, { TApiPromise } from "@/composables/baseApi"
+import baseApi, { TApiPromise, useApiQuery } from "@/composables/baseApi"
 import { useMutation } from "@tanstack/vue-query"
 import { ILoginResponse, TLoginPayload, TResetPasswordPayload, TSignupPayload } from "./types"
 
 /** Login api request  */
 export function useLogin() {
   return useMutation({
-    mutationFn: (body: TLoginPayload): TApiPromise<ILoginResponse> =>
-      baseApi.post("/accounts/auth/login/", body),
+    mutationFn: (body: TLoginPayload): TApiPromise<ILoginResponse["data"]> =>
+      baseApi.post("/account/auth/organizer/login/", body),
   })
 }
 
@@ -14,7 +14,7 @@ export function useLogin() {
 export function useRegister() {
   return useMutation({
     mutationFn: (body: TSignupPayload): TApiPromise<ILoginResponse> =>
-      baseApi.post("/accounts/signup/", body),
+      baseApi.post("/account/signup/", body),
   })
 }
 
@@ -22,42 +22,49 @@ export function useRegister() {
 export function useForgotPassword() {
   return useMutation({
     mutationFn: (body: { email: string }) =>
-      baseApi.post("/accounts/auth/password/request-token/", body),
+      baseApi.post("/account/organizer-forgot-password/", body),
   })
 }
 
 /** Reset password api request  */
 export function useResetPassword() {
   return useMutation({
-    mutationFn: ({ otp, ...body }: TResetPasswordPayload) =>
-      baseApi.post(`/accounts/auth/password/${otp}/reset/`, body),
+    mutationFn: (body: TResetPasswordPayload) => baseApi.post(`/account/og-reset-password/`, body),
   })
 }
 
 /** Verify email api request  */
 export function useVerifyEmail() {
   return useMutation({
-    mutationFn: (body) => baseApi.post("/account/verify_email/", body),
+    mutationFn: (body: { email: string; otp: string }) =>
+      baseApi.post("/account/verify-email/", body),
   })
 }
 
 /** Resend verification code api request  */
 export function useResendVerificationCode() {
   return useMutation({
-    mutationFn: (body) => baseApi.post("/account/resend_verification_code/", body),
+    mutationFn: (body) => baseApi.post("/account/resend-verification/", body),
   })
 }
 
-/** Triggers an email with reset token   */
-export function useSendResetTokenEmail() {
+/** Fetch supported banks */
+export function useGetSupportedBanks() {
+  return useApiQuery({ url: "/inventory/banks/supported-banks/" })
+}
+
+/** resolve a bank account */
+export function useResolveBankAccount() {
   return useMutation({
-    mutationFn: (body) => baseApi.post("/account/change_password/", body),
+    mutationFn: (body: { account_number: string; bank_code: string }) =>
+      baseApi.post("/inventory/banks/resolve-account/", body),
   })
 }
 
-/** Reset password api request  */
-export function useResetPasswordApi() {
+/** create a bank account */
+export function useAddBankAccount() {
   return useMutation({
-    mutationFn: (body) => baseApi.post("/account/reset_password/", body),
+    mutationFn: (body: { account_number: string; bank_name: string }) =>
+      baseApi.post("/inventory/organizer-bank-details/", body),
   })
 }

@@ -75,6 +75,7 @@
       :max="max"
       :step="step"
       :autocomplete="autocomplete"
+      :prefix="prefix"
     />
   </Field>
 </template>
@@ -152,6 +153,8 @@ interface FormFieldProps {
   step?: number | string
   /** Autocomplete attribute */
   autocomplete?: string
+  /** Prefix text */
+  prefix?: string
 
   // Select specific props
   /** Options for select fields */

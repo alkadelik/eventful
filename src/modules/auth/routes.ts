@@ -22,6 +22,17 @@ const authRoutes: RouteRecordRaw[] = [
     name: "ResetPassword",
     component: () => import("./views/reset-password.vue"),
   },
+  {
+    path: "confirm-email",
+    name: "ConfirmEmail",
+    component: () => import("./views/confirm-email.vue"),
+  },
+  {
+    path: "add-bank",
+    name: "AddBank",
+    component: () => import("./views/add-bank.vue"),
+    meta: { requiresAuth: true },
+  },
 ]
 
 export default authRoutes
