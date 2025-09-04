@@ -123,7 +123,7 @@ import { ref, computed, onMounted, onUnmounted } from "vue"
 
 type OptionValue = string | number | Record<string, unknown>
 
-interface Props {
+interface SelectProps {
   /** The current value of the select field. Can be a single value or array for multiple selection */
   modelValue?: OptionValue | OptionValue[] | null
   /** Array of options to display in the dropdown */
@@ -170,7 +170,7 @@ interface Props {
   placement?: "bottom" | "top" | "auto"
 }
 
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<SelectProps>(), {
   multiple: false,
   searchable: false,
   hideSelected: false,

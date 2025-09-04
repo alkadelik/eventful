@@ -16,12 +16,18 @@ export const useAuthStore = defineStore(
 
     // Actions
     const setAuthUser = (userData: IUser) => {
-      user.value = user.value ? { ...user.value, ...userData } : userData
+      user.value = userData
+    }
+
+    const updateAuthUser = (userData: Partial<IUser>) => {
+      if (user.value) {
+        user.value = { ...user.value, ...userData }
+      }
     }
 
     const setTokens = (tokens: IAuthTokens) => {
-      accessToken.value = tokens.accessToken
-      refreshToken.value = tokens.refreshToken
+      accessToken.value = tokens.access
+      refreshToken.value = tokens.refresh
     }
 
     const clearAuth = () => {
@@ -32,6 +38,11 @@ export const useAuthStore = defineStore(
 
     const setLoading = (loading: boolean) => {
       isLoading.value = loading
+    }
+
+    const logout = () => {
+      clearAuth()
+      window.location.href = "/login"
     }
 
     return {
@@ -46,14 +57,16 @@ export const useAuthStore = defineStore(
 
       // Actions
       setAuthUser,
+      updateAuthUser,
       setTokens,
       clearAuth,
       setLoading,
+      logout,
     }
   },
   {
     persist: {
-      storage: localStorage, // or sessionStorage if you prefer
+      storage: localStorage,
       paths: ["user", "accessToken", "refreshToken"], // only persist these
     },
   },

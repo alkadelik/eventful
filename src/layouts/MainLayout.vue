@@ -1,22 +1,15 @@
 <template>
   <div class="min-h-screen w-full bg-gray-50">
-    <!-- Mobile overlay -->
-    <div
-      v-if="isMobile && mobileSidebarOpen"
-      class="fixed inset-0 z-30 bg-black/40 lg:hidden"
-      @click="mobileSidebarOpen = false"
-    />
-
     <div class="flex">
       <!-- Sidebar -->
-      <AppSidebar :mobile-sidebar-open="mobileSidebarOpen" @logout="logout = true" />
+      <AppSidebar v-if="!isMobile" @logout="logout = true" />
 
       <!-- Main column -->
       <div
         :class="[
           'flex min-h-screen flex-1 flex-col overflow-x-hidden transition-all duration-200',
           'pt-16 pb-16 lg:pb-0', // height of header
-          sidebarPadding,
+          'pl-72',
         ]"
       >
         <!-- Topbar -->
@@ -25,6 +18,7 @@
         <!-- Content -->
         <main>
           <router-view />
+          <div class="h-screen" />
         </main>
 
         <!-- Bottom navigation for mobile -->
@@ -51,18 +45,27 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue"
+import { ref, watch } from "vue"
 import AppButton from "@components/AppButton.vue"
 import SidebarLink from "./parts/SidebarLink.vue"
-import { useMediaQuery } from "@vueuse/core"
 import LogoutModal from "@components/core/LogoutModal.vue"
 import AppHeader from "./parts/AppHeader.vue"
 import AppSidebar from "./parts/AppSidebar.vue"
+import { useMediaQuery } from "@vueuse/core"
+import { useGetProfile } from "@modules/shared/api"
+import { useAuthStore } from "@modules/auth/store"
 
 const isMobile = useMediaQuery("(max-width: 1024px)")
-
-const mobileSidebarOpen = ref(false)
 const logout = ref(false)
 
-const sidebarPadding = computed(() => (isMobile.value ? "lg:pl-72" : "pl-72"))
+const { data: profile } = useGetProfile()
+const { updateAuthUser } = useAuthStore()
+
+watch(
+  profile,
+  (val) => {
+    if (val) updateAuthUser(val)
+  },
+  { immediate: true },
+)
 </script>

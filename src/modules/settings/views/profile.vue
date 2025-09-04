@@ -2,7 +2,7 @@
   <div>
     <SectionHeader
       title="Personal Info"
-      size="md"
+      size="sm"
       subtitle="Update your photo and personal details."
     />
   </div>

@@ -19,7 +19,7 @@ app.use(FloatingVue as Plugin<unknown>)
 
 app.use(VueQueryPlugin)
 
-// Use router
+// // Use router
 app.use(router)
 
 // Mount the app to the DOM

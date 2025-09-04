@@ -1,29 +1,11 @@
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Navigation -->
-    <nav class="bg-white shadow-sm">
-      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="flex h-16 justify-between">
-          <div class="flex">
-            <div class="flex flex-shrink-0 items-center">
-              <h1 class="text-xl font-bold text-gray-900">Suite V2</h1>
-            </div>
-          </div>
-
-          <div class="flex items-center space-x-4">
-            <router-link to="/login" class="text-gray-500 hover:text-gray-700">
-              Sign in
-            </router-link>
-            <router-link
-              to="/register"
-              class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-            >
-              Get started
-            </router-link>
-          </div>
-        </div>
-      </div>
-    </nav>
+    <header class="flex h-20 items-center border-b border-gray-200 bg-white">
+      <AppSection class="!py-0">
+        <img src="/images/logos/leyyow-logo-2.svg?url" class="h-8" alt="leyyow logo" />
+      </AppSection>
+    </header>
 
     <!-- Main content -->
     <main>
@@ -31,18 +13,32 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white">
-      <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div class="border-t border-gray-200 pt-8">
-          <p class="text-center text-sm text-gray-500">
-            &copy; 2025 Suite V2. All rights reserved.
-          </p>
+    <footer class="bg-primary-600 py-6 text-white xl:py-10">
+      <AppSection class="grid grid-cols-4 items-end">
+        <div class="col-span-2">
+          <img src="/images/logos/leyyow-logo-2.svg?url" class="h-8" alt="leyyow logo" />
+          <h2 class="mt-4 text-xl font-semibold md:text-2xl xl:text-3xl">
+            Connecting Organizers & Merchants Seamlessly
+          </h2>
         </div>
-      </div>
+
+        <div>
+          <div class="border-l-2 p-4">
+            <h3 class="text-base font-semibold">For Organizers</h3>
+            <button type="button" class="text-sm">Create Event</button>
+          </div>
+        </div>
+        <div>
+          <div class="border-l-2 p-4">
+            <h3 class="text-base font-semibold">For Vendors</h3>
+            <button type="button" class="text-sm">Browse Events</button>
+          </div>
+        </div>
+      </AppSection>
     </footer>
   </div>
 </template>
 
 <script setup lang="ts">
-// Home layout for the landing page
+import AppSection from "@components/AppSection.vue"
 </script>

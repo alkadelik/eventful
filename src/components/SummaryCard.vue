@@ -55,7 +55,7 @@ interface Props {
 
 // Define props with defaults
 const props = withDefaults(defineProps<Props>(), {
-  iconClass: "primary",
+  iconClass: "green",
   size: "md",
 })
 
@@ -170,6 +170,7 @@ const iconContainerClasses = computed(() => {
     "rounded-xl",
     "transition-colors",
     "duration-200",
+    "bg-gray-100",
   ]
 
   // Size-based dimensions

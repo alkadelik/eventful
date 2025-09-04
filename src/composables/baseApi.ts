@@ -26,7 +26,7 @@ const refreshToken = async (): Promise<string> => {
   const { refreshToken, setTokens } = useAuthStore()
   const response = await baseApi.post("/auth/refresh/", { refreshToken })
   const { access, refresh } = response.data as { access: string; refresh: string }
-  setTokens({ accessToken: access, refreshToken: refresh })
+  setTokens({ access, refresh })
   return access
 }
 
@@ -81,10 +81,12 @@ export type TQueryArg = {
   url: string
   params?: MaybeRefOrGetter<Record<string, string | number | boolean> | undefined>
   enabled?: boolean
+  key: string
+  selectData?: boolean
 }
-export const useApiQuery = <T>({ url, params, enabled }: TQueryArg) => {
+export const useApiQuery = <T>({ url, params, enabled, key, selectData }: TQueryArg) => {
   return useQuery<T>({
-    queryKey: ["apiData", params],
+    queryKey: [key, params],
     queryFn: async () => {
       // Use toValue to handle both reactive and non-reactive values
       const paramValue = toValue(params)
@@ -94,6 +96,14 @@ export const useApiQuery = <T>({ url, params, enabled }: TQueryArg) => {
     retry: false,
     refetchOnWindowFocus: false,
     enabled,
+    select: selectData
+      ? (response: T) => {
+          if (response && typeof response === "object" && "data" in response) {
+            return (response as Record<string, unknown>).data as T
+          }
+          return response
+        }
+      : undefined,
   })
 }
 

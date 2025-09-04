@@ -5,9 +5,9 @@
     <SectionHeader title="Confirm Your Email" class="mb-2">
       <template #subtitle>
         We have sent a six-digit code to {{ email }}
-        <button type="button" class="text-primary-600 font-semibold underline underline-offset-4">
+        <!-- <button type="button" class="text-primary-600 font-semibold underline underline-offset-4">
           Change email
-        </button>
+        </button> -->
       </template>
     </SectionHeader>
 
@@ -23,8 +23,12 @@
 
     <p class="text-core-600 text-center text-sm">
       Didn't get the code?
-      <button to="/forgot-password" class="btn btn-ghost text-primary-600 font-medium">
-        Resend Code
+      <button
+        @click="onResend"
+        class="btn btn-ghost text-primary-600 font-medium"
+        :disabled="isResending"
+      >
+        {{ isResending ? "Resending..." : "Resend Code" }}
       </button>
     </p>
   </div>
@@ -37,9 +41,10 @@ import OtpField from "@components/form/OtpField.vue"
 import SectionHeader from "@components/SectionHeader.vue"
 import { ref } from "vue"
 import { useRoute, useRouter } from "vue-router"
-import { useVerifyEmail } from "../api"
+import { useResendVerificationCode, useVerifyEmail } from "../api"
 import { toast } from "@/composables/useToast"
 import { displayError } from "@/utils/error-handler"
+import { useAuthStore } from "../store"
 
 const route = useRoute()
 const router = useRouter()
@@ -47,6 +52,7 @@ const router = useRouter()
 const email = route.query.email as string
 const otp = ref("")
 
+const { mutate: resendCode, isPending: isResending } = useResendVerificationCode()
 const { mutate: verifyEmail, isPending } = useVerifyEmail()
 
 const onSubmit = () => {
@@ -55,10 +61,18 @@ const onSubmit = () => {
     {
       onSuccess: () => {
         toast.success("Email verified successfully")
-        router.push("/dashboard")
+        useAuthStore().updateAuthUser({ email_confirmed: true })
+        router.push("/add-bank")
       },
       onError: displayError,
     },
   )
+}
+
+const onResend = () => {
+  resendCode(email, {
+    onSuccess: () => toast.success("Verification code resent"),
+    onError: displayError,
+  })
 }
 </script>

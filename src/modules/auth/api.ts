@@ -1,6 +1,12 @@
 import baseApi, { TApiPromise, useApiQuery } from "@/composables/baseApi"
 import { useMutation } from "@tanstack/vue-query"
-import { ILoginResponse, TLoginPayload, TResetPasswordPayload, TSignupPayload } from "./types"
+import {
+  ILoginResponse,
+  ISignupResponse,
+  TLoginPayload,
+  TResetPasswordPayload,
+  TSignupPayload,
+} from "./types"
 
 /** Login api request  */
 export function useLogin() {
@@ -13,8 +19,8 @@ export function useLogin() {
 /** Register api request  */
 export function useRegister() {
   return useMutation({
-    mutationFn: (body: TSignupPayload): TApiPromise<ILoginResponse> =>
-      baseApi.post("/account/signup/", body),
+    mutationFn: (body: TSignupPayload): TApiPromise<ISignupResponse> =>
+      baseApi.post("/account/signup/legacy/", body),
   })
 }
 
@@ -44,13 +50,13 @@ export function useVerifyEmail() {
 /** Resend verification code api request  */
 export function useResendVerificationCode() {
   return useMutation({
-    mutationFn: (body) => baseApi.post("/account/resend-verification/", body),
+    mutationFn: (email: string) => baseApi.post("/account/resend-verification/", { email }),
   })
 }
 
 /** Fetch supported banks */
 export function useGetSupportedBanks() {
-  return useApiQuery({ url: "/inventory/banks/supported-banks/" })
+  return useApiQuery({ url: "/inventory/banks/supported-banks/", key: "supportedBanks" })
 }
 
 /** resolve a bank account */

@@ -1,7 +1,12 @@
 <template>
   <!-- Overlay -->
   <Transition name="modal-overlay">
-    <div v-if="open" class="fixed inset-0 z-40 bg-black/40" :class="overlayClasses" @click="close">
+    <div
+      v-if="open"
+      class="fixed inset-0 z-[1200] bg-black/40"
+      :class="overlayClasses"
+      @click="close"
+    >
       <!-- Modal Card -->
       <Transition name="modal-content">
         <div v-if="open" class="relative bg-white shadow-lg" :class="modalClasses" @click.stop>
@@ -22,7 +27,10 @@
           </slot>
 
           <!-- Body -->
-          <div class="bg-core-25 px-6 py-4" :class="[bodyClasses, props.bodyClass]">
+          <div
+            class="bg-core-25 px-6 py-4"
+            :class="[bodyClasses, props.bodyClass, { 'rounded-b-2xl': !$slots.footer }]"
+          >
             <slot />
           </div>
 
@@ -134,11 +142,11 @@ const modalClasses = computed(() => {
       baseClasses.push("")
       break
     case "bottom-nav":
-      baseClasses.push("rounded-t-lg md:rounded-lg mb-0 md:mb-auto")
+      baseClasses.push("rounded-t-2xl md:rounded-2xl mb-0 md:mb-auto")
       break
     case "centered":
     default:
-      baseClasses.push("rounded-lg")
+      baseClasses.push("rounded-2xl")
       break
   }
 
@@ -154,7 +162,7 @@ const bodyClasses = computed(() => {
   if (props.variant === "fullscreen") {
     classes.push("h-full overflow-y-auto")
   } else {
-    classes.push("max-h-[70vh] overflow-y-auto")
+    classes.push("max-h-[80vh] overflow-y-auto")
   }
 
   return classes.join(" ")

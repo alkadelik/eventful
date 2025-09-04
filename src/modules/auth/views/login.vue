@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Chip color="primary" size="md" label="Are you a Merchant?" class="!pr-1">
+    <Chip color="primary" size="md" label="Are you a Vendor?" class="!pr-1">
       <template #append>
         <a href="https://www.leyyow.com/auth/signin" target="_blank" rel="noopener">
           <Chip label="Sign In Here" color="warning" icon="arrow-right" class="flex-row-reverse" />
@@ -88,10 +88,13 @@ const loginSchema = yup.object({
 const onSubmit = (values: TLoginPayload) => {
   loginFn(values, {
     onSuccess: (res) => {
-      console.log(res)
       const { access, refresh, ...user } = res.data || {}
-      authStore.setTokens({ accessToken: access, refreshToken: refresh })
-      authStore.setAuthUser({ ...user, email: values.email })
+      authStore.setTokens({ access, refresh })
+      authStore.setAuthUser({
+        ...user,
+        email: values.email,
+        has_payment_account: true, /// TEMPORARY FIX
+      })
       toast.success("Your login was successful!")
       // check for redirect query param
       const redirectPath = router.currentRoute.value.query.redirect as string

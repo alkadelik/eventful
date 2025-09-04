@@ -20,7 +20,7 @@
 
     <div v-if="extraText" :class="textClasses" :style="maxWidth ? { maxWidth } : {}">
       <h4 :class="nameClasses">{{ name }}</h4>
-      <p :class="extraTextClasses">{{ extraText }}</p>
+      <p v-if="typeof extraText === 'string'" :class="extraTextClasses">{{ extraText }}</p>
     </div>
   </div>
 </template>
@@ -39,7 +39,7 @@ interface AvatarProps {
   /** User's name (required for alt text and initials) */
   name: string
   /** Additional text to display next to avatar */
-  extraText?: string
+  extraText?: string | boolean
   /** Size of the avatar - preset or custom number */
   size?: AvatarSize
   /** Maximum width for the text container */

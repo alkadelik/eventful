@@ -31,7 +31,7 @@ const authRoutes: RouteRecordRaw[] = [
     path: "add-bank",
     name: "AddBank",
     component: () => import("./views/add-bank.vue"),
-    meta: { requiresAuth: true },
+    // Removed requiresAuth meta since this is part of onboarding flow
   },
 ]
 

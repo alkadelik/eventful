@@ -8,6 +8,7 @@
     />
 
     <Tabs
+      v-if="myEvents?.results?.length"
       v-model="status"
       :tabs="[
         { title: 'All', key: 'all' },
@@ -21,9 +22,19 @@
       <div class="bg-white">
         <DataTable
           title="Recent Events"
-          :data="EVENTS"
+          :data="myEvents?.results ?? []"
           :columns="EVENT_COLUMN"
-          :loading="isFetching"
+          :loading="isPending"
+          @row-click="(item) => $router.push(`/events/${item.id}`)"
+          :empty-state="{
+            icon: 'box',
+            title: `You don't have any event yet`,
+            description: `Once you create an event, you'll see all your attendee stats, ticket sales, and engagement updates right here.`,
+            actionLabel: 'Create Event',
+            actionIcon: 'add',
+          }"
+          hide-total
+          @empty-action="openCreate = true"
         >
           <template #cell:action>
             <div class="flex gap-2">
@@ -32,13 +43,14 @@
           </template>
 
           <template #action>
-            <AppButton label="Create Event" icon="add" />
+            <AppButton label="Create Event" icon="add" @click="openCreate = true" />
           </template>
         </DataTable>
       </div>
     </div>
 
-    <div>{{ events }}</div>
+    <!-- Create Event Modal -->
+    <CreateEventModal v-model:open="openCreate" @close="openCreate = false" />
   </section>
 </template>
 
@@ -46,17 +58,22 @@
 import DataTable from "@components/DataTable.vue"
 import SectionHeader from "@components/SectionHeader.vue"
 import AppButton from "@components/AppButton.vue"
-import { EVENT_COLUMN, EVENTS } from "../constants"
+import { EVENT_COLUMN } from "../../constants"
 import Tabs from "@components/Tabs.vue"
 import { computed, ref } from "vue"
-import { useGetOrganizerEvents } from "../api"
 import Icon from "@components/Icon.vue"
+import CreateEventModal from "@modules/shared/components/CreateEventModal.vue"
+import { useGetOrganizerEvents } from "@modules/shared/api"
 
+const openCreate = ref(false)
 const status = ref("all")
 
-const params = computed(() => {
-  if (status.value === "all") return undefined
-  return { status: status.value }
-})
-const { data: events, isFetching } = useGetOrganizerEvents(params)
+const limit = ref(10)
+const page = ref(1)
+const pagination = computed(() => ({
+  limit: limit.value,
+  offset: page.value * limit.value - limit.value,
+  ...(status.value !== "all" ? { status: status.value } : {}),
+}))
+const { data: myEvents, isPending } = useGetOrganizerEvents(pagination)
 </script>

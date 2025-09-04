@@ -1,6 +1,6 @@
 <template>
   <div>
-    <SectionHeader title="Update Password" size="md" subtitle="Update your password." />
+    <SectionHeader title="Update Password" size="sm" subtitle="Update your password." />
   </div>
 </template>
 

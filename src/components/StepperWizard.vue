@@ -1,3 +1,63 @@
+<script setup lang="ts">
+import { ref, computed, watch } from "vue"
+
+/**
+ * Props interface for the StepperWizard component
+ */
+interface Props {
+  /** The current active step index (0-based) */
+  modelValue?: number
+  /** Array of step labels/names to display */
+  steps: string[]
+  /** Whether to show the step indicators (circles with numbers) */
+  showIndicators?: boolean
+  /** Whether to show step labels below the indicators */
+  showLabels?: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  modelValue: 0,
+  showIndicators: true,
+  showLabels: false,
+})
+
+const emit = defineEmits<{
+  /** Emitted when the step changes */
+  "update:modelValue": [value: number]
+}>()
+
+const currentStep = ref(props.modelValue || 0)
+
+watch(
+  () => props.modelValue,
+  (val) => {
+    currentStep.value = val
+  },
+)
+
+// Move to next step
+const onNext = (): void => {
+  if (currentStep.value < props.steps.length - 1) {
+    currentStep.value++
+    emit("update:modelValue", currentStep.value)
+  }
+}
+
+// Move to previous step
+const onPrev = (): void => {
+  if (currentStep.value > 0) {
+    currentStep.value--
+    emit("update:modelValue", currentStep.value)
+  }
+}
+
+// Dynamic step status
+const isActive = (index: number): boolean => index === currentStep.value
+const isCompleted = (index: number): boolean => index < currentStep.value
+
+const stepPercentage = computed(() => ((currentStep.value + 1) / props.steps.length) * 100)
+</script>
+
 <template>
   <div class="w-full">
     <!-- Stepper Header -->
@@ -50,46 +110,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref, computed, watch } from "vue"
-
-const props = defineProps({
-  modelValue: { type: Number },
-  steps: { type: Array, required: true },
-  showIndicators: { type: Boolean, default: true },
-  showLabels: { type: Boolean, default: false },
-})
-
-const emit = defineEmits(["update:modelValue"])
-const currentStep = ref(props.modelValue)
-
-watch(
-  () => props.modelValue,
-  (val) => {
-    currentStep.value = val
-  },
-)
-
-// Move to next step
-const onNext = () => {
-  if (currentStep.value < props.steps.length - 1) {
-    currentStep.value++
-    emit("update:modelValue", currentStep.value)
-  }
-}
-
-// Move to previous step
-const onPrev = () => {
-  if (currentStep.value > 0) {
-    currentStep.value--
-    emit("update:modelValue", currentStep.value)
-  }
-}
-
-// Dynamic step status
-const isActive = (index) => index === currentStep.value
-const isCompleted = (index) => index < currentStep.value
-
-const stepPercentage = computed(() => ((currentStep.value + 1) / props.steps.length) * 100)
-</script>

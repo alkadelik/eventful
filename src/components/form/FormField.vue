@@ -6,13 +6,13 @@
       v-bind="{ ...field, ...$attrs }"
       :model-value="field.value"
       :label="hideLabel ? '' : label || startCase(name)"
-      :options="options || []"
+      :options="optionsData"
       :placeholder="placeholder"
       :required="required"
       :disabled="disabled"
       :readonly="readonly"
       :error="fieldErrors[0]"
-      :hint="hint"
+      :hint="hintText"
       :variant="variant"
       :size="size"
       @update:model-value="field.value = $event"
@@ -28,7 +28,7 @@
       :disabled="disabled"
       :readonly="readonly"
       :error="fieldErrors[0]"
-      :hint="hint"
+      :hint="hintText"
       :variant="variant"
       :size="size"
       :rows="rows"
@@ -47,12 +47,30 @@
       :required="required"
       :disabled="disabled"
       :error="fieldErrors[0]"
-      :hint="hint"
+      :hint="hintText"
       :variant="variant"
       :size="size"
       :length="otpLength"
       :digits-only="digitsOnly"
       :separator="separator"
+    />
+
+    <!-- File Field -->
+    <FileUploader
+      v-else-if="type === 'file'"
+      v-bind="{ ...field, ...$attrs }"
+      :model-value="field.value"
+      :label="hideLabel ? '' : label || startCase(name)"
+      :required="required"
+      :disabled="disabled"
+      :error="fieldErrors[0]"
+      :hint="hint"
+      :variant="variant"
+      :size="size"
+      :accept="accept"
+      :max-size="maxSize"
+      :placeholder="placeholder"
+      @update:model-value="field.value = $event"
     />
 
     <!-- Text Field (default for all other types) -->
@@ -66,7 +84,7 @@
       :disabled="disabled"
       :readonly="readonly"
       :error="fieldErrors[0]"
-      :hint="hint"
+      :hint="hintText"
       :variant="variant"
       :size="size"
       :maxlength="maxlength"
@@ -87,6 +105,8 @@ import SelectField from "./SelectField.vue"
 import TextAreaField from "./TextAreaField.vue"
 import OtpField from "./OtpField.vue"
 import { startCase } from "@/utils/format-strings"
+import { computed } from "vue"
+import FileUploader from "./FileUploader.vue"
 
 /**
  * Form field types supported by the dynamic FormField component
@@ -107,6 +127,7 @@ export type FormFieldType =
   | "select"
   | "textarea"
   | "otp"
+  | "file"
 
 /**
  * Option value type for select fields (matches SelectField component)
@@ -177,6 +198,12 @@ interface FormFieldProps {
   digitsOnly?: boolean
   /** Separator character for OTP field */
   separator?: string
+
+  // File specific props
+  /** Accepted file types */
+  accept?: string
+  /** Maximum file size in MB */
+  maxSize?: number
 }
 
 const props = withDefaults(defineProps<FormFieldProps>(), {
@@ -187,6 +214,7 @@ const props = withDefaults(defineProps<FormFieldProps>(), {
   otpLength: 6,
   digitsOnly: true,
   separator: "-",
+  maxSize: 2,
 })
 
 // Expose props for reactive access in template
@@ -198,7 +226,6 @@ const {
   required,
   disabled,
   readonly,
-  hint,
   variant,
   size,
   maxlength,
@@ -207,7 +234,6 @@ const {
   max,
   step,
   autocomplete,
-  options,
   rows,
   cols,
   showCharacterCount,
@@ -216,4 +242,7 @@ const {
   digitsOnly,
   separator,
 } = props
+
+const optionsData = computed(() => props.options ?? [])
+const hintText = computed(() => props.hint ?? "")
 </script>

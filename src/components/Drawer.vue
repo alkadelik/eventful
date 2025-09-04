@@ -1,44 +1,35 @@
 <template>
-  <!-- Overlay -->
-  <Transition name="drawer-overlay">
-    <div v-if="open" class="fixed inset-0 z-40 bg-black/40" @click="close">
-      <!-- Drawer Panel -->
-      <Transition :name="drawerTransitionName">
-        <div v-if="open" class="relative bg-white shadow-lg" :class="drawerClasses" @click.stop>
-          <!-- Header -->
-          <slot name="header">
-            <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-              <h2 class="text-core-800 text-lg font-semibold">
-                {{ title }}
-              </h2>
-              <button
-                type="button"
-                @click="close"
-                class="text-core-800 hover:text-core-600 transition-colors"
-              >
-                <Icon name="close-circle" size="20" />
-              </button>
-            </div>
-          </slot>
+  <!-- Backdrop -->
+  <div :class="backdropClasses" @click="close" />
 
-          <!-- Body -->
-          <div
-            class="bg-core-25 flex-1 overflow-y-auto px-6 py-4"
-            :class="[bodyClasses, props.bodyClass]"
-          >
-            <slot />
-          </div>
-
-          <!-- Footer -->
-          <div v-if="$slots.footer" class="border-t border-gray-200 px-6 py-4">
-            <slot name="footer" />
-          </div>
-        </div>
-      </Transition>
+  <!-- Drawer -->
+  <aside :class="drawerClasses" @click.stop tabindex="-1" role="dialog" aria-modal="true">
+    <!-- Header -->
+    <div class="flex items-center justify-between border-b border-gray-200 p-5">
+      <slot name="header">
+        <h2 v-if="title" class="m-0 text-lg font-semibold text-gray-800">{{ title }}</h2>
+        <span v-else></span>
+        <button
+          type="button"
+          @click="close"
+          class="cursor-pointer border-none bg-transparent p-0 text-gray-500 transition-colors duration-200 hover:text-gray-700"
+        >
+          <Icon name="close-circle" size="20" />
+        </button>
+      </slot>
     </div>
-  </Transition>
-</template>
 
+    <!-- Body -->
+    <div class="flex-1 overflow-y-auto bg-gray-50 p-5" :class="props.bodyClass">
+      <slot />
+    </div>
+
+    <!-- Footer -->
+    <div v-if="$slots.footer" class="border-t border-gray-200 p-5">
+      <slot name="footer" />
+    </div>
+  </aside>
+</template>
 <script setup lang="ts">
 import { computed, watch, onUnmounted } from "vue"
 import Icon from "./Icon.vue"
@@ -87,43 +78,62 @@ const emit = defineEmits<Emits>()
 const close = () => emit("close")
 
 /**
- * Computed transition name based on position
+ * Computed classes for the backdrop
  */
-const drawerTransitionName = computed(() => {
-  return `drawer-${props.position}`
+const backdropClasses = computed(() => {
+  return [
+    "fixed inset-0 z-[1000] transition-all duration-300 ease-out",
+    props.open
+      ? "opacity-100 pointer-events-auto bg-black/60"
+      : "opacity-0 pointer-events-none bg-black/60",
+  ]
 })
 
 /**
- * Computed classes for the drawer content
+ * Computed classes for the drawer
  */
 const drawerClasses = computed(() => {
-  const baseClasses = ["fixed", "h-full", "flex", "flex-col"]
+  const baseClasses = [
+    "fixed bg-white z-[1100] transition-transform duration-300 ease-out shadow-xl flex flex-col focus:outline-none",
+  ]
 
-  // Position classes
+  // Position and transform classes
   switch (props.position) {
     case "left":
-      baseClasses.push("left-0", "top-0")
+      baseClasses.push(
+        "top-0 bottom-0 left-0 h-screen",
+        props.open ? "translate-x-0" : "-translate-x-full",
+      )
       break
     case "right":
-      baseClasses.push("right-0", "top-0")
+      baseClasses.push(
+        "top-0 bottom-0 right-0 h-screen",
+        props.open ? "translate-x-0" : "translate-x-full",
+      )
       break
     case "top":
-      baseClasses.push("top-0", "left-0", "right-0", "!h-auto", "max-h-[80vh]")
+      baseClasses.push(
+        "top-0 left-0 right-0 max-h-[80vh]",
+        props.open ? "translate-y-0" : "-translate-y-full",
+      )
       break
     case "bottom":
-      baseClasses.push("bottom-0", "left-0", "right-0", "!h-auto", "max-h-[80vh]")
+      baseClasses.push(
+        "bottom-0 left-0 right-0 max-h-[80vh]",
+        props.open ? "translate-y-0" : "translate-y-full",
+      )
       break
   }
 
   // Width classes for left/right drawers
   if (props.position === "left" || props.position === "right") {
     const maxWidthMap: Record<string, string> = {
-      xs: "w-80", // 320px
-      sm: "w-96", // 384px
-      md: "w-[28rem]", // 448px
-      lg: "w-[32rem]", // 512px
-      xl: "w-[36rem]", // 576px
-      "2xl": "w-[42rem]", // 672px
+      xs: "w-80 max-w-[90vw]",
+      sm: "w-96 max-w-[90vw]",
+      md: "w-[28rem] max-w-[90vw]",
+      lg: "w-[32rem] max-w-[90vw]",
+      xl: "w-[36rem] max-w-[90vw]",
+      "2xl": "w-[42rem] max-w-[90vw]",
       full: "w-full",
     }
 
@@ -131,21 +141,14 @@ const drawerClasses = computed(() => {
       baseClasses.push(maxWidthMap[props.maxWidth])
     } else {
       // Custom width value
-      baseClasses.push(`w-[${props.maxWidth}]`)
+      baseClasses.push(`w-[${props.maxWidth}] max-w-[90vw]`)
     }
-
-    // Ensure drawer doesn't exceed screen width on mobile
-    baseClasses.push("max-w-[90vw]", "sm:max-w-none")
+  } else {
+    // For top/bottom drawers, use full width
+    baseClasses.push("w-full")
   }
 
-  return baseClasses.join(" ")
-})
-
-/**
- * Computed classes for the drawer body
- */
-const bodyClasses = computed(() => {
-  return ""
+  return baseClasses
 })
 
 /**
@@ -172,60 +175,3 @@ onUnmounted(() => {
   document.body.style.overflow = ""
 })
 </script>
-
-<style scoped>
-/* Drawer overlay transitions */
-.drawer-overlay-enter-active,
-.drawer-overlay-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.drawer-overlay-enter-from,
-.drawer-overlay-leave-to {
-  opacity: 0;
-}
-
-/* Left drawer transitions */
-.drawer-left-enter-active,
-.drawer-left-leave-active {
-  transition: transform 0.3s ease;
-}
-
-.drawer-left-enter-from,
-.drawer-left-leave-to {
-  transform: translateX(-100%);
-}
-
-/* Right drawer transitions */
-.drawer-right-enter-active,
-.drawer-right-leave-active {
-  transition: transform 0.3s ease;
-}
-
-.drawer-right-enter-from,
-.drawer-right-leave-to {
-  transform: translateX(100%);
-}
-
-/* Top drawer transitions */
-.drawer-top-enter-active,
-.drawer-top-leave-active {
-  transition: transform 0.3s ease;
-}
-
-.drawer-top-enter-from,
-.drawer-top-leave-to {
-  transform: translateY(-100%);
-}
-
-/* Bottom drawer transitions */
-.drawer-bottom-enter-active,
-.drawer-bottom-leave-active {
-  transition: transform 0.3s ease;
-}
-
-.drawer-bottom-enter-from,
-.drawer-bottom-leave-to {
-  transform: translateY(100%);
-}
-</style>

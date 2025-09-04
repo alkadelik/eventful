@@ -1,138 +1,194 @@
+<script setup lang="ts">
+import AppButton from "@components/AppButton.vue"
+import AppSection from "@components/AppSection.vue"
+import Avatar from "@components/Avatar.vue"
+import Icon from "@components/Icon.vue"
+import EventCard from "../components/EventCard.vue"
+import EventDetailsDrawer from "../components/EventDetailsDrawer.vue"
+import { ref } from "vue"
+
+const openDetails = ref(false)
+</script>
+
 <template>
-  <!-- Hero section -->
-  <div class="relative bg-white">
-    <div class="mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
-      <div class="text-center">
-        <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
-          <span class="block">Welcome to</span>
-          <span class="block text-indigo-600">Suite V2</span>
-        </h1>
-        <p class="mx-auto mt-6 max-w-lg text-xl text-gray-500 sm:max-w-3xl">
-          The ultimate business management platform designed to streamline your operations, manage
-          your inventory, track orders, and engage with customers seamlessly.
-        </p>
-        <div class="mx-auto mt-10 max-w-sm sm:flex sm:max-w-none sm:justify-center">
-          <div class="space-y-4 sm:mx-auto sm:inline-grid sm:grid-cols-2 sm:gap-5 sm:space-y-0">
-            <router-link
-              to="/register"
-              class="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 sm:px-8"
-            >
-              Get started
-            </router-link>
-            <router-link
-              to="/login"
-              class="flex items-center justify-center rounded-md border border-transparent bg-indigo-100 px-4 py-3 text-base font-medium text-indigo-700 shadow-sm hover:bg-indigo-200 sm:px-8"
-            >
-              Sign in
-            </router-link>
+  <div>
+    <AppSection class="py-20">
+      <div class="flex items-center gap-8">
+        <div class="w-1/2">
+          <h2 class="text-5xl font-semibold">
+            Plan Everything <br />About Your Next <br />
+            Pop-up
+          </h2>
+          <p class="mt-6 text-lg">Quickly get started to create and manage your events.</p>
+          <div class="mt-6 flex gap-4">
+            <AppButton label="Create Event" size="lg" />
+            <AppButton label="Browse Events" variant="outlined" size="lg" />
+          </div>
+        </div>
+
+        <div class="w-1/2">
+          <img src="https://placehold.co/500x500" alt="Event" class="rounded-xl" />
+        </div>
+      </div>
+    </AppSection>
+
+    <AppSection background="bg-white" class="py-20">
+      <div class="mb-12 flex flex-col text-center">
+        <h2 class="mb-2 text-4xl font-semibold">Your Journey Starts Here 🚀</h2>
+        <p class="text-xl">Are you here to sell or to host? Let's get you set up in seconds.</p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-12">
+        <div
+          v-for="v in ['organizers', 'vendors']"
+          :key="v"
+          class="divide-y rounded-2xl border"
+          :class="[
+            { 'bg-primary-50 border-primary-600 divide-primary-600': v === 'organizers' },
+            { 'divide-gray-200 border-gray-200 bg-white': v === 'vendors' },
+          ]"
+        >
+          <div class="px-10 py-6">
+            <span class="text-xl font-semibold capitalize">For {{ v }}</span>
+          </div>
+          <div class="px-10 py-6">
+            <h3 class="text-3xl font-semibold">
+              {{
+                v === "organizers"
+                  ? "Plan, organize and track payments in your next event"
+                  : "Discover and register for upcoming events."
+              }}
+            </h3>
+            <p class="mt-2 text-base">Quickly get started to create and manage your events.</p>
+            <img src="" :alt="v" class="mt-6 h-60 w-full rounded-lg bg-gray-100" />
+          </div>
+          <div class="px-10 py-6">
+            <div class="mb-4 flex justify-between">
+              <p class="text-xl font-semibold">
+                {{ v === "organizers" ? "From Other Organizers" : "Ongoing Events" }}
+              </p>
+              <span class="flex gap-2">
+                <Icon
+                  name="arrow-right"
+                  size="24"
+                  class="rotate-180 cursor-pointer rounded-full border border-gray-200 bg-white p-1"
+                />
+                <Icon
+                  name="arrow-right"
+                  size="24"
+                  class="cursor-pointer rounded-full border border-gray-200 bg-white p-1"
+                />
+              </span>
+            </div>
+            <EventCard :class="v === 'vendors' ? '!bg-gray-50' : ''" @click="openDetails = true" />
+          </div>
+          <div class="px-10 py-6">
+            <p class="mb-3 text-xl font-semibold">Get The Best of Leyyow Events</p>
+            <div class="space-y-1.5">
+              <p
+                v-for="x in [
+                  'Plan events',
+                  'Send event links to vendors',
+                  'Track registrations and payments',
+                ]"
+                :key="x"
+                class="flex items-center gap-2 text-sm"
+              >
+                <Icon name="check-circle" size="20" class="text-primary-600" />
+                {{ x }}
+              </p>
+            </div>
+          </div>
+          <div class="px-10 py-6">
+            <AppButton
+              :label="v === 'organizers' ? 'Create Event' : 'Browse Events'"
+              size="lg"
+              :variant="v === 'organizers' ? 'filled' : 'outlined'"
+              class="w-full"
+            />
           </div>
         </div>
       </div>
-    </div>
-  </div>
+    </AppSection>
 
-  <!-- Features section -->
-  <div class="bg-gray-50 py-24 sm:py-32">
-    <div class="mx-auto max-w-7xl px-6 lg:px-8">
-      <div class="mx-auto max-w-2xl lg:text-center">
-        <h2 class="text-base leading-7 font-semibold text-indigo-600">Everything you need</h2>
-        <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-          Manage your business with ease
-        </p>
-        <p class="mt-6 text-lg leading-8 text-gray-600">
-          Our comprehensive suite of tools helps you manage every aspect of your business from a
-          single, intuitive platform.
-        </p>
+    <AppSection class="py-20">
+      <div class="mb-12 flex flex-col">
+        <h2 class="mb-2 text-4xl font-semibold">Upcoming Pop-Up Events</h2>
+        <p class="text-xl">Discover events near you and book a booth today.</p>
       </div>
-      <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
-        <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
-          <div class="flex flex-col">
-            <dt class="flex items-center gap-x-3 text-base leading-7 font-semibold text-gray-900">
-              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
-                <svg
-                  class="h-6 w-6 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M9 12h3.75M9 15h3.75M9 18h3.75m3-3h0 1.5M15 12h0 1.5m-6 3v2.25a2.25 2.25 0 002.25 2.25h13.5a2.25 2.25 0 002.25-2.25V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v13.5z"
-                  />
-                </svg>
-              </div>
-              Order Management
-            </dt>
-            <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600">
-              <p class="flex-auto">
-                Track and manage all your orders in one place. From order creation to fulfillment,
-                stay on top of your business operations.
-              </p>
-            </dd>
-          </div>
-          <div class="flex flex-col">
-            <dt class="flex items-center gap-x-3 text-base leading-7 font-semibold text-gray-900">
-              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
-                <svg
-                  class="h-6 w-6 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"
-                  />
-                </svg>
-              </div>
-              Inventory Control
-            </dt>
-            <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600">
-              <p class="flex-auto">
-                Keep track of your stock levels, manage product information, and receive alerts when
-                inventory runs low.
-              </p>
-            </dd>
-          </div>
-          <div class="flex flex-col">
-            <dt class="flex items-center gap-x-3 text-base leading-7 font-semibold text-gray-900">
-              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
-                <svg
-                  class="h-6 w-6 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"
-                  />
-                </svg>
-              </div>
-              Customer Management
-            </dt>
-            <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600">
-              <p class="flex-auto">
-                Build and maintain strong relationships with your customers through comprehensive
-                customer management tools.
-              </p>
-            </dd>
-          </div>
-        </dl>
+      <div class="grid grid-cols-3 gap-6">
+        <EventCard
+          v-for="x in 6"
+          :key="x"
+          class="cursor-pointer rounded-2xl border border-gray-200 bg-white p-5"
+          @click="openDetails = true"
+        />
       </div>
-    </div>
+    </AppSection>
+
+    <AppSection background="bg-white" class="py-20">
+      <div class="mb-12 flex flex-col text-center">
+        <h2 class="mb-2 text-4xl font-semibold">What Our Organizers and Vendors Say</h2>
+        <p class="text-xl">Real stories from successful events and happy merchants.</p>
+      </div>
+
+      <div class="flex gap-6">
+        <div class="bg-primary-600 flex w-80 flex-col rounded-2xl p-6 text-white">
+          <Icon name="quote-up" size="120" />
+          <h3 class="mt-3 mb-6 text-3xl font-semibold">
+            Trusted by Event <br />
+            Professionals
+          </h3>
+          <div class="mt-auto flex items-center justify-between gap-4">
+            <Icon name="arrow-left" size="20" />
+            <div class="h-1.5 w-full rounded-full bg-gray-200">
+              <div class="bg-primary-300 h-1.5 rounded-full" style="width: 45%"></div>
+            </div>
+            <Icon name="arrow-right" size="20" />
+          </div>
+        </div>
+
+        <div class="flex flex-1 flex-col rounded-2xl border border-gray-200 bg-white p-8">
+          <div class="inline-flex gap-2">
+            <Icon
+              v-for="v in 5"
+              :key="v"
+              size="24"
+              name="star-filled"
+              :class="v <= 4 ? 'text-primary-400' : 'text-gray-300'"
+            />
+          </div>
+          <p class="mt-4 mb-10 text-xl">
+            "Leyyow made organizing our pop-up event a breeze. The platform's intuitive interface
+            and seamless vendor management tools saved us countless hours. Our vendors were thrilled
+            with the exposure they received, and attendees loved the variety of offerings. Leyyow
+            truly connects organizers and merchants in a way that benefits everyone involved."
+          </p>
+          <Avatar
+            url="https://randomuser.me/api/portraits/women/2.jpg"
+            name="Tolu A."
+            size="lg"
+            extra-text="Marketing Lead at a Lagos Fintech Startup"
+            class="mt-auto"
+          />
+        </div>
+      </div>
+    </AppSection>
+
+    <AppSection background="bg-white" class="py-20 text-white">
+      <div
+        class="rounded-3xl bg-[linear-gradient(to_bottom_right,_#443685,_#670047,_#dd9790,_#ffb263)] px-14 py-16"
+      >
+        <h2 class="mb-4 text-5xl font-semibold">Ready to host or join an event?</h2>
+        <p class="text-2xl">Create your pop-up or book a booth in minutes.</p>
+        <div class="mt-8 flex justify-end gap-4">
+          <AppButton label="Create Event" size="lg" />
+          <AppButton label="Browse Events" color="alt" size="lg" />
+        </div>
+      </div>
+    </AppSection>
+
+    <!-- Event Details Drawer -->
+    <EventDetailsDrawer :open="openDetails" @close="openDetails = false" />
   </div>
 </template>
-
-<script setup lang="ts">
-// Home page content
-</script>

@@ -1,3 +1,10 @@
+<script setup lang="ts">
+import Icon from "@components/Icon.vue"
+import { useAuthStore } from "@modules/auth/store"
+
+// No script logic needed for this layout component
+</script>
+
 <template>
   <div class="flex h-screen">
     <!-- Left Side -->
@@ -17,6 +24,17 @@
         <div class="mb-10 flex items-center gap-2 md:mb-10">
           <h3 class="text-lg font-bold">Eventful by</h3>
           <img src="/images/logos/leyyow-logo-2.svg?url" alt="leyyow logo" class="h-8" />
+
+          <template v-if="!($route.path.includes('login') || $route.path.includes('signup'))">
+            <span class="flex-1" />
+            <button
+              type="button"
+              class="rounded-xl hover:bg-red-100"
+              @click="useAuthStore().logout()"
+            >
+              <Icon name="signout" size="20" class="text-core-600" />
+            </button>
+          </template>
         </div>
         <router-view />
       </div>

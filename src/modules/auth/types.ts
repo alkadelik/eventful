@@ -1,30 +1,29 @@
 export interface IUser {
-  id?: number
+  id: number
+  account_id: number
   avatar_url?: string | null
   first_name: string
   last_name: string
-  email?: string
+  email: string
   email_confirmed: boolean
   phone?: string | null
   company_name?: string | null
+  has_payment_account?: boolean
 }
 
 export interface IAuthTokens {
-  accessToken: string
-  refreshToken: string
+  access: string
+  refresh: string
 }
 
 export type TLoginPayload = { email: string; password: string }
 
 export interface ILoginResponse {
-  data: {
-    access: string
-    refresh: string
-    avatar_url?: string | null
-    first_name: string
-    last_name: string
-    email_confirmed: boolean
-  }
+  data: IUser & IAuthTokens
+}
+
+export interface ISignupResponse {
+  data: IUser & { token: IAuthTokens }
 }
 
 export type TSignupPayload = {

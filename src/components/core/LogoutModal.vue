@@ -27,12 +27,10 @@ import { useAuthStore } from "@modules/auth/store"
 
 defineProps({ open: Boolean })
 const emit = defineEmits(["close"])
-const store = useAuthStore()
+const { logout } = useAuthStore()
 
 const onLogout = () => {
-  console.log("Logging out...")
-  store.clearAuth()
-  window.location.href = "/login"
+  logout()
   emit("close")
 }
 </script>

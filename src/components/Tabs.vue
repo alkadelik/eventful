@@ -6,7 +6,7 @@
         v-for="tab in processedTabs"
         :key="tab.key"
         :class="[
-          'px-4 py-2 text-sm font-medium transition-all duration-200',
+          'px-4 py-2 text-sm font-medium capitalize transition-all duration-200',
           getTabClasses(tab),
           equal && 'flex-1',
         ]"

@@ -1,9 +1,8 @@
 <template>
   <aside
     :class="[
-      'fixed z-40 h-screen w-72 border-r border-gray-200 bg-white transition-all duration-200',
+      'fixed top-0 bottom-0 left-0 h-screen w-72 border-r border-gray-200 bg-white transition-all duration-200',
       'flex h-full flex-col divide-y divide-gray-200',
-      isMobile ? (mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full') : 'translate-x-0',
     ]"
   >
     <!-- Brand -->
@@ -42,14 +41,11 @@
 <script setup lang="ts">
 import { useAuthStore } from "@modules/auth/store"
 import { getFullName, TNameObj } from "@/utils/format-strings"
-import { useMediaQuery } from "@vueuse/core"
 import Avatar from "@components/Avatar.vue"
 import SidebarLink from "./SidebarLink.vue"
-
-defineProps<{ mobileSidebarOpen: boolean }>()
+import { computed } from "vue"
 
 defineEmits<{ logout: [value: boolean] }>()
 
-const { user } = useAuthStore()
-const isMobile = useMediaQuery("(max-width: 1024px)")
+const user = computed(() => useAuthStore().user)
 </script>

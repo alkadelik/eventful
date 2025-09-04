@@ -11,7 +11,7 @@ export function useCreateLocation() {
 
 /** Fetch all store locations */
 export function useGetLocations() {
-  return useApiQuery({ url: "/stores/locations/" })
+  return useApiQuery({ url: "/stores/locations/", key: "storeLocations" })
 }
 
 /** Delete a store location by ID */

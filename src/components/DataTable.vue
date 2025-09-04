@@ -1,67 +1,100 @@
 <template>
-  <div>
-    <!-- Table header and title -->
-    <div
-      v-if="$slots.title || props.title || $slots.action"
-      class="flex items-center justify-between px-3 py-4"
-    >
-      <div class="flex-1">
-        <slot name="title">
-          <h2 v-if="props.title" class="text-core-800 text-lg font-semibold">{{ props.title }}</h2>
-        </slot>
+  <!-- Empty table state -->
+
+  <div class="w-full overflow-hidden rounded-lg bg-white shadow-sm" :class="props.class">
+    <div v-if="!data.length" class="mx-auto flex w-full items-center justify-center px-4 py-16">
+      <div v-if="loading" class="flex items-center justify-center">
+        <Icon name="loader" size="80" class="text-primary-500 animate-spin" />
       </div>
-      <div v-if="$slots.action" class="flex items-center gap-2">
-        <slot name="action" />
-      </div>
+      <EmptyState
+        v-else
+        :icon="props.emptyState?.icon || 'box'"
+        :title="props.emptyState?.title || 'No Data Available'"
+        :description="props.emptyState?.description || 'There are currently no records to display.'"
+        :action-label="props.emptyState?.actionLabel"
+        :action-icon="props.emptyState?.actionIcon"
+        size="md"
+        @action="$emit('empty-action')"
+      />
     </div>
-    <!--  -->
-    <div class="w-full overflow-x-auto px-px">
-      <table class="min-w-full border-0" :class="props.layout">
-        <thead class="bg-gray-200">
-          <tr v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
-            <th v-for="header in headerGroup.headers" :key="header.id" :colSpan="header.colSpan">
-              <span
-                class="text-core-700 flex gap-1 px-4 py-3 text-left text-sm font-medium whitespace-nowrap capitalize"
-              >
-                <FlexRender
-                  v-if="!header.isPlaceholder"
-                  :render="header.column.columnDef.header"
-                  :props="header.getContext()"
-                />
-              </span>
-            </th>
-          </tr>
-        </thead>
-        <template v-if="loading && data.length">
-          <tr>
-            <td :colspan="columns.length" class="px-1 pt-2">
-              <div class="bg-primary-50 h-1.5 w-full overflow-hidden rounded-xl">
-                <div class="progress left-right bg-primary-500 h-full w-full rounded" />
-              </div>
-            </td>
-          </tr>
-        </template>
-        <tbody v-if="data.length" :class="{ 'opacity-50': loading }">
-          <tr
-            v-for="row in table.getRowModel().rows"
-            :key="row.id"
-            :class="[
-              'text-core-800 cursor-pointer border-b border-gray-200 bg-white hover:bg-gray-50',
-              { 'last:border-0': !showPagination },
-            ]"
-            @click="handleRowClick(row.original as T)"
-          >
-            <td
-              v-for="cell in row.getVisibleCells()"
-              :key="cell.id"
-              :class="['p-4 text-sm', (cell.column.columnDef.meta as { class?: string })?.class]"
+
+    <template v-else>
+      <!-- Table header and title -->
+      <div
+        v-if="$slots.title || props.title || $slots.action"
+        class="flex items-center justify-between px-3 py-4"
+      >
+        <div class="flex-1">
+          <slot name="title">
+            <div class="flex items-center gap-2">
+              <h2 v-if="props.title" class="text-core-800 text-lg font-semibold">
+                {{ props.title }}
+              </h2>
+              <Chip
+                v-if="
+                  !hideTotal &&
+                  ((serverPagination && totalItemsCount !== undefined) ||
+                    (!serverPagination && data.length))
+                "
+                size="sm"
+                :label="Number(serverPagination ? totalItemsCount : data.length).toLocaleString()"
+              />
+            </div>
+          </slot>
+        </div>
+        <div v-if="$slots.action" class="flex items-center gap-2">
+          <slot name="action" />
+        </div>
+      </div>
+      <!--  -->
+      <div class="w-full overflow-x-auto px-px">
+        <table class="min-w-full border-0" :class="props.layout">
+          <thead class="bg-gray-200">
+            <tr v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
+              <th v-for="header in headerGroup.headers" :key="header.id" :colSpan="header.colSpan">
+                <span
+                  class="text-core-700 flex gap-1 px-4 py-3 text-left text-sm font-medium whitespace-nowrap capitalize"
+                >
+                  <FlexRender
+                    v-if="!header.isPlaceholder"
+                    :render="header.column.columnDef.header"
+                    :props="header.getContext()"
+                  />
+                </span>
+              </th>
+            </tr>
+          </thead>
+          <template v-if="loading && data.length">
+            <tr>
+              <td :colspan="columns.length" class="px-1 pt-2">
+                <div class="bg-primary-50 h-1.5 w-full overflow-hidden rounded-xl">
+                  <div class="progress left-right bg-primary-500 h-full w-full rounded" />
+                </div>
+              </td>
+            </tr>
+          </template>
+          <tbody v-if="data.length" :class="{ 'opacity-50': loading }">
+            <tr
+              v-for="row in table.getRowModel().rows"
+              :key="row.id"
+              :class="[
+                'text-core-800 cursor-pointer border-b border-gray-200 bg-white hover:bg-gray-50',
+                { 'last:border-0': !showPagination },
+              ]"
+              @click="handleRowClick(row.original as T)"
             >
-              <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+              <td
+                v-for="cell in row.getVisibleCells()"
+                :key="cell.id"
+                :class="['p-4 text-sm', (cell.column.columnDef.meta as { class?: string })?.class]"
+              >
+                <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </template>
     <!--  -->
     <!-- MOBILE TABLE -->
     <!--  -->
@@ -102,23 +135,6 @@
           </span>
         </div>
       </div>
-    </div>
-
-    <!-- Empty table state -->
-    <div v-if="!data.length" class="mx-auto flex w-full items-center justify-center px-4 py-16">
-      <div v-if="loading" class="flex items-center justify-center">
-        <Icon name="loader" size="80" class="text-primary-500 animate-spin" />
-      </div>
-      <EmptyState
-        v-else
-        :icon="props.emptyState?.icon || 'box'"
-        :title="props.emptyState?.title || 'No Data Available'"
-        :description="props.emptyState?.description || 'There are currently no records to display.'"
-        :action-label="props.emptyState?.actionLabel"
-        :action-icon="props.emptyState?.actionIcon"
-        size="md"
-        @action="$emit('empty-action')"
-      />
     </div>
 
     <!--  -->
@@ -236,6 +252,7 @@ import { computed, h, onMounted, ref, useSlots, watch, type VNode } from "vue"
 import Icon from "./Icon.vue"
 import AppButton from "./AppButton.vue"
 import EmptyState from "./EmptyState.vue"
+import Chip from "./Chip.vue"
 
 // Type definitions
 export interface TableColumn<T = Record<string, unknown>> {
@@ -294,6 +311,11 @@ interface Props {
     actionLabel?: string
     actionIcon?: string
   }
+  /** Additional CSS classes for the table container */
+  class?: string
+
+  /** Hide total items count in title */
+  hideTotal?: boolean
 }
 
 // Define emits
