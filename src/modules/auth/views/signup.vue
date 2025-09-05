@@ -1,7 +1,7 @@
 <template>
   <div class="text-core-800">
     <SectionHeader
-      title="Create Your Organizer Account"
+      title="Create Your Organiser Account"
       subtitle="Quickly get started to create and manage your events."
       class="mb-6 md:mb-10"
     />

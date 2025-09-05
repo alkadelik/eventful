@@ -9,8 +9,8 @@
     </Chip>
 
     <SectionHeader
-      title="Organizer Log In"
-      subtitle="Good to see you again—pick up right where you left off"
+      title="Organiser Log In"
+      subtitle="Good to see you again - pick up right where you left off"
       class="my-6 md:my-10"
     />
 
