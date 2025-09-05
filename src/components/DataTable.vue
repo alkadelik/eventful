@@ -1,7 +1,5 @@
 <template>
-  <!-- Empty table state -->
-
-  <div class="w-full overflow-hidden rounded-lg bg-white shadow-sm" :class="props.class">
+  <div class="w-full overflow-hidden rounded-lg md:bg-white md:shadow-sm" :class="props.class">
     <div v-if="!data.length" class="mx-auto flex w-full items-center justify-center px-4 py-16">
       <div v-if="loading" class="flex items-center justify-center">
         <Icon name="loader" size="80" class="text-primary-500 animate-spin" />
@@ -47,7 +45,7 @@
         </div>
       </div>
       <!--  -->
-      <div class="w-full overflow-x-auto px-px">
+      <div class="hidden w-full overflow-x-auto px-px md:block">
         <table class="min-w-full border-0" :class="props.layout">
           <thead class="bg-gray-200">
             <tr v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
@@ -98,7 +96,7 @@
     <!--  -->
     <!-- MOBILE TABLE -->
     <!--  -->
-    <div className="px-1 space-y-6 md:hidden">
+    <div class="space-y-4 p-4 md:hidden">
       <!-- <label
         for="select-all"
         class="inline-flex items-center gap-1 rounded border border-gray4 py-1 px-3 text-sm"
@@ -116,24 +114,25 @@
       <div
         v-for="row in table.getRowModel().rows"
         :key="row.id"
-        :class="[
-          'rounded-lg border border-gray-200 bg-white',
-          { 'cursor-pointer hover:bg-gray-50': true },
-        ]"
+        :class="['rounded-lg border border-gray-200', { 'cursor-pointer hover:bg-gray-50': true }]"
         @click="handleRowClick(row.original as T)"
       >
-        <div
-          v-for="cell in row.getVisibleCells()"
-          :key="cell.id"
-          class="flex justify-between gap-4 border-b border-gray-200 px-4 py-3 text-sm last:border-0"
-        >
-          <span className="font-medium text-core-600">
-            <FlexRender :render="cell.column.columnDef.header" :props="cell.getContext()" />
-          </span>
-          <span className="text-right text-core-800">
-            <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
-          </span>
-        </div>
+        <!-- Custom mobile card slot -->
+        <slot name="mobile-card" :item="row.original as T">
+          <!-- Default mobile card layout -->
+          <div
+            v-for="cell in row.getVisibleCells()"
+            :key="cell.id"
+            class="flex justify-between gap-4 border-b border-gray-200 px-4 py-3 text-sm last:border-0"
+          >
+            <span class="text-core-600 font-medium">
+              <FlexRender :render="cell.column.columnDef.header" :props="cell.getContext()" />
+            </span>
+            <span class="text-core-800 text-right">
+              <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
+            </span>
+          </div>
+        </slot>
       </div>
     </div>
 
@@ -197,7 +196,7 @@
           @click="table.previousPage()"
           :disabled="!table.getCanPreviousPage()"
         />
-        <div className="text-sm" v-if="!serverPagination || (serverPagination && totalItemsCount)">
+        <div class="text-sm" v-if="!serverPagination || (serverPagination && totalItemsCount)">
           <b>
             {{
               table.getState().pagination.pageIndex > 0
@@ -335,6 +334,8 @@ interface DataTableSlots<T> {
   title?: () => VNode[]
   /** Action buttons or controls for the table header */
   action?: () => VNode[]
+  /** Custom mobile card rendering */
+  "mobile-card"?: (props: { item: T }) => VNode[]
   /** Dynamic cell slots for custom cell rendering */
   [name: `cell:${string}`]: (props: {
     value: string | number | boolean | null | undefined | Record<string, unknown>

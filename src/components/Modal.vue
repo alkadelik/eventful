@@ -51,7 +51,7 @@ import Icon from "./Icon.vue"
 /**
  * Modal variant types
  */
-type ModalVariant = "centered" | "fullscreen" | "bottom-nav"
+type ModalVariant = "centered" | "fullscreen" | "bottom-sheet"
 
 /**
  * Props interface for the Modal component
@@ -98,11 +98,11 @@ const overlayClasses = computed(() => {
   switch (props.variant) {
     case "fullscreen":
       return ""
-    case "bottom-nav":
+    case "bottom-sheet":
       return "flex items-end justify-center md:items-center"
     case "centered":
     default:
-      return "flex items-center justify-center"
+      return "flex items-end justify-center md:items-center"
   }
 })
 
@@ -141,12 +141,12 @@ const modalClasses = computed(() => {
     case "fullscreen":
       baseClasses.push("")
       break
-    case "bottom-nav":
+    case "bottom-sheet":
       baseClasses.push("rounded-t-2xl md:rounded-2xl mb-0 md:mb-auto")
       break
     case "centered":
     default:
-      baseClasses.push("rounded-2xl")
+      baseClasses.push("rounded-t-2xl md:rounded-2xl mb-0 md:mb-auto")
       break
   }
 

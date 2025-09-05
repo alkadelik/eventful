@@ -9,7 +9,7 @@
         :class="[
           'flex min-h-screen flex-1 flex-col overflow-x-hidden transition-all duration-200',
           'pt-16 pb-16 lg:pb-0', // height of header
-          'pl-72',
+          'lg:pl-72',
         ]"
       >
         <!-- Topbar -->
@@ -18,13 +18,12 @@
         <!-- Content -->
         <main>
           <router-view />
-          <div class="h-screen" />
         </main>
 
         <!-- Bottom navigation for mobile -->
         <nav
           v-if="isMobile"
-          class="fixed right-0 bottom-0 left-0 z-30 border-t border-gray-200 bg-white"
+          class="fixed right-0 bottom-0 left-0 z-10 border-t border-gray-200 bg-white"
         >
           <div class="flex items-center justify-around px-2 py-2">
             <SidebarLink label="Dashboard" icon="box" to="/dashboard" />

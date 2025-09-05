@@ -1,5 +1,5 @@
 <template>
-  <header class="fixed top-0 right-0 left-72 z-5 border-b border-gray-200 bg-white">
+  <header class="fixed top-0 right-0 left-0 z-5 border-b border-gray-200 bg-white lg:left-72">
     <AppSection class="flex h-16 items-center gap-1.5 px-4">
       <img
         v-if="showLogo"

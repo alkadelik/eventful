@@ -164,9 +164,7 @@ const subtitleClasses = computed(() => {
  */
 const iconContainerClasses = computed(() => {
   const baseClasses = [
-    "flex",
-    "items-center",
-    "justify-center",
+    "flex items-center justify-center flex-shrink-0",
     "rounded-xl",
     "transition-colors",
     "duration-200",
