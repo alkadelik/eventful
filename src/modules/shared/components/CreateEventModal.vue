@@ -4,20 +4,31 @@ import FormField from "@components/form/FormField.vue"
 import Icon from "@components/Icon.vue"
 import Modal from "@components/Modal.vue"
 import StepperWizard from "@components/StepperWizard.vue"
-import { ref } from "vue"
+import { ref, computed, watch } from "vue"
 import { useForm } from "vee-validate"
 import { createEventSchema } from "@/utils/validationSchemas"
-import { useCreateEvent } from "../api"
-import type { EventPayload } from "../types"
+import { useCreateEvent, useUpdateEvent } from "../api"
+import type { EventPayload, TEvent } from "../types"
 import { useAuthStore } from "@modules/auth/store"
 import { toast } from "@/composables/useToast"
 import { displayError } from "@/utils/error-handler"
+import { useQueryClient } from "@tanstack/vue-query"
 
-defineProps<{ open: boolean }>()
 const emit = defineEmits<{ (e: "close"): void; (e: "refresh"): void }>()
+const props = defineProps<{ open: boolean; event?: TEvent; isEditMode?: boolean }>()
 const activeStep = ref(0)
 
-const { mutate: createEvent, isPending } = useCreateEvent()
+const { mutate: createEvent, isPending: isCreating } = useCreateEvent()
+const { mutate: updateEvent, isPending: isUpdating } = useUpdateEvent()
+
+// Computed to get the current loading state
+const isLoading = computed(() => isCreating.value || isUpdating.value)
+
+// Computed to get the modal title
+const modalTitle = computed(() => (props.isEditMode ? "Edit Event" : "Create Event"))
+
+// Computed to get the button label
+const buttonLabel = computed(() => (props.isEditMode ? "Update Event" : "Create Event"))
 
 // const INIT_VAL = {
 //   event_name: "Something Awesome",
@@ -32,62 +43,183 @@ const { mutate: createEvent, isPending } = useCreateEvent()
 //   externalLink: "",
 // }
 
+// Define form data interface
+interface FormData {
+  event_name: string
+  startDate: string
+  endDate: string
+  venueAddress: string
+  registrationCost: number
+  capacity: number
+  description: string
+  eventInstructions: string
+  terms: File | null
+  externalLink: string
+}
+
+// Store initial values for comparison
+const initialValues = ref<Partial<FormData>>({})
+
+// Get initial values for the form
+const getInitialValues = (): Partial<FormData> => {
+  if (props.isEditMode && props.event) {
+    const values: FormData = {
+      event_name: props.event.event_name,
+      startDate: props.event.start_date,
+      endDate: props.event.end_date,
+      venueAddress: props.event.location,
+      registrationCost: props.event.participant_fee,
+      capacity: parseInt(props.event.capacity),
+      description: props.event.description,
+      eventInstructions: props.event.eventInstructions || "",
+      terms: null,
+      externalLink: "",
+    }
+    initialValues.value = { ...values }
+    return values
+  }
+  initialValues.value = {}
+  return {}
+}
+
+// Helper function to get only changed values
+const getChangedValues = (currentData: Partial<FormData>): EventPayload | Partial<EventPayload> => {
+  if (!props.isEditMode || !props.event) {
+    // For create mode, return all values
+    return {
+      organizer: user?.account_id ?? user?.id ?? 0,
+      event_name: currentData.event_name!,
+      location: currentData.venueAddress!,
+      description: currentData.description || "",
+      capacity: currentData.capacity!.toString(),
+      start_date: currentData.startDate!,
+      end_date: currentData.endDate!,
+      participant_fee: currentData.registrationCost!,
+    }
+  }
+
+  // For edit mode, only include changed fields
+  const changes: Partial<EventPayload> = {}
+
+  if (currentData.event_name !== initialValues.value.event_name) {
+    changes.event_name = currentData.event_name
+  }
+
+  if (currentData.venueAddress !== initialValues.value.venueAddress) {
+    changes.location = currentData.venueAddress
+  }
+
+  if (currentData.description !== initialValues.value.description) {
+    changes.description = currentData.description || ""
+  }
+
+  if (currentData.capacity !== initialValues.value.capacity) {
+    changes.capacity = currentData.capacity?.toString()
+  }
+
+  if (currentData.startDate !== initialValues.value.startDate) {
+    changes.start_date = currentData.startDate
+  }
+
+  if (currentData.endDate !== initialValues.value.endDate) {
+    changes.end_date = currentData.endDate
+  }
+
+  if (currentData.registrationCost !== initialValues.value.registrationCost) {
+    changes.participant_fee = currentData.registrationCost
+  }
+
+  return changes
+}
+
 // Initialize VeeValidate form
-const { handleSubmit, meta, values, errors } = useForm({
+const { handleSubmit, values, errors, resetForm } = useForm({
   validationSchema: createEventSchema,
-  //   initialValues: INIT_VAL,
+  initialValues: getInitialValues(),
 })
 
 const { user } = useAuthStore()
+const queryClient = useQueryClient()
 
 const onSubmit = handleSubmit((data) => {
-  const payload: EventPayload = {
-    organizer: user?.account_id ?? user?.id ?? 0,
-    event_name: data.event_name,
-    location: data.venueAddress,
-    description: data.description || "",
-    capacity: data.capacity.toString(),
-    start_date: data.startDate,
-    end_date: data.endDate,
-    participant_fee: data.registrationCost,
-  }
+  const payload = getChangedValues(data)
 
-  createEvent(payload, {
-    onSuccess: () => {
-      toast.success("Event created successfully")
-      emit("refresh")
+  if (props.isEditMode && props.event) {
+    // Only send update if there are actual changes
+    if (Object.keys(payload).length === 0) {
+      toast.success("No changes to update")
       emit("close")
-    },
-    onError: displayError,
-  })
+      return
+    }
+
+    // Update existing event with only changed fields
+    updateEvent(
+      { id: props.event.id, body: payload as Partial<EventPayload> },
+      {
+        onSuccess: () => {
+          toast.success("Event updated successfully")
+          emit("refresh")
+          queryClient.invalidateQueries({ queryKey: ["organizerEvents", "eventStats"] })
+          emit("close")
+        },
+        onError: displayError,
+      },
+    )
+  } else {
+    // Create new event with all required fields
+    createEvent(payload as EventPayload, {
+      onSuccess: () => {
+        toast.success("Event created successfully")
+        emit("refresh")
+        queryClient.invalidateQueries({ queryKey: ["organizerEvents", "eventStats"] })
+        emit("close")
+      },
+      onError: displayError,
+    })
+  }
 })
 
 // Check if we can proceed to next step (validate required fields for current step)
 const canProceedToNextStep = () => {
-  const step0RequiredFields = [
-    "event_name",
-    "startDate",
-    "endDate",
-    "venueAddress",
-    "registrationCost",
-    "capacity",
-  ]
-  return step0RequiredFields.every(
-    (field) => values[field] && values[field] !== "" && values[field] !== 0,
-  )
+  if (!values.event_name || values.event_name === "") return false
+  if (!values.startDate || values.startDate === "") return false
+  if (!values.endDate || values.endDate === "") return false
+  if (!values.venueAddress || values.venueAddress === "") return false
+  if (!values.registrationCost || values.registrationCost === 0) return false
+  if (!values.capacity || values.capacity === 0) return false
+
+  return true
 }
+
+// Watch for prop changes to reset form when switching between create/edit
+watch(
+  () => [props.open, props.isEditMode, props.event],
+  ([open]) => {
+    if (open) {
+      // Reset step when modal opens
+      activeStep.value = 0
+
+      // Reset form with new initial values
+      const newInitialValues = getInitialValues()
+      resetForm({ values: newInitialValues })
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
-  <Modal :open="open" @close="emit('close')" title="Create Event" max-width="2xl">
+  <Modal :open="open" @close="emit('close')" :title="modalTitle" max-width="2xl">
     <form @submit.prevent="onSubmit">
       <StepperWizard
         v-model="activeStep"
-        :steps="['Event Details', 'Event Instructions']"
+        :steps="[
+          'Event Details',
+          // 'Event Instructions'
+        ]"
         :show-indicators="false"
         v-slot="{ step }"
       >
-        {{ errors }} - {{ meta.valid }}
         <div v-show="step === 0" class="space-y-6">
           <div>
             <span class="bg-core-200 flex size-10 items-center justify-center rounded-lg p-2">
@@ -104,7 +236,7 @@ const canProceedToNextStep = () => {
 
           <FormField name="venueAddress" required />
 
-          <div class="grid grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <FormField name="registrationCost" type="number" required />
             <FormField name="capacity" label="Maximum No. of Registrants" type="number" required />
           </div>
@@ -157,19 +289,22 @@ const canProceedToNextStep = () => {
           label="Create Event"
           type="button"
           :disabled="Object.keys(errors).length > 0"
-          :loading="isPending"
+          :loading="isLoading"
           @click="onSubmit"
         />
       </div>
       <AppButton
         v-else
-        label="Next"
         class="w-full"
+        :label="buttonLabel"
         size="lg"
-        @click="activeStep++"
         type="button"
         :disabled="!canProceedToNextStep()"
+        :loading="isLoading"
+        @click="onSubmit"
       />
+      <!-- label="Next" -->
+      <!-- @click="activeStep++" -->
     </template>
   </Modal>
 </template>

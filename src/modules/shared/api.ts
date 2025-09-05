@@ -38,8 +38,8 @@ export function useCreateEvent() {
 /** edit an event */
 export function useUpdateEvent() {
   return useMutation({
-    mutationFn: ({ id, body }: { id: number; body: EventPayload }) =>
-      baseApi.put(`/inventory/organizer/events/${id}/`, body),
+    mutationFn: ({ id, body }: { id: number; body: Partial<EventPayload> }) =>
+      baseApi.patch(`/inventory/organizer/events/${id}/`, body),
   })
 }
 
