@@ -20,7 +20,7 @@ const openCreate = ref(false)
 
 const STATS = computed(() => {
   const { events, revenue, registrations } = evtStats?.value || {}
-  const totalRevenue = Number(revenue?.total?.slice(1).replace(",", "")) || 0
+  const totalRevenue = Number(revenue?.total) || 0
   return [
     {
       title: "Total Events",
@@ -52,7 +52,7 @@ const STATS = computed(() => {
 
 <template>
   <div
-    v-if="!recentEvents?.results?.length"
+    v-if="!recentEvents?.results?.length && !isPending"
     class="bg-primary-50 text-primary-600 flex items-center gap-3 px-4 py-3"
   >
     <span
@@ -74,13 +74,13 @@ const STATS = computed(() => {
     />
   </div>
 
-  <section class="space-y-8 p-8">
+  <section class="space-y-8 p-4 md:p-8">
     <SectionHeader
       :title="`Good Afternoon, ${getFullName(user as TNameObj)} 👋`"
       subtitle="Here's what's happening in your events this week:"
     />
 
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-4">
+    <div class="grid grid-cols-2 gap-2 md:gap-6 lg:grid-cols-4">
       <SummaryCard
         v-for="stat in STATS"
         :key="stat.title"

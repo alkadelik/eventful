@@ -1,5 +1,38 @@
+<script setup lang="ts">
+import DataTable from "@components/DataTable.vue"
+import SectionHeader from "@components/SectionHeader.vue"
+import AppButton from "@components/AppButton.vue"
+import { EVENT_COLUMN } from "../../constants"
+import Tabs from "@components/Tabs.vue"
+import { computed, onMounted, ref } from "vue"
+import Icon from "@components/Icon.vue"
+import CreateEventModal from "@modules/shared/components/CreateEventModal.vue"
+import { useGetOrganizerEvents } from "@modules/shared/api"
+import { useRoute } from "vue-router"
+
+const openCreate = ref(false)
+const status = ref("all")
+
+const route = useRoute()
+
+const limit = ref(10)
+const page = ref(1)
+const pagination = computed(() => ({
+  limit: limit.value,
+  offset: page.value * limit.value - limit.value,
+  ...(status.value !== "all" ? { status: status.value } : {}),
+}))
+const { data: myEvents, isPending } = useGetOrganizerEvents(pagination)
+
+onMounted(() => {
+  if (route.query.open === "create") {
+    openCreate.value = true
+  }
+})
+</script>
+
 <template>
-  <section class="px-8 py-6">
+  <section class="p-4 md:px-8 md:py-6">
     <SectionHeader
       :title="`My Events`"
       subtitle="Stay updated with the latest happenings in your events."
@@ -53,27 +86,3 @@
     <CreateEventModal v-model:open="openCreate" @close="openCreate = false" />
   </section>
 </template>
-
-<script setup lang="ts">
-import DataTable from "@components/DataTable.vue"
-import SectionHeader from "@components/SectionHeader.vue"
-import AppButton from "@components/AppButton.vue"
-import { EVENT_COLUMN } from "../../constants"
-import Tabs from "@components/Tabs.vue"
-import { computed, ref } from "vue"
-import Icon from "@components/Icon.vue"
-import CreateEventModal from "@modules/shared/components/CreateEventModal.vue"
-import { useGetOrganizerEvents } from "@modules/shared/api"
-
-const openCreate = ref(false)
-const status = ref("all")
-
-const limit = ref(10)
-const page = ref(1)
-const pagination = computed(() => ({
-  limit: limit.value,
-  offset: page.value * limit.value - limit.value,
-  ...(status.value !== "all" ? { status: status.value } : {}),
-}))
-const { data: myEvents, isPending } = useGetOrganizerEvents(pagination)
-</script>

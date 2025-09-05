@@ -6,39 +6,68 @@ import Icon from "@components/Icon.vue"
 import EventCard from "../components/EventCard.vue"
 import EventDetailsDrawer from "../components/EventDetailsDrawer.vue"
 import { ref } from "vue"
+import { useRouter } from "vue-router"
 
 const openDetails = ref(false)
+const router = useRouter()
+
+const openBrowseEvents = (id?: string | number) => {
+  // https://suite-staging-branch.vercel.app
+  window.open(
+    `https://suite-staging-branch.vercel.app/dashboard/sales/upcoming-events${id ? `/${id}` : ""}`,
+    "_blank",
+  )
+}
+
+const openCreateEvent = () => {
+  router.push("/events?open=create")
+}
 </script>
 
 <template>
   <div>
-    <AppSection class="py-20">
-      <div class="flex items-center gap-8">
-        <div class="w-1/2">
-          <h2 class="text-5xl font-semibold">
+    <AppSection class="py-12 md:py-20">
+      <div class="flex flex-col items-center gap-8 md:flex-row">
+        <div class="w-full md:w-1/2">
+          <h2 class="text-3xl font-semibold md:text-5xl">
             Plan Everything <br />About Your Next <br />
             Pop-up
           </h2>
-          <p class="mt-6 text-lg">Quickly get started to create and manage your events.</p>
-          <div class="mt-6 flex gap-4">
-            <AppButton label="Create Event" size="lg" />
-            <AppButton label="Browse Events" variant="outlined" size="lg" />
+          <p class="mt-4 text-base md:mt-6 md:text-lg">
+            Quickly get started to create and manage your events.
+          </p>
+          <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:gap-4 md:mt-6">
+            <AppButton
+              label="Create Event"
+              size="lg"
+              class="w-full sm:w-auto"
+              @click="openCreateEvent"
+            />
+            <AppButton
+              label="Browse Events"
+              variant="outlined"
+              size="lg"
+              class="w-full sm:w-auto"
+              @click="openBrowseEvents()"
+            />
           </div>
         </div>
 
-        <div class="w-1/2">
+        <div class="w-full md:w-1/2">
           <img src="https://placehold.co/500x500" alt="Event" class="rounded-xl" />
         </div>
       </div>
     </AppSection>
 
-    <AppSection background="bg-white" class="py-20">
-      <div class="mb-12 flex flex-col text-center">
-        <h2 class="mb-2 text-4xl font-semibold">Your Journey Starts Here 🚀</h2>
-        <p class="text-xl">Are you here to sell or to host? Let's get you set up in seconds.</p>
+    <AppSection background="bg-white" class="py-12 md:py-20">
+      <div class="mb-8 flex flex-col text-center md:mb-12">
+        <h2 class="mb-2 text-2xl font-semibold md:text-4xl">Your Journey Starts Here 🚀</h2>
+        <p class="text-lg md:text-xl">
+          Are you here to sell or to host? Let's get you set up in seconds.
+        </p>
       </div>
 
-      <div class="grid grid-cols-2 gap-12">
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:gap-12">
         <div
           v-for="v in ['organizers', 'vendors']"
           :key="v"
@@ -48,23 +77,25 @@ const openDetails = ref(false)
             { 'divide-gray-200 border-gray-200 bg-white': v === 'vendors' },
           ]"
         >
-          <div class="px-10 py-6">
-            <span class="text-xl font-semibold capitalize">For {{ v }}</span>
+          <div class="px-6 py-4 md:px-10 md:py-6">
+            <span class="text-lg font-semibold capitalize md:text-xl">For {{ v }}</span>
           </div>
-          <div class="px-10 py-6">
-            <h3 class="text-3xl font-semibold">
+          <div class="px-6 py-4 md:px-10 md:py-6">
+            <h3 class="text-xl font-semibold md:text-3xl">
               {{
                 v === "organizers"
                   ? "Plan, organize and track payments in your next event"
                   : "Discover and register for upcoming events."
               }}
             </h3>
-            <p class="mt-2 text-base">Quickly get started to create and manage your events.</p>
-            <img src="" :alt="v" class="mt-6 h-60 w-full rounded-lg bg-gray-100" />
+            <p class="mt-2 text-sm md:text-base">
+              Quickly get started to create and manage your events.
+            </p>
+            <img src="" :alt="v" class="mt-4 h-40 w-full rounded-lg bg-gray-100 md:mt-6 md:h-60" />
           </div>
-          <div class="px-10 py-6">
+          <div class="px-6 py-4 md:px-10 md:py-6">
             <div class="mb-4 flex justify-between">
-              <p class="text-xl font-semibold">
+              <p class="text-lg font-semibold md:text-xl">
                 {{ v === "organizers" ? "From Other Organizers" : "Ongoing Events" }}
               </p>
               <span class="flex gap-2">
@@ -82,8 +113,8 @@ const openDetails = ref(false)
             </div>
             <EventCard :class="v === 'vendors' ? '!bg-gray-50' : ''" @click="openDetails = true" />
           </div>
-          <div class="px-10 py-6">
-            <p class="mb-3 text-xl font-semibold">Get The Best of Leyyow Events</p>
+          <div class="px-6 py-4 md:px-10 md:py-6">
+            <p class="mb-3 text-lg font-semibold md:text-xl">Get The Best of Leyyow Events</p>
             <div class="space-y-1.5">
               <p
                 v-for="x in [
@@ -99,43 +130,44 @@ const openDetails = ref(false)
               </p>
             </div>
           </div>
-          <div class="px-10 py-6">
+          <div class="px-6 py-4 md:px-10 md:py-6">
             <AppButton
               :label="v === 'organizers' ? 'Create Event' : 'Browse Events'"
               size="lg"
               :variant="v === 'organizers' ? 'filled' : 'outlined'"
               class="w-full"
+              @click="v === 'organizers' ? openCreateEvent() : openBrowseEvents()"
             />
           </div>
         </div>
       </div>
     </AppSection>
 
-    <AppSection class="py-20">
-      <div class="mb-12 flex flex-col">
-        <h2 class="mb-2 text-4xl font-semibold">Upcoming Pop-Up Events</h2>
-        <p class="text-xl">Discover events near you and book a booth today.</p>
+    <AppSection class="py-12 md:py-20">
+      <div class="mb-8 flex flex-col md:mb-12">
+        <h2 class="mb-2 text-2xl font-semibold md:text-4xl">Upcoming Pop-Up Events</h2>
+        <p class="text-lg md:text-xl">Discover events near you and book a booth today.</p>
       </div>
-      <div class="grid grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
         <EventCard
           v-for="x in 6"
           :key="x"
-          class="cursor-pointer rounded-2xl border border-gray-200 bg-white p-5"
+          class="cursor-pointer rounded-2xl border border-gray-200 bg-white p-4 md:p-5"
           @click="openDetails = true"
         />
       </div>
     </AppSection>
 
-    <AppSection background="bg-white" class="py-20">
-      <div class="mb-12 flex flex-col text-center">
-        <h2 class="mb-2 text-4xl font-semibold">What Our Organizers and Vendors Say</h2>
-        <p class="text-xl">Real stories from successful events and happy merchants.</p>
+    <AppSection background="bg-white" class="py-12 md:py-20">
+      <div class="mb-8 flex flex-col text-center md:mb-12">
+        <h2 class="mb-2 text-2xl font-semibold md:text-4xl">What Our Organizers and Vendors Say</h2>
+        <p class="text-lg md:text-xl">Real stories from successful events and happy merchants.</p>
       </div>
 
-      <div class="flex gap-6">
-        <div class="bg-primary-600 flex w-80 flex-col rounded-2xl p-6 text-white">
-          <Icon name="quote-up" size="120" />
-          <h3 class="mt-3 mb-6 text-3xl font-semibold">
+      <div class="flex flex-col gap-6 lg:flex-row">
+        <div class="bg-primary-600 flex w-full flex-col rounded-2xl p-6 text-white lg:w-80">
+          <Icon name="quote-up" class="!size-16 md:!size-[120px]" />
+          <h3 class="mt-3 mb-6 text-xl font-semibold md:text-3xl">
             Trusted by Event <br />
             Professionals
           </h3>
@@ -148,17 +180,17 @@ const openDetails = ref(false)
           </div>
         </div>
 
-        <div class="flex flex-1 flex-col rounded-2xl border border-gray-200 bg-white p-8">
+        <div class="flex flex-1 flex-col rounded-2xl border border-gray-200 bg-white p-6 md:p-8">
           <div class="inline-flex gap-2">
             <Icon
               v-for="v in 5"
               :key="v"
-              size="24"
+              size="20"
               name="star-filled"
-              :class="v <= 4 ? 'text-primary-400' : 'text-gray-300'"
+              :class="[v <= 4 ? 'text-primary-400' : 'text-gray-300', 'md:size-6']"
             />
           </div>
-          <p class="mt-4 mb-10 text-xl">
+          <p class="mt-4 mb-6 text-base md:mb-10 md:text-xl">
             "Leyyow made organizing our pop-up event a breeze. The platform's intuitive interface
             and seamless vendor management tools saved us countless hours. Our vendors were thrilled
             with the exposure they received, and attendees loved the variety of offerings. Leyyow
@@ -175,15 +207,26 @@ const openDetails = ref(false)
       </div>
     </AppSection>
 
-    <AppSection background="bg-white" class="py-20 text-white">
+    <AppSection background="bg-white" class="py-12 text-white md:py-20">
       <div
-        class="rounded-3xl bg-[linear-gradient(to_bottom_right,_#443685,_#670047,_#dd9790,_#ffb263)] px-14 py-16"
+        class="rounded-3xl bg-[linear-gradient(to_bottom_right,_#443685,_#670047,_#dd9790,_#ffb263)] px-8 py-12 md:px-14 md:py-16"
       >
-        <h2 class="mb-4 text-5xl font-semibold">Ready to host or join an event?</h2>
-        <p class="text-2xl">Create your pop-up or book a booth in minutes.</p>
-        <div class="mt-8 flex justify-end gap-4">
-          <AppButton label="Create Event" size="lg" />
-          <AppButton label="Browse Events" color="alt" size="lg" />
+        <h2 class="mb-4 text-3xl font-semibold md:text-5xl">Ready to host or join an event?</h2>
+        <p class="text-lg md:text-2xl">Create your pop-up or book a booth in minutes.</p>
+        <div class="mt-6 flex flex-col justify-end gap-3 sm:flex-row sm:gap-4 md:mt-8">
+          <AppButton
+            label="Create Event"
+            size="lg"
+            class="w-full sm:w-auto"
+            @click="openCreateEvent"
+          />
+          <AppButton
+            label="Browse Events"
+            color="alt"
+            size="lg"
+            class="w-full sm:w-auto"
+            @click="openBrowseEvents()"
+          />
         </div>
       </div>
     </AppSection>
