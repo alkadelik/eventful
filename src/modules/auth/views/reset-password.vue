@@ -4,7 +4,7 @@
 
     <StepperWizard
       v-model="activeStep"
-      :steps="[1, 2]"
+      :steps="['1', '2']"
       :show-indicators="false"
       v-slot="{ onNext, step }"
     >
