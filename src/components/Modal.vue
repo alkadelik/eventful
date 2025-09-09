@@ -5,7 +5,7 @@
       v-if="open"
       class="fixed inset-0 z-[1200] bg-black/40"
       :class="overlayClasses"
-      @click="close"
+      @click="emit('close')"
     >
       <!-- Modal Card -->
       <Transition name="modal-content">
@@ -18,7 +18,7 @@
               </h2>
               <button
                 type="button"
-                @click="close"
+                @click="emit('close')"
                 class="text-core-800 hover:text-core-600 transition-colors"
               >
                 <Icon name="close-circle" size="20" />
@@ -28,7 +28,7 @@
 
           <!-- Body -->
           <div
-            class="bg-core-25 px-6 py-4"
+            class="bg-base-background px-6 py-4"
             :class="[bodyClasses, props.bodyClass, { 'rounded-b-2xl': !$slots.footer }]"
           >
             <slot />
@@ -51,7 +51,7 @@ import Icon from "./Icon.vue"
 /**
  * Modal variant types
  */
-type ModalVariant = "centered" | "fullscreen" | "bottom-sheet"
+type ModalVariant = "centered" | "fullscreen" | "bottom"
 
 /**
  * Props interface for the Modal component
@@ -61,7 +61,12 @@ interface Props {
   open: boolean
   /** Optional title for the modal header */
   title?: string
-  /** Modal variant - determines positioning and size behavior */
+  /** Modal variant - determines positioning and size behavior
+   * - 'centered' - Centered modal with max width
+   * - 'fullscreen' - Fullscreen modal
+   * - 'bottom' - Bottom navigation style modal (full width on mobile, centered on desktop)
+   * @default "bottom"
+   */
   variant?: ModalVariant
   /** Custom max width for the modal (e.g., 'sm', 'md', 'lg', 'xl', '2xl', '500px') */
   maxWidth?: string
@@ -69,27 +74,14 @@ interface Props {
   bodyClass?: string
 }
 
-/**
- * Events emitted by the Modal component
- */
-interface Emits {
-  /** Emitted when the modal should be closed */
-  (e: "close"): void
-}
-
 // Define props with defaults
 const props = withDefaults(defineProps<Props>(), {
-  variant: "centered",
+  variant: "bottom",
   maxWidth: "lg",
 })
 
 // Define emits
-const emit = defineEmits<Emits>()
-
-/**
- * Close the modal
- */
-const close = () => emit("close")
+const emit = defineEmits(["close"])
 
 /**
  * Computed classes for the overlay
@@ -98,11 +90,11 @@ const overlayClasses = computed(() => {
   switch (props.variant) {
     case "fullscreen":
       return ""
-    case "bottom-sheet":
-      return "flex items-end justify-center md:items-center"
+    case "bottom":
+      return "flex items-end justify-center md:items-center md:justify-center"
     case "centered":
     default:
-      return "flex items-end justify-center md:items-center"
+      return "flex items-center justify-center"
   }
 })
 
@@ -141,12 +133,12 @@ const modalClasses = computed(() => {
     case "fullscreen":
       baseClasses.push("")
       break
-    case "bottom-sheet":
-      baseClasses.push("rounded-t-2xl md:rounded-2xl mb-0 md:mb-auto")
+    case "bottom":
+      baseClasses.push("rounded-t-2xl mb-0 md:rounded-2xl")
       break
     case "centered":
     default:
-      baseClasses.push("rounded-t-2xl md:rounded-2xl mb-0 md:mb-auto")
+      baseClasses.push("rounded-2xl")
       break
   }
 
@@ -169,25 +161,16 @@ const bodyClasses = computed(() => {
 })
 
 /**
- * Prevent body scrolling when modal is open
+ * Prevent body scrolling when modal is open and restore on close
  */
 watch(
   () => props.open,
   (isOpen) => {
-    if (isOpen) {
-      // Prevent body scrolling
-      document.body.style.overflow = "hidden"
-    } else {
-      // Restore body scrolling
-      document.body.style.overflow = ""
-    }
+    if (isOpen) document.body.style.overflow = "hidden"
+    else document.body.style.overflow = ""
   },
   { immediate: true },
 )
-
-/**
- * Cleanup: restore body scrolling when component is unmounted
- */
 onUnmounted(() => {
   document.body.style.overflow = ""
 })

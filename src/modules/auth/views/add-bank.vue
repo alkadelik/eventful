@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="bg-core-50 mb-4 flex size-10 items-center justify-center rounded-xl p-2">
-      <Icon name="shop-add" size="28" />
+      <Icon name="bank" size="28" />
     </div>
 
     <SectionHeader

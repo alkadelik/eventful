@@ -15,8 +15,9 @@ import Avatar from "@components/Avatar.vue"
 import CreateEventModal from "@modules/shared/components/CreateEventModal.vue"
 import { useRoute } from "vue-router"
 import { useGetOrganizerEventDetails, useGetSingleEventStatistics } from "@modules/shared/api"
-import { clipboardCopy } from "@/utils/others"
 import { TEvent } from "@modules/shared/types"
+import EmptyState from "@components/EmptyState.vue"
+import { useMediaQuery } from "@vueuse/core"
 
 const openShare = ref(false)
 const openEdit = ref(false)
@@ -49,13 +50,20 @@ const getEventStatus = (event: TEvent) => {
 }
 
 const eventStatus = computed(() => getEventStatus(details?.value as TEvent))
+const chipColor = computed(() =>
+  eventStatus.value === "ongoing"
+    ? "success"
+    : eventStatus.value === "upcoming"
+      ? "primary"
+      : "alt",
+)
 
 const formatDate = (dateStr: string) => {
   const date = new Date(dateStr)
   return date.toLocaleDateString("en-GB").replace(/\//g, "-")
 }
 
-const eventUrl = computed(() => `www.leyyow.com/popup/${details?.value?.event_slug || ""}`)
+const isMobile = useMediaQuery("(max-width: 768px)")
 
 const STATS = computed(() => {
   const { events, revenue, registrations } = stats?.value || {}
@@ -74,157 +82,85 @@ const STATS = computed(() => {
       iconClass: "green" as const,
     },
     {
-      title: "Avg. Revenue / Event",
+      title: "Avg. Revenue / Vendor",
       value: totalRevenue && events?.total ? formatCurrency(totalRevenue / (events.total || 1)) : 0,
       icon: "shop",
       iconClass: "green" as const,
     },
-  ]
+  ].slice(0, isMobile.value ? 2 : 3)
+})
+
+const actionMenu = computed(() => {
+  return [
+    { label: "Edit event", icon: "edit", action: () => (openEdit.value = true) },
+    { divider: true },
+    { label: "Share Event", icon: "share", action: () => (openShare.value = true) },
+  ].filter((item) => isMobile.value || (!isMobile.value && item.icon === "share"))
 })
 </script>
 
 <template>
-  <div class="p-4 md:p-6">
-    <div v-if="isPending" class="flex min-h-[50vh] items-center justify-center">
-      <Icon name="loader" size="80" class="text-primary-500 animate-spin" />
-    </div>
+  <div class="px-4 py-8 md:px-6 md:py-10">
+    <EmptyState
+      v-if="isPending || !details"
+      title="Fetching Event Details..."
+      :loading="isPending"
+      description="Details of this event will appear here soon"
+    />
 
     <section v-else class="space-y-4 md:space-y-6">
-      <header class="space-y-4">
-        <!-- Mobile: Stack vertically -->
-        <div class="flex items-center gap-4 md:hidden">
-          <button type="button">
-            <Icon name="arrow-left" size="24" @click="$router.back()" />
-          </button>
-          <h3 class="flex-1 truncate text-lg font-semibold">{{ details?.event_name }}</h3>
-          <DropdownMenu
-            :items="[
-              { label: 'Edit Event', icon: 'edit', action: () => (openEdit = true) },
-              { label: 'Share Event', icon: 'box', action: () => (openShare = true) },
-              { divider: true },
-              {
-                label: 'Delete Event',
-                icon: 'copy',
-                class: 'text-red-600 hover:bg-red-50',
-                iconClass: 'text-red-600',
-                action: () => {},
-              },
-            ]"
-          >
-            <template #trigger>
-              <Icon name="dots-vertical" size="20" />
-            </template>
-          </DropdownMenu>
-        </div>
+      <header class="flex flex-col items-start space-y-4 md:flex-row md:gap-4">
+        <button
+          type="button"
+          class="text-primary-600 md:text-core-800 inline-flex items-center gap-1 text-sm"
+        >
+          <Icon name="arrow-left" class="!size-5 md:!size-7" @click="$router.push('/events')" />
+          <span class="md:hidden">Back</span>
+        </button>
 
-        <!-- Desktop: Original layout -->
-        <div class="hidden items-start gap-4 md:flex">
-          <button type="button">
-            <Icon name="arrow-left" size="28" @click="$router.back()" />
-          </button>
-          <div class="flex-1">
-            <div class="mb-2 flex items-center gap-6">
+        <div class="flex w-full flex-1 gap-3">
+          <div class="flex-1 truncate">
+            <div class="mb-3 flex items-center gap-2">
               <h3 class="truncate text-xl font-semibold">{{ details?.event_name }}</h3>
-              <Chip
-                :label="eventStatus"
-                class="capitalize"
-                size="sm"
-                :color="
-                  eventStatus === 'ongoing'
-                    ? 'success'
-                    : eventStatus === 'upcoming'
-                      ? 'primary'
-                      : 'alt'
-                "
-              />
+              <Chip :label="eventStatus" class="capitalize" size="sm" :color="chipColor" />
             </div>
-            <div class="space-y-1.5">
+            <div class="space-y-2">
               <p class="flex items-center gap-2 text-sm">
-                <Icon name="calendar-tick" size="20" />
+                <Icon name="calendar" size="20" />
                 {{ formatDate(details?.start_date || "") }} -
                 {{ formatDate(details?.end_date || "") }}
               </p>
               <p class="flex items-center gap-2 text-sm">
-                <Icon name="star" size="20" />
+                <Icon name="location" size="20" />
                 {{ details?.location }}
               </p>
 
-              <div class="mt-2 inline-flex items-center gap-4 text-sm">
-                <p>{{ eventUrl }}</p>
-                <Icon
-                  name="copy"
-                  size="16"
-                  class="text-primary-600 cursor-pointer"
-                  @click="clipboardCopy(eventUrl)"
-                />
+              <div class="mt-1 inline-flex items-center gap-4 text-base font-semibold">
+                {{ details?.participant_fee ? formatCurrency(details?.participant_fee) : "Free" }}
               </div>
             </div>
           </div>
 
-          <AppButton label="Edit Event" icon="edit" size="sm" @click="openEdit = true" />
-          <DropdownMenu
-            :items="[
-              { label: 'Share Event', icon: 'box', action: () => (openShare = true) },
-              { divider: true },
-              {
-                label: 'Delete Event',
-                icon: 'copy',
-                class: 'text-red-600 hover:bg-red-50',
-                iconClass: 'text-red-600',
-                action: () => {},
-              },
-            ]"
-          >
-            <template #trigger>
-              <Icon name="dots-vertical" class="mt-2" />
-            </template>
-          </DropdownMenu>
-        </div>
-
-        <!-- Mobile: Event details -->
-        <div class="space-y-3 md:hidden">
-          <div class="flex items-center justify-between">
-            <Chip
-              :label="eventStatus"
-              class="capitalize"
-              size="sm"
-              :color="
-                eventStatus === 'ongoing'
-                  ? 'success'
-                  : eventStatus === 'upcoming'
-                    ? 'primary'
-                    : 'alt'
-              "
-            />
-          </div>
-
-          <div class="space-y-2">
-            <p class="flex items-center gap-2 text-sm">
-              <Icon name="calendar-tick" size="18" />
-              {{ formatDate(details?.start_date || "") }} -
-              {{ formatDate(details?.end_date || "") }}
-            </p>
-            <p class="flex items-center gap-2 text-sm">
-              <Icon name="star" size="18" />
-              {{ details?.location }}
-            </p>
-
-            <div class="flex items-center gap-2 text-sm">
-              <p class="flex-1 truncate">{{ eventUrl }}</p>
-              <Icon
-                name="copy"
-                size="16"
-                class="text-primary-600 flex-shrink-0 cursor-pointer"
-                @click="clipboardCopy(eventUrl)"
-              />
-            </div>
+          <AppButton
+            label="Edit Event"
+            icon="edit"
+            class="!hidden md:!inline-flex"
+            size="sm"
+            @click="openEdit = true"
+          />
+          <div>
+            <DropdownMenu :items="actionMenu">
+              <template #trigger>
+                <Icon name="dots-vertical" class="mt-1" />
+              </template>
+            </DropdownMenu>
           </div>
         </div>
       </header>
 
-      <Tabs v-model="activeTab" :tabs="['overview', 'vendors']">
+      <Tabs v-model="activeTab" :tabs="['overview', 'vendors']" class="max-w-md">
         <template #overview>
-          <div class="mb-6 grid grid-cols-1 gap-4 md:mb-8 md:grid-cols-3">
+          <div class="grid grid-cols-2 gap-2 rounded-xl bg-gray-50 p-2 md:grid-cols-3 md:gap-6">
             <SummaryCard
               v-for="stat in STATS"
               :key="stat.title"
@@ -235,7 +171,7 @@ const STATS = computed(() => {
             />
           </div>
 
-          <div class="rounded-2xl bg-white p-4 md:p-6">
+          <div class="mt-6 rounded-2xl border border-gray-50 bg-white p-4 shadow-sm md:p-6">
             <h3 class="mb-4 text-lg font-semibold md:mb-6">Other Information</h3>
 
             <div class="space-y-3">
@@ -252,24 +188,51 @@ const STATS = computed(() => {
         </template>
 
         <template #vendors>
-          <div class="overflow-x-auto">
+          <EmptyState
+            v-if="!details?.registered_merchants?.length"
+            title="No attendee yet!"
+            description="Once people start registering, you'll see them here. Share your event to kick things off!"
+            action-label="Share Event"
+            action-icon="share"
+            :loading="isPending"
+            @action="openShare = true"
+          />
+
+          <div v-else class="overflow-x-auto">
+            <div class="flex items-center gap-2 py-4 md:px-4">
+              <h2 class="text-lg font-semibold">Registered Vendors</h2>
+              <Chip :label="details?.registered_merchants?.length?.toLocaleString()" size="sm" />
+            </div>
             <DataTable
-              title="Registered Vendors"
               :data="details?.registered_merchants ?? []"
               :columns="VENDORS_COLUMN"
-              :loading="false"
-              :empty-state="{
-                icon: 'box',
-                title: `No attendee yet!`,
-                description: `Once people start registering, you'll see them here. Share your event to kick things off!`,
-                actionLabel: 'Share Event',
-                actionIcon: 'add',
-              }"
-              hide-total
-              @empty-action="openShare = true"
+              :loading="isPending"
             >
               <template #cell:name="{ value }">
                 <Avatar :name="String(value)" :extra-text="true" />
+              </template>
+
+              <template #mobile-card="{ item }">
+                <div
+                  class="bg-core-25 border-core-300 flex items-start gap-3 rounded-2xl border px-4 py-5"
+                >
+                  <Avatar
+                    :name="item.name"
+                    background-color="#edd5d8"
+                    text-color="var(--color-core-600)"
+                  />
+                  <div class="text-core-600 flex-1">
+                    <h3 class="text-core-700 mb-1.5 text-base font-semibold capitalize">
+                      {{ item.name }}
+                    </h3>
+                    <p class="mb-1 flex items-center gap-2">
+                      <Icon name="sms" size="14" /> {{ item.email }}
+                    </p>
+                    <p class="flex items-center gap-2">
+                      <Icon name="call" size="14" /> {{ item.phone }}
+                    </p>
+                  </div>
+                </div>
               </template>
             </DataTable>
           </div>

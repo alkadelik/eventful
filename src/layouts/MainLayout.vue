@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen w-full bg-gray-50">
+  <div class="min-h-screen w-full bg-white lg:bg-gray-50">
     <div class="flex">
       <!-- Sidebar -->
       <AppSidebar v-if="!isMobile" @logout="logout = true" />

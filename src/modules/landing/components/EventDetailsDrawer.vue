@@ -5,7 +5,6 @@ import AppButton from "@components/AppButton.vue"
 import Chip from "@components/Chip.vue"
 import Drawer from "@components/Drawer.vue"
 import Icon from "@components/Icon.vue"
-import SummaryCard from "@components/SummaryCard.vue"
 import { computed, ref } from "vue"
 import ShareEventModal from "./ShareEventModal.vue"
 
@@ -52,11 +51,6 @@ const otherInfo = computed(() => {
             <Icon name="copy" size="16" class="text-primary-600" />
           </div>
         </div>
-      </div>
-
-      <div class="grid grid-cols-2 gap-4">
-        <SummaryCard icon="shop-add" title="Vendor Capacity" :value="60" />
-        <SummaryCard icon="shop-add" title="Registered Vendors" :value="15" />
       </div>
 
       <div class="rounded-2xl bg-white p-6">

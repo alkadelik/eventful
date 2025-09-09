@@ -28,7 +28,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  size: "lg",
+  size: "md",
 })
 
 const titleClasses = computed(() => {
@@ -51,6 +51,7 @@ const subtitleClasses = computed(() => {
     case "lg":
       return "text-sm md:text-base"
     case "md":
+      return "text-sm md:text-base"
     default:
       return "text-sm"
   }

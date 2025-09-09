@@ -9,8 +9,13 @@ import Icon from "@components/Icon.vue"
 import CreateEventModal from "@modules/shared/components/CreateEventModal.vue"
 import { useGetOrganizerEvents } from "@modules/shared/api"
 import { useRoute } from "vue-router"
+import EmptyState from "@components/EmptyState.vue"
+import ShareEventModal from "@modules/landing/components/ShareEventModal.vue"
+import TableEventCard from "@modules/shared/components/TableEventCard.vue"
+import DropdownMenu from "@components/DropdownMenu.vue"
 
 const openCreate = ref(false)
+const openShare = ref(false)
 const status = ref("all")
 
 const route = useRoute()
@@ -22,13 +27,14 @@ const pagination = computed(() => ({
   offset: page.value * limit.value - limit.value,
   ...(status.value !== "all" ? { status: status.value } : {}),
 }))
-const { data: myEvents, isPending } = useGetOrganizerEvents(pagination)
+const { data: myEvents, isPending, refetch } = useGetOrganizerEvents(pagination)
 
+// trigger create-event modal open if route.query.open
 onMounted(() => {
-  if (route.query.open === "create") {
-    openCreate.value = true
-  }
+  if (route.query.open === "create") openCreate.value = true
 })
+
+const isEmpty = computed(() => !myEvents?.value?.results?.length)
 </script>
 
 <template>
@@ -40,49 +46,71 @@ onMounted(() => {
       size="md"
     />
 
-    <Tabs
-      v-if="myEvents?.results?.length"
-      v-model="status"
-      :tabs="[
-        { title: 'All', key: 'all' },
-        { title: 'Upcoming', key: 'upcoming' },
-        { title: 'Ongoing', key: 'ongoing' },
-        { title: 'Past', key: 'past' },
-      ]"
+    <EmptyState
+      v-if="isEmpty"
+      title="You don't have any events yet"
+      description="Once you create an event, you’ll see all your attendee stats, ticket sales, and engagement updates right here."
+      action-label="Create Event"
+      action-icon="add"
+      :loading="isPending"
+      @action="openCreate = true"
     />
 
-    <div class="border-core-100 space-y-6 rounded-xl border bg-white">
-      <div class="bg-white">
+    <template v-else>
+      <Tabs
+        v-if="myEvents?.results?.length"
+        v-model="status"
+        :tabs="[
+          { title: 'All', key: 'all' },
+          { title: 'Upcoming', key: 'upcoming' },
+        ]"
+        class="max-w-md"
+      />
+
+      <div class="border-core-100 md:rounded-3xl md:border md:bg-white md:shadow-xs">
+        <div class="flex items-center justify-between gap-2 px-0 py-4 md:p-6">
+          <h2 class="text-lg font-semibold">All Events</h2>
+          <AppButton label="Create Event" icon="add" @click="openCreate = true" />
+        </div>
         <DataTable
-          title="Recent Events"
           :data="myEvents?.results ?? []"
           :columns="EVENT_COLUMN"
           :loading="isPending"
-          @row-click="(item) => $router.push(`/events/${item.id}`)"
-          :empty-state="{
-            icon: 'box',
-            title: `You don't have any event yet`,
-            description: `Once you create an event, you'll see all your attendee stats, ticket sales, and engagement updates right here.`,
-            actionLabel: 'Create Event',
-            actionIcon: 'add',
-          }"
-          hide-total
-          @empty-action="openCreate = true"
+          :show-pagination="true"
         >
-          <template #cell:action>
-            <div class="flex gap-2">
-              <Icon name="eye" size="16" class="text-core-500 hover:text-core-700 cursor-pointer" />
+          <!-- @row-click="(item) => $router.push(`/events/${item.id}`)" -->
+          <template #cell:action="{ item }">
+            <div class="inline-flex gap-3">
+              <Icon name="eye" @click.stop="() => $router.push(`/events/${item.id}`)" />
+
+              <DropdownMenu
+                :items="[
+                  {
+                    label: 'View Event',
+                    icon: 'eye',
+                    action: () => $router.push(`/events/${item.id}`),
+                  },
+                  { divider: true },
+                  { label: 'Share Event', icon: 'share', action: () => (openShare = true) },
+                ]"
+              >
+                <template #trigger>
+                  <Icon name="dots-vertical" size="20" />
+                </template>
+              </DropdownMenu>
             </div>
           </template>
 
-          <template #action>
-            <AppButton label="Create Event" icon="add" @click="openCreate = true" />
+          <template #mobile-card="{ item }">
+            <TableEventCard :event="item" @share="openShare = true" />
           </template>
         </DataTable>
       </div>
-    </div>
+    </template>
 
     <!-- Create Event Modal -->
-    <CreateEventModal v-model:open="openCreate" @close="openCreate = false" />
+    <CreateEventModal v-model:open="openCreate" @close="openCreate = false" @refresh="refetch" />
+
+    <ShareEventModal v-model:open="openShare" @close="openShare = false" />
   </section>
 </template>

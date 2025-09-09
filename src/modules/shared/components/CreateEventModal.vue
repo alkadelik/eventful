@@ -6,13 +6,13 @@ import Modal from "@components/Modal.vue"
 import StepperWizard from "@components/StepperWizard.vue"
 import { ref, computed, watch } from "vue"
 import { useForm } from "vee-validate"
-import { createEventSchema } from "@/utils/validationSchemas"
 import { useCreateEvent, useUpdateEvent } from "../api"
 import type { EventPayload, TEvent } from "../types"
 import { useAuthStore } from "@modules/auth/store"
 import { toast } from "@/composables/useToast"
 import { displayError } from "@/utils/error-handler"
 import { useQueryClient } from "@tanstack/vue-query"
+import { createEventSchema } from "../validationSchemas"
 
 const emit = defineEmits<{ (e: "close"): void; (e: "refresh"): void }>()
 const props = defineProps<{ open: boolean; event?: TEvent; isEditMode?: boolean }>()
@@ -21,27 +21,9 @@ const activeStep = ref(0)
 const { mutate: createEvent, isPending: isCreating } = useCreateEvent()
 const { mutate: updateEvent, isPending: isUpdating } = useUpdateEvent()
 
-// Computed to get the current loading state
 const isLoading = computed(() => isCreating.value || isUpdating.value)
-
-// Computed to get the modal title
 const modalTitle = computed(() => (props.isEditMode ? "Edit Event" : "Create Event"))
-
-// Computed to get the button label
 const buttonLabel = computed(() => (props.isEditMode ? "Update Event" : "Create Event"))
-
-// const INIT_VAL = {
-//   event_name: "Something Awesome",
-//   startDate: "2025-09-01",
-//   endDate: "2025-09-12",
-//   venueAddress: "123 Main St",
-//   registrationCost: 20000,
-//   capacity: 50,
-//   description: "",
-//   eventInstructions: "",
-//   terms: null,
-//   externalLink: "",
-// }
 
 // Define form data interface
 interface FormData {
@@ -52,9 +34,9 @@ interface FormData {
   registrationCost: number
   capacity: number
   description: string
-  eventInstructions: string
-  terms: File | null
-  externalLink: string
+  // eventInstructions: string
+  // terms: File | null
+  // externalLink: string
 }
 
 // Store initial values for comparison
@@ -71,9 +53,6 @@ const getInitialValues = (): Partial<FormData> => {
       registrationCost: props.event.participant_fee,
       capacity: parseInt(props.event.capacity),
       description: props.event.description,
-      eventInstructions: props.event.eventInstructions || "",
-      terms: null,
-      externalLink: "",
     }
     initialValues.value = { ...values }
     return values
@@ -133,7 +112,7 @@ const getChangedValues = (currentData: Partial<FormData>): EventPayload | Partia
 }
 
 // Initialize VeeValidate form
-const { handleSubmit, values, errors, resetForm } = useForm({
+const { handleSubmit, resetForm, meta } = useForm({
   validationSchema: createEventSchema,
   initialValues: getInitialValues(),
 })
@@ -179,18 +158,6 @@ const onSubmit = handleSubmit((data) => {
   }
 })
 
-// Check if we can proceed to next step (validate required fields for current step)
-const canProceedToNextStep = () => {
-  if (!values.event_name || values.event_name === "") return false
-  if (!values.startDate || values.startDate === "") return false
-  if (!values.endDate || values.endDate === "") return false
-  if (!values.venueAddress || values.venueAddress === "") return false
-  if (!values.registrationCost || values.registrationCost === 0) return false
-  if (!values.capacity || values.capacity === 0) return false
-
-  return true
-}
-
 // Watch for prop changes to reset form when switching between create/edit
 watch(
   () => [props.open, props.isEditMode, props.event],
@@ -198,7 +165,6 @@ watch(
     if (open) {
       // Reset step when modal opens
       activeStep.value = 0
-
       // Reset form with new initial values
       const newInitialValues = getInitialValues()
       resetForm({ values: newInitialValues })
@@ -244,7 +210,7 @@ watch(
           <FormField name="description" type="textarea" :rows="4" />
         </div>
 
-        <div v-show="step === 1" class="space-y-6">
+        <!-- <div v-show="step === 1" class="space-y-6">
           <div>
             <span class="bg-core-200 flex size-10 items-center justify-center rounded-lg p-2">
               <Icon name="shop-add" size="32" />
@@ -278,12 +244,12 @@ watch(
             placeholder="www.docs.google.com/..."
             prefix="https://"
           />
-        </div>
+        </div> -->
       </StepperWizard>
     </form>
 
     <template #footer>
-      <div v-if="activeStep >= 1" class="grid grid-cols-2 gap-4">
+      <!-- <div v-if="activeStep >= 1" class="grid grid-cols-2 gap-4">
         <AppButton color="alt" label="Back" @click="activeStep--" icon="arrow-left" type="button" />
         <AppButton
           label="Create Event"
@@ -292,14 +258,12 @@ watch(
           :loading="isLoading"
           @click="onSubmit"
         />
-      </div>
+      </div> -->
       <AppButton
-        v-else
         class="w-full"
         :label="buttonLabel"
         size="lg"
-        type="button"
-        :disabled="!canProceedToNextStep()"
+        :inactive="!meta.valid"
         :loading="isLoading"
         @click="onSubmit"
       />

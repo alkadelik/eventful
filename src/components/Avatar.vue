@@ -9,7 +9,7 @@
         v-if="url && !loading"
         :src="url"
         :alt="name"
-        :class="imageClasses"
+        :class="[imageClasses]"
         :style="{ height: `${sizeValue}px`, width: `${sizeValue}px` }"
         loading="lazy"
       />

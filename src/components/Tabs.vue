@@ -1,7 +1,7 @@
 <template>
-  <div :class="props.class">
+  <div>
     <!-- Tabs Header -->
-    <div ref="tabContainer" :class="['tabheader flex overflow-x-auto', headerClasses]">
+    <div ref="tabContainer" :class="['tabheader flex overflow-x-auto', headerClasses, props.class]">
       <button
         v-for="tab in processedTabs"
         :key="tab.key"

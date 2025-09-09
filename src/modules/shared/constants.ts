@@ -3,14 +3,18 @@ import { TEvent, TVendor } from "./types"
 import { formatCurrency } from "@/utils/format-currency"
 
 export const EVENT_COLUMN: TableColumn<TEvent>[] = [
-  { header: "Event name", accessor: "event_name" },
+  { header: "Event name", accessor: "event_name", class: "font-medium text-core-800" },
   {
     header: "Price",
     accessor: "participant_fee",
-    cell: ({ value }) => formatCurrency(value as number),
+    cell: ({ value }) => (value ? formatCurrency(value as number) : "Free"),
   },
   { header: "Merchants", accessor: "merchants" },
-  { header: "Revenue", accessor: "revenue", cell: ({ value }) => formatCurrency(value as number) },
+  {
+    header: "Revenue",
+    accessor: "revenue",
+    cell: ({ value }) => (value ? formatCurrency(value as number) : "--"),
+  },
   {
     header: "Start Date",
     accessor: "start_date",

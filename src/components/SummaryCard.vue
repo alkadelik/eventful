@@ -1,22 +1,3 @@
-<template>
-  <div :class="containerClasses">
-    <div class="flex items-center justify-between">
-      <p :class="titleClasses">{{ title }}</p>
-      <div :class="iconContainerClasses">
-        <Icon :name="icon" :size="iconSize" :class="iconClasses" />
-      </div>
-    </div>
-    <div class="flex items-end gap-2">
-      <h3 :class="valueClasses">{{ formattedValue }}</h3>
-      <div v-if="trend" :class="trendClasses">
-        <Icon :name="trendIcon" size="16" :class="trendIconClasses" />
-        <span class="text-sm">{{ trend }}%</span>
-      </div>
-    </div>
-    <p v-if="subtitle" :class="subtitleClasses">{{ subtitle }}</p>
-  </div>
-</template>
-
 <script setup lang="ts">
 import Icon from "@components/Icon.vue"
 import { computed } from "vue"
@@ -25,11 +6,6 @@ import { computed } from "vue"
  * Color theme type for the summary card
  */
 export type SummaryCardColor = "blue" | "green" | "red" | "yellow" | "purple" | "gray" | "primary"
-
-/**
- * Size variants for the summary card
- */
-export type SummaryCardSize = "sm" | "md" | "lg"
 
 /**
  * Props interface for the SummaryCard component
@@ -43,12 +19,6 @@ interface Props {
   icon: string
   /** Color theme for the icon background and styling */
   iconClass?: SummaryCardColor
-  /** Optional subtitle text displayed below the value */
-  subtitle?: string
-  /** Optional trend percentage (positive/negative number) */
-  trend?: number
-  /** Size variant of the card */
-  size?: SummaryCardSize
   /** Additional CSS classes for the container */
   class?: string
 }
@@ -56,7 +26,6 @@ interface Props {
 // Define props with defaults
 const props = withDefaults(defineProps<Props>(), {
   iconClass: "green",
-  size: "md",
 })
 
 /**
@@ -77,39 +46,17 @@ const formattedValue = computed(() => {
 })
 
 /**
- * Determine trend direction and icon
- */
-const trendIcon = computed(() => {
-  if (!props.trend) return ""
-  return props.trend > 0 ? "arrow-right" : "arrow-right"
-})
-
-/**
  * Container classes
  */
 const containerClasses = computed(() => {
   const baseClasses = [
-    "border-core-100",
-    "flex",
-    "flex-col",
-    "gap-3",
-    "rounded-xl",
-    "border",
-    "bg-white",
+    "border-core-100 shadow-xs flex flex-col gap-1 rounded-xl",
+    "md:border bg-white p-4 md:px-6",
   ]
 
-  // Size-based padding and spacing
-  const sizeClasses = {
-    sm: "px-4 py-3",
-    md: "px-6 py-4",
-    lg: "px-8 py-6",
-  }
+  const classes = [...baseClasses]
 
-  const classes = [...baseClasses, sizeClasses[props.size]]
-
-  if (props.class) {
-    classes.push(props.class)
-  }
+  if (props.class) classes.push(props.class)
 
   return classes
 })
@@ -118,45 +65,16 @@ const containerClasses = computed(() => {
  * Title classes
  */
 const titleClasses = computed(() => {
-  const baseClasses = ["text-core-600", "font-medium"]
-
-  const sizeClasses = {
-    sm: "text-xs",
-    md: "text-sm",
-    lg: "text-base",
-  }
-
-  return [...baseClasses, sizeClasses[props.size]]
+  const baseClasses = ["text-core-600 font-medium text-sm"]
+  return [...baseClasses]
 })
 
 /**
  * Value classes
  */
 const valueClasses = computed(() => {
-  const baseClasses = ["font-bold", "text-core-800"]
-
-  const sizeClasses = {
-    sm: "text-xl",
-    md: "text-2xl",
-    lg: "text-3xl",
-  }
-
-  return [...baseClasses, sizeClasses[props.size]]
-})
-
-/**
- * Subtitle classes
- */
-const subtitleClasses = computed(() => {
-  const baseClasses = ["text-core-500"]
-
-  const sizeClasses = {
-    sm: "text-xs",
-    md: "text-sm",
-    lg: "text-sm",
-  }
-
-  return [...baseClasses, sizeClasses[props.size]]
+  const baseClasses = ["font-bold text-core-800 text-2xl"]
+  return [...baseClasses]
 })
 
 /**
@@ -164,33 +82,10 @@ const subtitleClasses = computed(() => {
  */
 const iconContainerClasses = computed(() => {
   const baseClasses = [
-    "flex items-center justify-center flex-shrink-0",
-    "rounded-xl",
-    "transition-colors",
-    "duration-200",
-    "bg-gray-100",
+    "flex items-center justify-center flex-shrink-0 rounded-xl",
+    "transition-colors duration-200 bg-gray-100",
   ]
-
-  // Size-based dimensions
-  const sizeClasses = {
-    sm: "size-8 p-1.5",
-    md: "size-10 p-2",
-    lg: "size-12 p-2.5",
-  }
-
-  // Color-based background
-  //   const colorClasses = {
-  //     blue: "bg-blue-50",
-  //     green: "bg-green-50",
-  //     red: "bg-red-50",
-  //     yellow: "bg-yellow-50",
-  //     purple: "bg-purple-50",
-  //     gray: "bg-gray-50",
-  //     primary: "bg-primary-50",
-  //   }
-  // colorClasses[props.iconClass]
-
-  return [...baseClasses, sizeClasses[props.size], "bg-core-50"]
+  return [...baseClasses, "bg-core-50 size-10 p-2"]
 })
 
 /**
@@ -209,40 +104,17 @@ const iconClasses = computed(() => {
 
   return colorClasses[props.iconClass]
 })
-
-/**
- * Icon size based on card size
- */
-const iconSize = computed(() => {
-  const sizeMap = {
-    sm: "16",
-    md: "20",
-    lg: "24",
-  }
-
-  return sizeMap[props.size]
-})
-
-/**
- * Trend container classes
- */
-const trendClasses = computed(() => {
-  if (!props.trend) return []
-
-  const baseClasses = ["flex", "items-center", "gap-1", "px-2", "py-1", "rounded-md", "text-xs"]
-
-  const trendColorClasses =
-    props.trend > 0 ? ["bg-green-50", "text-green-600"] : ["bg-red-50", "text-red-600"]
-
-  return [...baseClasses, ...trendColorClasses]
-})
-
-/**
- * Trend icon classes
- */
-const trendIconClasses = computed(() => {
-  if (!props.trend) return ""
-
-  return props.trend > 0 ? "text-green-600" : "text-red-600"
-})
 </script>
+
+<template>
+  <div :class="containerClasses">
+    <div class="flex flex-col-reverse gap-1 sm:flex-row sm:items-center sm:justify-between">
+      <p :class="titleClasses">{{ title }}</p>
+      <div :class="iconContainerClasses">
+        <Icon :name="icon" :size="20" :class="iconClasses" />
+      </div>
+    </div>
+
+    <h3 :class="valueClasses">{{ formattedValue }}</h3>
+  </div>
+</template>
