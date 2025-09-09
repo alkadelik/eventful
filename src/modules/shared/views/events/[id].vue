@@ -198,7 +198,7 @@ const actionMenu = computed(() => {
             @action="openShare = true"
           />
 
-          <div v-else class="overflow-x-auto">
+          <div v-else>
             <div class="flex items-center gap-2 py-4 md:px-4">
               <h2 class="text-lg font-semibold">Registered Vendors</h2>
               <Chip :label="details?.registered_merchants?.length?.toLocaleString()" size="sm" />
