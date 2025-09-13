@@ -1,6 +1,8 @@
 import { TEvent } from "./types"
 
-export const getEventStatus = (event: TEvent): "upcoming" | "ongoing" | "ended" => {
+export const getEventStatus = (event: TEvent | null): "upcoming" | "ongoing" | "ended" => {
+  if (!event) return "ended"
+
   const now = new Date()
   const startDate = new Date(event.start_date)
   const endDate = new Date(event.end_date)

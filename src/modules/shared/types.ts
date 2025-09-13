@@ -12,6 +12,9 @@ export type TEvent = {
   eventInstructions?: string
   termsAndConditions?: string
   registered_merchants?: TVendor[]
+  registration_stats?: {
+    total_registered: number
+  }
 }
 
 export type TEventResponse = {

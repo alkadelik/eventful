@@ -128,12 +128,12 @@ const drawerClasses = computed(() => {
   // Width classes for left/right drawers
   if (props.position === "left" || props.position === "right") {
     const maxWidthMap: Record<string, string> = {
-      xs: "w-80 max-w-[90vw]",
-      sm: "w-96 max-w-[90vw]",
-      md: "w-[28rem] max-w-[90vw]",
-      lg: "w-[32rem] max-w-[90vw]",
-      xl: "w-[36rem] max-w-[90vw]",
-      "2xl": "w-[42rem] max-w-[90vw]",
+      xs: "w-full sm:w-80 sm:max-w-[98vw]",
+      sm: "w-full sm:w-96 sm:max-w-[98vw]",
+      md: "w-full sm:w-[28rem] sm:max-w-[98vw]",
+      lg: "w-full sm:w-[32rem] sm:max-w-[98vw]",
+      xl: "w-full sm:w-[36rem] sm:max-w-[98vw]",
+      "2xl": "w-full sm:w-[42rem] sm:max-w-[98vw]",
       full: "w-full",
     }
 
@@ -141,7 +141,7 @@ const drawerClasses = computed(() => {
       baseClasses.push(maxWidthMap[props.maxWidth])
     } else {
       // Custom width value
-      baseClasses.push(`w-[${props.maxWidth}] max-w-[90vw]`)
+      baseClasses.push(`w-full sm:w-[${props.maxWidth}] sm:max-w-[98vw]`)
     }
   } else {
     // For top/bottom drawers, use full width

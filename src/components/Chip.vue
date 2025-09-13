@@ -78,7 +78,7 @@ const props = withDefaults(defineProps<ChipProps>(), {
 
 const chipClasses = computed(() => {
   const baseClasses = [
-    "inline-flex",
+    "inline-flex capitalize",
     "items-center",
     "rounded-full",
     "font-medium",

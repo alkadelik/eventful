@@ -5,23 +5,30 @@ import Avatar from "@components/Avatar.vue"
 import Icon from "@components/Icon.vue"
 import EventCard from "../components/EventCard.vue"
 import EventDetailsDrawer from "../components/EventDetailsDrawer.vue"
-import { ref } from "vue"
+import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
+import { useGetOrganizerEventsPublic } from "@modules/shared/api"
+import { TEvent } from "@modules/shared/types"
 
 const openDetails = ref(false)
 const router = useRouter()
 
-const openBrowseEvents = (id?: string | number) => {
-  // https://suite-staging-branch.vercel.app
-  window.open(
-    `https://suite-staging-branch.vercel.app/dashboard/sales/upcoming-events${id ? `/${id}` : ""}`,
-    "_blank",
-  )
-}
-
 const openCreateEvent = () => {
   router.push("/events?open=create")
 }
+
+const { data: orgEvents } = useGetOrganizerEventsPublic()
+
+// events that are upcoming or ongoing
+const filteredEvents = computed(() => {
+  return (
+    orgEvents.value?.filter(
+      (evt) => new Date(evt.start_date) >= new Date() || new Date(evt.end_date) >= new Date(),
+    ) || []
+  )
+})
+
+const selectedEvent = ref<TEvent | null>(null)
 </script>
 
 <template>
@@ -48,13 +55,13 @@ const openCreateEvent = () => {
               variant="outlined"
               size="lg"
               class="w-full sm:w-auto"
-              @click="openBrowseEvents()"
+              @click="router.push('/upcoming-events')"
             />
           </div>
         </div>
 
         <div class="w-full md:w-1/2">
-          <img src="https://placehold.co/500x500" alt="Event" class="rounded-xl" />
+          <img src="/images/hero.png" alt="Event" class="rounded-xl" />
         </div>
       </div>
     </AppSection>
@@ -91,27 +98,11 @@ const openCreateEvent = () => {
             <p class="mt-2 text-sm md:text-base">
               Quickly get started to create and manage your events.
             </p>
-            <img src="" :alt="v" class="mt-4 h-40 w-full rounded-lg bg-gray-100 md:mt-6 md:h-60" />
-          </div>
-          <div class="px-6 py-4 md:px-10 md:py-6">
-            <div class="mb-4 flex justify-between">
-              <p class="text-lg font-semibold md:text-xl">
-                {{ v === "organizers" ? "From Other Organizers" : "Ongoing Events" }}
-              </p>
-              <span class="flex gap-2">
-                <Icon
-                  name="arrow-right"
-                  size="24"
-                  class="rotate-180 cursor-pointer rounded-full border border-gray-200 bg-white p-1"
-                />
-                <Icon
-                  name="arrow-right"
-                  size="24"
-                  class="cursor-pointer rounded-full border border-gray-200 bg-white p-1"
-                />
-              </span>
-            </div>
-            <EventCard :class="v === 'vendors' ? '!bg-gray-50' : ''" @click="openDetails = true" />
+            <img
+              :src="v === 'organizers' ? '/images/event.png' : '/images/booth.png'"
+              :alt="v"
+              class="mt-4 h-40 w-full rounded-lg bg-gray-100 md:mt-6 md:h-60"
+            />
           </div>
           <div class="px-6 py-4 md:px-10 md:py-6">
             <p class="mb-3 text-lg font-semibold md:text-xl">Get The Best of Leyyow Events</p>
@@ -136,7 +127,7 @@ const openCreateEvent = () => {
               size="lg"
               :variant="v === 'organizers' ? 'filled' : 'outlined'"
               class="w-full"
-              @click="v === 'organizers' ? openCreateEvent() : openBrowseEvents()"
+              @click="v === 'organizers' ? openCreateEvent() : router.push('/upcoming-events')"
             />
           </div>
         </div>
@@ -150,10 +141,16 @@ const openCreateEvent = () => {
       </div>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
         <EventCard
-          v-for="x in 6"
-          :key="x"
+          v-for="evt in filteredEvents.slice(0, 6)"
+          :key="evt.id"
+          :event="evt"
           class="cursor-pointer rounded-2xl border border-gray-200 bg-white p-4 md:p-5"
-          @click="openDetails = true"
+          @click="
+            () => {
+              selectedEvent = evt
+              openDetails = true
+            }
+          "
         />
       </div>
     </AppSection>
@@ -225,13 +222,13 @@ const openCreateEvent = () => {
             color="alt"
             size="lg"
             class="w-full sm:w-auto"
-            @click="openBrowseEvents()"
+            @click="router.push('/upcoming-events')"
           />
         </div>
       </div>
     </AppSection>
 
     <!-- Event Details Drawer -->
-    <EventDetailsDrawer :open="openDetails" @close="openDetails = false" />
+    <EventDetailsDrawer :open="openDetails" :event="selectedEvent" @close="openDetails = false" />
   </div>
 </template>

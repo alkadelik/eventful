@@ -1,9 +1,15 @@
+<script setup lang="ts">
+import AppSection from "@components/AppSection.vue"
+</script>
+
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Navigation -->
     <header class="sticky top-0 flex h-16 items-center border-b border-gray-200 bg-white md:h-20">
       <AppSection class="!py-0">
-        <img src="/images/logos/leyyow-logo-2.svg?url" class="h-6 md:h-8" alt="leyyow logo" />
+        <router-link to="/">
+          <img src="/images/logos/leyyow-logo-2.svg?url" class="h-6 md:h-8" alt="leyyow logo" />
+        </router-link>
       </AppSection>
     </header>
 
@@ -40,7 +46,3 @@
     </footer>
   </div>
 </template>
-
-<script setup lang="ts">
-import AppSection from "@components/AppSection.vue"
-</script>

@@ -20,6 +20,18 @@ export function useGetOrganizerEvents(
   })
 }
 
+/** Fetch organizer events - public */
+export function useGetOrganizerEventsPublic(
+  params?: MaybeRefOrGetter<Record<string, string | number | boolean> | undefined>,
+) {
+  return useApiQuery<TEvent[]>({
+    url: "/inventory/organizer/public-events/",
+    params,
+    key: "organizerEventsPublic",
+    // selectData: true,
+  })
+}
+
 /** Fetch organizer events */
 export function useGetOrganizerEventStats() {
   return useApiQuery<EventDashboardStats>({
