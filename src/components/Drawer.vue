@@ -1,35 +1,3 @@
-<template>
-  <!-- Backdrop -->
-  <div :class="backdropClasses" @click="close" />
-
-  <!-- Drawer -->
-  <aside :class="drawerClasses" @click.stop tabindex="-1" role="dialog" aria-modal="true">
-    <!-- Header -->
-    <div class="flex items-center justify-between border-b border-gray-200 p-5">
-      <slot name="header">
-        <h2 v-if="title" class="m-0 text-lg font-semibold text-gray-800">{{ title }}</h2>
-        <span v-else></span>
-        <button
-          type="button"
-          @click="close"
-          class="cursor-pointer border-none bg-transparent p-0 text-gray-500 transition-colors duration-200 hover:text-gray-700"
-        >
-          <Icon name="close-circle" size="20" />
-        </button>
-      </slot>
-    </div>
-
-    <!-- Body -->
-    <div class="flex-1 overflow-y-auto bg-gray-50 p-5" :class="props.bodyClass">
-      <slot />
-    </div>
-
-    <!-- Footer -->
-    <div v-if="$slots.footer" class="border-t border-gray-200 p-5">
-      <slot name="footer" />
-    </div>
-  </aside>
-</template>
 <script setup lang="ts">
 import { computed, watch, onUnmounted } from "vue"
 import Icon from "./Icon.vue"
@@ -101,13 +69,13 @@ const drawerClasses = computed(() => {
   switch (props.position) {
     case "left":
       baseClasses.push(
-        "top-0 bottom-0 left-0 h-screen",
+        "top-0 bottom-0 left-0 h-[100dvh]",
         props.open ? "translate-x-0" : "-translate-x-full",
       )
       break
     case "right":
       baseClasses.push(
-        "top-0 bottom-0 right-0 h-screen",
+        "top-0 bottom-0 right-0 h-[100dvh]",
         props.open ? "translate-x-0" : "translate-x-full",
       )
       break
@@ -175,3 +143,36 @@ onUnmounted(() => {
   document.body.style.overflow = ""
 })
 </script>
+
+<template>
+  <!-- Backdrop -->
+  <div :class="backdropClasses" @click="close" />
+
+  <!-- Drawer -->
+  <aside :class="drawerClasses" @click.stop tabindex="-1" role="dialog" aria-modal="true">
+    <!-- Header -->
+    <div class="flex items-center justify-between border-b border-gray-200 p-5">
+      <slot name="header">
+        <h2 v-if="title" class="m-0 text-lg font-semibold text-gray-800">{{ title }}</h2>
+        <span v-else></span>
+        <button
+          type="button"
+          @click="close"
+          class="cursor-pointer border-none bg-transparent p-0 text-gray-500 transition-colors duration-200 hover:text-gray-700"
+        >
+          <Icon name="close-circle" size="20" />
+        </button>
+      </slot>
+    </div>
+
+    <!-- Body -->
+    <div class="flex-1 overflow-y-auto bg-gray-50 p-5" :class="props.bodyClass">
+      <slot />
+    </div>
+
+    <!-- Footer -->
+    <div v-if="$slots.footer" class="border-t border-gray-200 p-5">
+      <slot name="footer" />
+    </div>
+  </aside>
+</template>
