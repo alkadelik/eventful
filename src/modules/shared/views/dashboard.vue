@@ -12,7 +12,6 @@ import CreateEventModal from "../components/CreateEventModal.vue"
 import { formatCurrency } from "@/utils/format-currency"
 import EmptyState from "@components/EmptyState.vue"
 import DropdownMenu from "@components/DropdownMenu.vue"
-import ShareEventModal from "@modules/landing/components/ShareEventModal.vue"
 import TableEventCard from "../components/TableEventCard.vue"
 
 const { user } = useAuthStore()
@@ -163,6 +162,5 @@ const isEmpty = computed(() => !recentEvents.value?.results?.length)
 
     <!-- Create Event Modal -->
     <CreateEventModal v-model:open="openCreate" @close="openCreate = false" @refresh="refetch" />
-    <ShareEventModal :open="openShare" @close="openShare = false" />
   </section>
 </template>

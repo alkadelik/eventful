@@ -134,6 +134,6 @@ const slotsRemaining = computed(() => {
       <AppButton label="Register For  Event" @click="openRegisterPage" />
     </div>
 
-    <ShareEventModal :open="openShare" @close="openShare = false" />
+    <ShareEventModal :open="openShare" @close="openShare = false" :event="orgEvent as TEvent" />
   </AppSection>
 </template>

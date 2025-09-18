@@ -118,5 +118,5 @@ const slotsRemaining = computed(() => {
 
     <!--  -->
   </Drawer>
-  <ShareEventModal :open="openShare" @close="openShare = false" />
+  <ShareEventModal :open="openShare" @close="openShare = false" :event="event as TEvent" />
 </template>

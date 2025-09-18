@@ -13,10 +13,12 @@ import EmptyState from "@components/EmptyState.vue"
 import ShareEventModal from "@modules/landing/components/ShareEventModal.vue"
 import TableEventCard from "@modules/shared/components/TableEventCard.vue"
 import DropdownMenu from "@components/DropdownMenu.vue"
+import { TEvent } from "@modules/shared/types"
 
 const openCreate = ref(false)
 const openShare = ref(false)
 const status = ref("all")
+const selectedEvent = ref<TEvent>()
 
 const route = useRoute()
 
@@ -102,7 +104,15 @@ const isEmpty = computed(() => !myEvents?.value?.results?.length)
           </template>
 
           <template #mobile-card="{ item }">
-            <TableEventCard :event="item" @share="openShare = true" />
+            <TableEventCard
+              :event="item"
+              @share="
+                () => {
+                  openShare = true
+                  selectedEvent = item
+                }
+              "
+            />
           </template>
         </DataTable>
       </div>
@@ -111,6 +121,6 @@ const isEmpty = computed(() => !myEvents?.value?.results?.length)
     <!-- Create Event Modal -->
     <CreateEventModal v-model:open="openCreate" @close="openCreate = false" @refresh="refetch" />
 
-    <ShareEventModal v-model:open="openShare" @close="openShare = false" />
+    <ShareEventModal v-model:open="openShare" @close="openShare = false" :event="selectedEvent" />
   </section>
 </template>

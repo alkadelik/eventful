@@ -241,7 +241,7 @@ const actionMenu = computed(() => {
     </section>
 
     <!-- Modals -->
-    <ShareEventModal :open="openShare" @close="openShare = false" />
+    <ShareEventModal :open="openShare" @close="openShare = false" :event="details" />
     <CreateEventModal
       :open="openEdit"
       @close="openEdit = false"
