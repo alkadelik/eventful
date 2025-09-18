@@ -11,6 +11,11 @@ const landingRoutes: RouteRecordRaw[] = [
     name: "UpcomingEvents",
     component: () => import("./views/upcoming-events.vue"),
   },
+  {
+    path: "upcoming-events/:id",
+    name: "EventDetails",
+    component: () => import("./views/[id].vue"),
+  },
 ]
 
 export default landingRoutes

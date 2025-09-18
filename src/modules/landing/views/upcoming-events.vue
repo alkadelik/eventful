@@ -2,12 +2,12 @@
 import AppSection from "@components/AppSection.vue"
 import { useGetOrganizerEventsPublic } from "@modules/shared/api"
 import { computed, ref } from "vue"
-import EventDetailsDrawer from "../components/EventDetailsDrawer.vue"
 import EventCard from "../components/EventCard.vue"
 import { TEvent } from "@modules/shared/types"
 import Tabs from "@components/Tabs.vue"
 import BackButton from "@components/BackButton.vue"
 import EmptyState from "@components/EmptyState.vue"
+import { useRouter } from "vue-router"
 
 const tabs = [
   { title: "Ongoing", key: "ongoing" },
@@ -34,13 +34,11 @@ const filteredEvents = computed(() => {
   return orgEvents.value
 })
 
-const openDetails = ref(false)
-const selectedEvent = ref<TEvent | null>(null)
 const activeTab = ref("ongoing")
+const router = useRouter()
 
 const openEvent = (event: TEvent) => {
-  selectedEvent.value = event
-  openDetails.value = true
+  router.push(`/upcoming-events/${event.id}`)
 }
 </script>
 
@@ -73,8 +71,5 @@ const openEvent = (event: TEvent) => {
         />
       </div>
     </template>
-
-    <!-- Event Details Drawer -->
-    <EventDetailsDrawer :open="openDetails" :event="selectedEvent" @close="openDetails = false" />
   </AppSection>
 </template>

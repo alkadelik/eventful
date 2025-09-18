@@ -63,6 +63,15 @@ export function useGetOrganizerEventDetails(id: string) {
   })
 }
 
+/** Fetch public organizer event details by ID */
+export function useGetPublicOrganizerEventById(id: string) {
+  return useApiQuery<TEvent>({
+    url: `/inventory/public/events/${id}/`,
+    key: "publicEventById",
+    selectData: true,
+  })
+}
+
 /** Fetch statistics of a particular event */
 export function useGetSingleEventStatistics(id: string) {
   return useApiQuery<EventDashboardStats>({

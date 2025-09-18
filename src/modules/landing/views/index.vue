@@ -4,13 +4,10 @@ import AppSection from "@components/AppSection.vue"
 import Avatar from "@components/Avatar.vue"
 import Icon from "@components/Icon.vue"
 import EventCard from "../components/EventCard.vue"
-import EventDetailsDrawer from "../components/EventDetailsDrawer.vue"
-import { computed, ref } from "vue"
+import { computed } from "vue"
 import { useRouter } from "vue-router"
 import { useGetOrganizerEventsPublic } from "@modules/shared/api"
-import { TEvent } from "@modules/shared/types"
 
-const openDetails = ref(false)
 const router = useRouter()
 
 const openCreateEvent = () => {
@@ -27,8 +24,6 @@ const filteredEvents = computed(() => {
     ) || []
   )
 })
-
-const selectedEvent = ref<TEvent | null>(null)
 </script>
 
 <template>
@@ -147,8 +142,7 @@ const selectedEvent = ref<TEvent | null>(null)
           class="cursor-pointer rounded-2xl border border-gray-200 bg-white p-4 md:p-5"
           @click="
             () => {
-              selectedEvent = evt
-              openDetails = true
+              $router.push(`/upcoming-events/${evt.id}`)
             }
           "
         />
@@ -227,8 +221,5 @@ const selectedEvent = ref<TEvent | null>(null)
         </div>
       </div>
     </AppSection>
-
-    <!-- Event Details Drawer -->
-    <EventDetailsDrawer :open="openDetails" :event="selectedEvent" @close="openDetails = false" />
   </div>
 </template>
