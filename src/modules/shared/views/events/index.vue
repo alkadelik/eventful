@@ -84,6 +84,15 @@ const isEmpty = computed(() => !myEvents?.value?.results?.length)
           <template #cell:action="{ item }">
             <div class="inline-flex gap-3">
               <Icon name="eye" @click.stop="() => $router.push(`/events/${item.id}`)" />
+              <Icon
+                name="edit"
+                @click.stop="
+                  () => {
+                    selectedEvent = item
+                    openCreate = true
+                  }
+                "
+              />
 
               <DropdownMenu
                 :items="[
@@ -119,7 +128,13 @@ const isEmpty = computed(() => !myEvents?.value?.results?.length)
     </template>
 
     <!-- Create Event Modal -->
-    <CreateEventModal v-model:open="openCreate" @close="openCreate = false" @refresh="refetch" />
+    <CreateEventModal
+      v-model:open="openCreate"
+      @close="openCreate = false"
+      :is-edit-mode="!!selectedEvent"
+      :event="selectedEvent"
+      @refresh="refetch"
+    />
 
     <ShareEventModal v-model:open="openShare" @close="openShare = false" :event="selectedEvent" />
   </section>
