@@ -5,10 +5,12 @@ import AppSection from "@components/AppSection.vue"
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Navigation -->
-    <header class="sticky top-0 flex h-16 items-center border-b border-gray-200 bg-white md:h-20">
+    <header
+      class="sticky top-0 z-50 flex h-16 items-center border-b border-gray-200 bg-white md:h-20"
+    >
       <AppSection class="!py-0">
         <router-link to="/">
-          <img src="/images/logos/leyyow-logo-2.svg?url" class="h-6 md:h-8" alt="leyyow logo" />
+          <img src="/LYW.svg?url" class="h-6 md:h-8" alt="leyyow logo" />
         </router-link>
       </AppSection>
     </header>
@@ -22,7 +24,7 @@ import AppSection from "@components/AppSection.vue"
     <footer class="bg-primary-600 py-6 text-white md:py-8 xl:py-10">
       <AppSection class="grid grid-cols-1 gap-6 md:grid-cols-4 md:items-end">
         <div class="md:col-span-2">
-          <img src="/images/logos/leyyow-logo-2.svg?url" class="h-6 md:h-8" alt="leyyow logo" />
+          <img src="/LYW.svg?url" class="h-6 md:h-8" alt="leyyow logo" />
           <h2 class="mt-3 text-lg font-semibold md:mt-4 md:text-xl xl:text-3xl">
             Connecting Organizers & Merchants Seamlessly
           </h2>

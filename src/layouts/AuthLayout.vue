@@ -24,7 +24,7 @@ import { useAuthStore } from "@modules/auth/store"
         <div class="mb-10 flex items-center gap-2 md:mb-10">
           <h3 class="text-lg font-bold">Eventful by</h3>
           <router-link to="/">
-            <img src="/images/logos/leyyow-logo-2.svg?url" alt="leyyow logo" class="h-8" />
+            <img src="/LYW.svg?url" alt="leyyow logo" class="h-8" />
           </router-link>
 
           <template v-if="!($route.path.includes('login') || $route.path.includes('signup'))">

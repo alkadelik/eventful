@@ -7,7 +7,7 @@
   >
     <!-- Brand -->
     <div class="flex items-center gap-3 px-4 py-4">
-      <img src="/images/logos/leyyow-logo-4.svg?url" alt="Leyyow" class="h-8 w-auto" />
+      <img src="/LYW.svg?url" alt="Leyyow" class="h-8 w-auto" />
     </div>
 
     <!-- User Info -->
