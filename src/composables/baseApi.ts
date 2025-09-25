@@ -16,9 +16,6 @@ baseApi.interceptors.request.use((config) => {
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`
   }
-  //   if (user && user.store_id) {
-  //     config.headers["X-Store-ID"] = user.store_id.toString()
-  //   }
   return config
 })
 
@@ -61,7 +58,7 @@ baseApi.interceptors.response.use(
       } catch (refreshError) {
         // If refresh fails, perform a logout or redirect
         toast.error("Session expired. Please log in again.")
-        useAuthStore().clearAuth()
+        useAuthStore().logout()
         // redirect to login page with the current path as redirect query
         const redirectPath = window.location.pathname + window.location.search
         window.location.href = `/login?redirect=${encodeURIComponent(redirectPath)}`
@@ -83,8 +80,16 @@ export type TQueryArg = {
   enabled?: boolean
   key: string
   selectData?: boolean
+  refetchOnMount?: true | false | "always"
 }
-export const useApiQuery = <T>({ url, params, enabled, key, selectData }: TQueryArg) => {
+export const useApiQuery = <T>({
+  url,
+  params,
+  enabled,
+  key,
+  selectData,
+  refetchOnMount,
+}: TQueryArg) => {
   return useQuery<T>({
     queryKey: [key, params],
     queryFn: async () => {
@@ -95,6 +100,7 @@ export const useApiQuery = <T>({ url, params, enabled, key, selectData }: TQuery
     },
     retry: false,
     refetchOnWindowFocus: false,
+    refetchOnMount,
     enabled,
     select: selectData
       ? (response: T) => {

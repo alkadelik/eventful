@@ -59,7 +59,8 @@ export function useUpdateEvent() {
 export function useGetOrganizerEventDetails(id: string) {
   return useApiQuery<TEvent>({
     url: `/inventory/organizer/events/${id}/details/`,
-    key: "eventDetails",
+    key: `eventDetails_${id}`,
+    refetchOnMount: "always",
   })
 }
 
@@ -67,8 +68,9 @@ export function useGetOrganizerEventDetails(id: string) {
 export function useGetPublicOrganizerEventById(id: string) {
   return useApiQuery<TEvent>({
     url: `/inventory/public/events/${id}/`,
-    key: "publicEventById",
+    key: `publicEventById_${id}`,
     selectData: true,
+    refetchOnMount: "always",
   })
 }
 
@@ -76,6 +78,7 @@ export function useGetPublicOrganizerEventById(id: string) {
 export function useGetSingleEventStatistics(id: string) {
   return useApiQuery<EventDashboardStats>({
     url: `/inventory/organizer/events/${id}/statistics/`,
-    key: "eventSingleStats",
+    key: `eventSingleStats_${id}`,
+    refetchOnMount: "always",
   })
 }
