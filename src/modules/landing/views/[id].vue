@@ -11,9 +11,11 @@ import ShareEventModal from "../components/ShareEventModal.vue"
 import AppSection from "@components/AppSection.vue"
 import BackButton from "@components/BackButton.vue"
 import { useRoute } from "vue-router"
-import { useGetPublicOrganizerEventById } from "@modules/shared/api"
+import { useGetOrganizerEventsPublic, useGetPublicOrganizerEventById } from "@modules/shared/api"
 import { TEvent } from "@modules/shared/types"
 import EmptyState from "@components/EmptyState.vue"
+import EventCard from "../components/EventCard.vue"
+import TextField from "@components/form/TextField.vue"
 
 const route = useRoute()
 
@@ -50,6 +52,26 @@ const slotsRemaining = computed(() => {
     Number(orgEvent.value?.capacity) - (orgEvent.value?.registration_stats?.total_registered || 0)
   )
 })
+
+const { data: orgEvents } = useGetOrganizerEventsPublic()
+
+// events that are upcoming or ongoing
+const filteredEvents = computed(() => {
+  return (
+    orgEvents.value?.filter(
+      (evt) => new Date(evt.start_date) >= new Date() || new Date(evt.end_date) >= new Date(),
+    ) || []
+  )
+})
+
+const getFirst3Initials = (name: string) => {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 3)
+    .toUpperCase()
+}
 </script>
 
 <template>
@@ -64,63 +86,83 @@ const slotsRemaining = computed(() => {
     <BackButton label="Go Back" class="mb-6" />
 
     <section class="space-y-6">
-      <div class="rounded-2xl border border-gray-200 bg-green-950 p-5 text-white">
-        <div class="mb-2 flex items-center gap-2">
-          <h3 class="truncate text-xl font-semibold capitalize">{{ orgEvent?.event_name }}</h3>
-          <Chip
-            :label="getEventStatus(orgEvent as TEvent)"
-            size="sm"
-            :color="
-              getEventStatus(orgEvent as TEvent) === 'upcoming'
-                ? 'primary'
-                : getEventStatus(orgEvent as TEvent) === 'ongoing'
-                  ? 'success'
-                  : 'alt'
-            "
-          />
-          <Icon name="share" size="28" class="ml-auto" @click="openShare = true" />
-        </div>
-        <div class="space-y-1.5">
-          <p class="flex items-center gap-2 text-sm">
-            <Icon name="calendar" size="20" />
-            {{ formatDate(orgEvent?.start_date || "") }} -
-            {{ formatDate(orgEvent?.end_date || "") }}
-          </p>
-          <p class="flex items-center gap-2 text-sm">
-            <Icon name="location" size="20" />
-            {{ orgEvent?.location || "N/A" }}
-          </p>
+      <div class="relative z-[1] rounded-xl">
+        <img
+          src="@/assets/images/eventful-noise-grid.svg?url"
+          :alt="orgEvent?.event_name"
+          class="h-40 w-full rounded-xl bg-amber-600 object-cover"
+        />
 
-          <!-- <div
-                  class="mt-2 inline-flex items-center gap-4 rounded-md border border-white/20 bg-green-200/20 px-2 py-1 text-sm"
-                >
-                  <p>www.leyyow.com/popup/slug</p>
-                  <Icon name="copy" size="16" class="text-primary-600" />
-                </div> -->
-          <div class="flex items-center gap-2">
-            <Icon name="dollar-circle" size="20" />
-            <p class="mr-2 text-sm">
-              {{ orgEvent?.participant_fee ? formatCurrency(orgEvent?.participant_fee) : "Free" }}
-            </p>
-            <Chip
-              v-if="slotsRemaining < 30"
-              :label="`${slotsRemaining} spots left`"
-              size="sm"
-              color="error"
-              class="!border-error border"
-            />
-          </div>
+        <div
+          class="absolute top-0 bottom-0 flex w-full items-center justify-center text-7xl font-black tracking-wider text-white"
+        >
+          {{ getFirst3Initials(orgEvent?.event_name || "") }}
         </div>
       </div>
 
-      <div class="border-core-100 rounded-2xl border bg-white p-6 shadow-xs">
+      <section class="flex gap-6">
+        <div class="flex-1">
+          <div class="mb-3 flex items-center gap-2">
+            <h3 class="truncate text-xl font-semibold capitalize">{{ orgEvent?.event_name }}</h3>
+            <Chip
+              :label="getEventStatus(orgEvent as TEvent)"
+              size="sm"
+              :color="
+                getEventStatus(orgEvent as TEvent) === 'upcoming'
+                  ? 'primary'
+                  : getEventStatus(orgEvent as TEvent) === 'ongoing'
+                    ? 'success'
+                    : 'alt'
+              "
+            />
+          </div>
+          <div class="space-y-3">
+            <p class="flex items-center gap-2 text-sm">
+              <Icon name="calendar" size="20" />
+              {{ formatDate(orgEvent?.start_date || "") }} -
+              {{ formatDate(orgEvent?.end_date || "") }}
+            </p>
+            <p class="flex items-center gap-2 text-sm capitalize">
+              <Icon name="location" size="20" />
+              {{ orgEvent?.location || "N/A" }}
+            </p>
+
+            <!-- <div
+                      class="mt-2 inline-flex items-center gap-4 rounded-md border border-white/20 bg-green-200/20 px-2 py-1 text-sm"
+                    >
+                      <p>www.leyyow.com/popup/slug</p>
+                      <Icon name="copy" size="16" class="text-primary-600" />
+                    </div> -->
+            <div class="flex items-center gap-2">
+              <Icon name="dollar-circle" size="20" />
+              <p class="mr-2 text-sm">
+                {{ orgEvent?.participant_fee ? formatCurrency(orgEvent?.participant_fee) : "Free" }}
+              </p>
+              <Chip
+                v-if="slotsRemaining < 30"
+                :label="`${slotsRemaining} spots left`"
+                size="sm"
+                color="error"
+                class="!border-error border"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <AppButton color="alt" label="Share Event" @click="openShare = true" />
+          <AppButton label="Register For  Event" @click="openRegisterPage" />
+        </div>
+      </section>
+
+      <div class="rounded-2xl bg-white p-6 shadow-xs">
         <h3 class="mb-4 text-lg font-semibold">Other Information</h3>
 
-        <div class="space-y-3">
+        <div class="divide-core-100 divide-y">
           <div
             v-for="(value, key) in otherInfo"
             :key="key"
-            class="flex flex-col gap-1 text-sm md:flex-row"
+            class="flex flex-col gap-1 py-3 text-sm"
           >
             <p class="text-core-600 flex-1 font-semibold">{{ startCase(key) }}</p>
             <p class="flex-2 font-medium">{{ value }}</p>
@@ -129,10 +171,39 @@ const slotsRemaining = computed(() => {
       </div>
     </section>
 
-    <div class="mt-auto grid grid-cols-2 gap-4">
-      <AppButton color="alt" label="Share Event" @click="openShare = true" />
-      <AppButton label="Register For  Event" @click="openRegisterPage" />
-    </div>
+    <section class="mt-12">
+      <h2 class="mb-4 text-2xl font-semibold">Other events you may like</h2>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+        <EventCard
+          v-for="evt in filteredEvents.slice(0, 3)"
+          :key="evt.id"
+          :event="evt"
+          @click="
+            () => {
+              $router.push(`/upcoming-events/${evt.id}`)
+            }
+          "
+        />
+      </div>
+    </section>
+
+    <section
+      class="mt-12 flex flex-col items-center justify-center rounded-xl bg-white py-12 shadow-xs"
+    >
+      <div class="mx-auto max-w-screen-sm">
+        <h2 class="mb-2 text-center text-2xl font-semibold md:text-3xl">
+          Get notified about future events like this.
+        </h2>
+        <p class="mb-8 text-center text-lg md:text-xl">
+          Create your pop-up or book a booth in minutes.
+        </p>
+        <form class="grid gap-4">
+          <TextField type="email" placeholder="e.g. Adebola99@gmail.com" />
+          <AppButton type="submit" label="Subscribe Now" size="lg" class="w-full" />
+        </form>
+      </div>
+    </section>
 
     <ShareEventModal :open="openShare" @close="openShare = false" :event="orgEvent as TEvent" />
   </AppSection>

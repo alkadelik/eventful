@@ -139,7 +139,6 @@ const filteredEvents = computed(() => {
           v-for="evt in filteredEvents.slice(0, 6)"
           :key="evt.id"
           :event="evt"
-          class="cursor-pointer rounded-2xl border border-gray-200 bg-white p-4 md:p-5"
           @click="
             () => {
               $router.push(`/upcoming-events/${evt.id}`)
