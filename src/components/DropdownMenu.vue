@@ -11,7 +11,7 @@
         type="button"
         :class="$slots.trigger ? triggerClass : triggerClasses"
         :disabled="disabled"
-        @click="handleToggle(toggle, shown)"
+        @click.stop="handleToggle(toggle, shown)"
       >
         <slot name="trigger" :open="shown" :disabled="disabled">
           <div v-if="leftIcon" class="text-core-400 flex items-center">

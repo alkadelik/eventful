@@ -114,7 +114,7 @@ const actionMenu = computed(() => {
           type="button"
           class="text-primary-600 md:text-core-800 inline-flex items-center gap-1 text-sm"
         >
-          <Icon name="arrow-left" class="!size-5 md:!size-7" @click="$router.push('/events')" />
+          <Icon name="arrow-left" class="!size-5 md:!size-7" @click="$router.back()" />
           <span class="md:hidden">Back</span>
         </button>
 
