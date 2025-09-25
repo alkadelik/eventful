@@ -79,8 +79,8 @@ const isEmpty = computed(() => !myEvents?.value?.results?.length)
           :columns="EVENT_COLUMN"
           :loading="isPending"
           :show-pagination="true"
+          @row-click="(item) => $router.push(`/events/${item.id}`)"
         >
-          <!-- @row-click="(item) => $router.push(`/events/${item.id}`)" -->
           <template #cell:action="{ item }">
             <div class="inline-flex gap-3">
               <Icon name="eye" @click.stop="() => $router.push(`/events/${item.id}`)" />
