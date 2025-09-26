@@ -40,6 +40,9 @@ export interface EventDashboardStats {
   }
   registrations: {
     total: number
+    successful: number
+    pending: number
+    failed: number
   }
   revenue: {
     total: string

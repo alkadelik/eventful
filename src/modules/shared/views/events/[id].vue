@@ -71,7 +71,7 @@ const STATS = computed(() => {
   return [
     {
       title: "Total Registrations",
-      value: registrations?.total || 0,
+      value: registrations?.successful || 0,
       icon: "shop",
       iconClass: "green" as const,
     },
