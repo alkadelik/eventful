@@ -15,6 +15,7 @@ export type TEvent = {
   registration_stats?: {
     total_registered: number
   }
+  registration_count?: number
 }
 
 export type TEventResponse = {

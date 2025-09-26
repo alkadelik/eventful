@@ -97,9 +97,8 @@ const onSubmit = (values: TLoginPayload) => {
       })
       toast.success("Your login was successful!")
       // check for redirect query param
-      // const redirectPath = router.currentRoute.value.query.redirect as string
-      // router.push(redirectPath || "/dashboard")
-      router.push("/dashboard")
+      const redirectPath = router.currentRoute.value.query.redirect as string
+      router.push(redirectPath || "/dashboard")
     },
     onError: displayError,
   })

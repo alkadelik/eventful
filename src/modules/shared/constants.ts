@@ -9,11 +9,14 @@ export const EVENT_COLUMN: TableColumn<TEvent>[] = [
     accessor: "participant_fee",
     cell: ({ value }) => (value ? formatCurrency(value as number) : "Free"),
   },
-  { header: "Merchants", accessor: "merchants" },
+  { header: "Merchants", accessor: "merchants", cell: ({ item }) => item?.registration_count || 0 },
   {
     header: "Revenue",
     accessor: "revenue",
-    cell: ({ value }) => (value ? formatCurrency(value as number) : "--"),
+    cell: ({ item }) =>
+      item.participant_fee && item.registration_count
+        ? formatCurrency(item.participant_fee * item.registration_count)
+        : "--",
   },
   {
     header: "Start Date",

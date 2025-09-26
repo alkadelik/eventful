@@ -31,7 +31,7 @@ const filteredEvents = computed(() => {
     <AppSection class="py-12 md:py-20">
       <div class="flex flex-col items-center gap-8 md:flex-row">
         <div class="w-full md:w-1/2">
-          <h2 class="text-3xl font-semibold md:text-5xl">
+          <h2 class="text-3xl leading-[1.35] font-bold md:text-5xl">
             Plan Everything <br />About Your Next <br />
             Pop-up
           </h2>
