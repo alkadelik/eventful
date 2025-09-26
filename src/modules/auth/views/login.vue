@@ -93,12 +93,13 @@ const onSubmit = (values: TLoginPayload) => {
       authStore.setAuthUser({
         ...user,
         email: values.email,
-        has_payment_account: true, /// TEMPORARY FIX
+        // has_payment_account: true, /// TEMPORARY FIX
       })
       toast.success("Your login was successful!")
       // check for redirect query param
-      const redirectPath = router.currentRoute.value.query.redirect as string
-      router.push(redirectPath || "/dashboard")
+      // const redirectPath = router.currentRoute.value.query.redirect as string
+      // router.push(redirectPath || "/dashboard")
+      router.push("/dashboard")
     },
     onError: displayError,
   })
