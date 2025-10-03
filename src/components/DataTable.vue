@@ -32,7 +32,7 @@
             v-for="row in table.getRowModel().rows"
             :key="row.id"
             :class="[
-              'text-core-700 cursor-pointer border-b border-gray-200 bg-white hover:bg-gray-50',
+              'text-core-700 cursor-pointer border-b border-gray-200 bg-white hover:bg-gray-50/50',
               { 'last:border-0': !showPagination },
             ]"
             @click="handleRowClick(row.original as T)"
@@ -108,6 +108,7 @@
     <div
       v-if="data.length && showPagination"
       class="text-core-800 flex flex-col-reverse items-center justify-between gap-4 px-5 py-6 md:flex-row"
+      :class="`hidden md:flex`"
     >
       <!-- Select Entries PerPage -->
       <div class="inline-flex items-center gap-1 text-sm">

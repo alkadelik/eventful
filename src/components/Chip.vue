@@ -52,10 +52,11 @@ export interface ChipProps {
    * - success: Green color scheme for positive states
    * - warning: Yellow/orange color scheme for warnings
    * - error: Red color scheme for errors
+   * - blue: Blue color scheme for informational states
    * - alt: Gray color scheme for neutral states
    * @default "primary"
    */
-  color?: "primary" | "success" | "warning" | "error" | "alt"
+  color?: "primary" | "success" | "warning" | "error" | "blue" | "alt"
 
   /**
    * Whether to show a colored dot instead of an icon
@@ -100,6 +101,7 @@ const chipClasses = computed(() => {
       success: "bg-green-600 text-white",
       warning: "bg-yellow-600 text-white",
       error: "bg-red-600 text-white",
+      blue: "bg-blue-600 text-white",
       alt: "bg-gray-600 text-white",
     },
     outlined: {
@@ -107,6 +109,7 @@ const chipClasses = computed(() => {
       success: "bg-green-50 text-green-700 border border-green-200",
       warning: "bg-yellow-50 text-yellow-700 border border-yellow-200",
       error: "bg-red-50 text-red-700 border border-red-200",
+      blue: "bg-blue-50 text-blue-700 border border-blue-200",
       alt: "bg-gray-50 text-gray-700 border border-gray-200",
     },
   }
@@ -146,6 +149,7 @@ const dotClasses = computed(() => {
     success: "bg-green-400",
     warning: "bg-yellow-400",
     error: "bg-red-400",
+    blue: "bg-blue-400",
     alt: "bg-gray-400",
   }
 
@@ -157,6 +161,7 @@ const dotClasses = computed(() => {
       success: "bg-green-600",
       warning: "bg-yellow-600",
       error: "bg-red-600",
+      blue: "bg-blue-600",
       alt: "bg-gray-600",
     },
   }

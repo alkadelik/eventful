@@ -19,7 +19,7 @@ interface EventCardProps {
 
 const props = defineProps<EventCardProps>()
 
-const emit = defineEmits<{ (e: "click"): void; (e: "share"): void }>()
+const emit = defineEmits<{ (e: "click"): void; (e: "share"): void; (e: "edit"): void }>()
 </script>
 
 <template>
@@ -33,16 +33,19 @@ const emit = defineEmits<{ (e: "click"): void; (e: "share"): void }>()
         {{ event.event_name }}
       </h3>
 
+      <span v-if="event.participant_fee && event.registration_count" class="font-medium">
+        {{ formatCurrency(event.participant_fee * event.registration_count) }}
+      </span>
+
       <DropdownMenu
-        :items="[
-          {
-            label: 'View Event',
-            icon: 'eye',
-            action: () => $router.push(`/events/${event.id}`),
-          },
-          { divider: true },
-          { label: 'Share Event', icon: 'share', action: () => emit('share') },
-        ]"
+        :items="
+          [
+            { label: 'Edit Event', icon: 'edit', action: () => emit('edit') },
+            { label: 'View Event', icon: 'eye', action: () => emit('click') },
+            { divider: true },
+            { label: 'Share Event', icon: 'share', action: () => emit('share') },
+          ].filter((d) => d.icon !== 'edit' || !event.registration_count)
+        "
       >
         <template #trigger>
           <Icon name="dots-vertical" size="20" />
@@ -51,13 +54,13 @@ const emit = defineEmits<{ (e: "click"): void; (e: "share"): void }>()
     </div>
     <div class="space-y-1.5">
       <p class="flex items-center gap-2 text-sm">
-        {{ formatDate(event?.start_date || "") }} -
-        {{ formatDate(event?.end_date || "") }}
-      </p>
-      <p class="flex items-center gap-2 text-sm">
         {{ event.participant_fee ? formatCurrency(event.participant_fee) : "Free" }}
         <span>&middot;</span>
         {{ Number(event.capacity).toLocaleString() }}
+      </p>
+      <p class="flex items-center gap-2 text-sm">
+        {{ formatDate(event?.start_date || "") }} -
+        {{ formatDate(event?.end_date || "") }}
       </p>
       <Chip
         :label="getEventStatus(event)"

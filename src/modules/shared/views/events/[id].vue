@@ -10,18 +10,33 @@ import DropdownMenu from "@components/DropdownMenu.vue"
 import Tabs from "@components/Tabs.vue"
 import ShareEventModal from "@modules/landing/components/ShareEventModal.vue"
 import DataTable from "@components/DataTable.vue"
-import { VENDORS_COLUMN } from "@modules/shared/constants"
+import { CODES_COLUMN, VENDORS_COLUMN } from "@modules/shared/constants"
 import Avatar from "@components/Avatar.vue"
 import CreateEventModal from "@modules/shared/components/CreateEventModal.vue"
 import { useRoute } from "vue-router"
-import { useGetOrganizerEventDetails, useGetSingleEventStatistics } from "@modules/shared/api"
-import { TEvent } from "@modules/shared/types"
+import {
+  useGetOrganizerEventDetails,
+  useGetOrganizerEventDiscountCodes,
+  useGetSingleEventStatistics,
+} from "@modules/shared/api"
+import { TDiscountCode, TEvent } from "@modules/shared/types"
 import EmptyState from "@components/EmptyState.vue"
 import { useMediaQuery } from "@vueuse/core"
+import TextField from "@components/form/TextField.vue"
+import ExportRegVendorsModal from "@modules/shared/components/ExportRegVendorsModal.vue"
+import CreateDiscountCodeModal from "@modules/shared/components/CreateDiscountCodeModal.vue"
+import DiscountCodeCard from "@modules/shared/components/DiscountCodeCard.vue"
+import { checkCodeExpiry } from "@modules/shared/utils"
+import DeleteDeactivateCodeModal from "@modules/shared/components/DeleteDeactivateCodeModal.vue"
 
 const openShare = ref(false)
 const openEdit = ref(false)
+const openExport = ref(false)
+const openAddCode = ref(false)
+const openDeactivate = ref(false)
+const openDelete = ref(false)
 const activeTab = ref("overview")
+const selectedCode = ref<TDiscountCode | undefined>()
 const route = useRoute()
 
 const eventId = route.params.id as string
@@ -95,7 +110,22 @@ const actionMenu = computed(() => {
     { label: "Edit event", icon: "edit", action: () => (openEdit.value = true) },
     { divider: true },
     { label: "Share Event", icon: "share", action: () => (openShare.value = true) },
-  ].filter((item) => isMobile.value || (!isMobile.value && item.icon === "share"))
+  ].filter((item) =>
+    isMobile.value
+      ? item.icon !== "edit" || !stats.value?.registrations.successful
+      : item.icon === "share",
+  )
+})
+
+const {
+  data: discountCodes,
+  isPending: isFetchingDiscountCodes,
+  refetch: refetchCodes,
+} = useGetOrganizerEventDiscountCodes()
+
+const eventDiscountCodes = computed(() => {
+  if (!discountCodes.value) return []
+  return discountCodes.value?.filter((code) => code.event === Number(eventId)) || []
 })
 </script>
 
@@ -142,13 +172,14 @@ const actionMenu = computed(() => {
           </div>
 
           <AppButton
+            v-if="!stats?.registrations.successful && eventStatus !== 'past'"
             label="Edit Event"
             icon="edit"
             class="!hidden md:!inline-flex"
             size="sm"
             @click="openEdit = true"
           />
-          <div>
+          <div v-if="eventStatus !== 'past'">
             <DropdownMenu :items="actionMenu">
               <template #trigger>
                 <Icon name="dots-vertical" class="mt-1" />
@@ -158,7 +189,13 @@ const actionMenu = computed(() => {
         </div>
       </header>
 
-      <Tabs v-model="activeTab" :tabs="['overview', 'vendors']" class="max-w-md">
+      <Tabs
+        v-model="activeTab"
+        :tabs="
+          ['overview', 'vendors', 'codes'].filter((x) => x !== 'codes' || details?.participant_fee)
+        "
+        class="max-w-md"
+      >
         <template #overview>
           <div class="grid grid-cols-2 gap-2 rounded-xl bg-gray-50 p-2 md:grid-cols-3 md:gap-6">
             <SummaryCard
@@ -198,10 +235,19 @@ const actionMenu = computed(() => {
             @action="openShare = true"
           />
 
-          <div v-else>
+          <div v-else class="rounded-2xl border border-gray-100 bg-white shadow-sm">
             <div class="flex items-center gap-2 py-4 md:px-4">
               <h2 class="text-lg font-semibold">Registered Vendors</h2>
               <Chip :label="details?.registered_merchants?.length?.toLocaleString()" size="sm" />
+
+              <AppButton
+                label="Export"
+                size="sm"
+                class="ml-auto"
+                variant="outlined"
+                icon="download-cloud"
+                @click="openExport = true"
+              />
             </div>
             <DataTable
               :data="details?.registered_merchants ?? []"
@@ -210,6 +256,11 @@ const actionMenu = computed(() => {
             >
               <template #cell:name="{ value }">
                 <Avatar :name="String(value)" :extra-text="true" />
+              </template>
+
+              <template #cell:code="{ value }">
+                <Chip v-if="value" :label="String(value)" class="!rounded-lg" />
+                <span v-else>--</span>
               </template>
 
               <template #mobile-card="{ item }">
@@ -237,6 +288,121 @@ const actionMenu = computed(() => {
             </DataTable>
           </div>
         </template>
+
+        <template v-if="details?.participant_fee" #codes>
+          <EmptyState
+            v-if="!eventDiscountCodes?.length"
+            title="No discount codes yet!"
+            description="Create a code to offer merchants special pricing."
+            action-label="Create discount code"
+            action-icon="add"
+            :loading="isFetchingDiscountCodes"
+            @action="openAddCode = true"
+          />
+
+          <div v-else class="rounded-2xl border-gray-100 md:border md:bg-white md:shadow-sm">
+            <div
+              class="flex flex-col gap-2 py-4 md:flex-row md:items-center md:justify-between md:px-4"
+            >
+              <div class="flex items-center gap-2">
+                <h2 class="text-lg font-semibold">Discount Codes</h2>
+                <Chip :label="eventDiscountCodes?.length?.toLocaleString()" size="sm" />
+              </div>
+
+              <div class="flex items-center justify-between gap-2">
+                <TextField left-icon="search" placeholder="Search by code name" />
+                <AppButton label="Add Code" size="sm" icon="add" @click="openAddCode = true" />
+              </div>
+            </div>
+            <DataTable
+              :data="eventDiscountCodes ?? []"
+              :columns="CODES_COLUMN"
+              :loading="isFetchingDiscountCodes"
+            >
+              <template #cell:name="{ value }">
+                <Avatar :name="String(value)" :extra-text="true" />
+              </template>
+
+              <template #cell:code="{ value }">
+                <div class="flex items-center gap-2">
+                  <span class="flex size-8 items-center justify-center rounded-lg bg-gray-200">
+                    <Icon name="discount" size="20" />
+                  </span>
+                  <span>{{ value }}</span>
+                </div>
+              </template>
+
+              <template #cell:usage_count="{ item }">
+                <div v-if="item.max_uses" class="flex items-center gap-2 text-xs">
+                  <div class="h-1.5 w-16 rounded-full bg-gray-200">
+                    <div
+                      class="bg-primary-600 h-1.5 rounded-full"
+                      :style="`width: ${((item.usage_count || 0) / item.max_uses) * 100}%`"
+                    ></div>
+                  </div>
+                  <span class="flex w-max flex-shrink-0 break-keep">
+                    {{ `${item.usage_count || 0} / ${item.max_uses}` }}
+                  </span>
+                </div>
+                <span v-else>---</span>
+              </template>
+
+              <template #cell:action="{ item }">
+                <div class="inline-flex gap-3">
+                  <Icon
+                    name="edit"
+                    @click.stop="
+                      () => {
+                        selectedCode = item
+                        openAddCode = true
+                      }
+                    "
+                  />
+
+                  <DropdownMenu
+                    :items="[
+                      {
+                        label: 'Deactivate Code',
+                        icon: 'close-circle',
+                        action: () => (openDeactivate = true),
+                      },
+                      { divider: true },
+                      {
+                        label: 'Delete Code',
+                        icon: 'trash',
+                        class: 'text-red-500',
+                        iconClass: 'text-red-500',
+                        action: () => (openDelete = true),
+                      },
+                    ]"
+                  />
+                </div>
+              </template>
+
+              <template #cell:status="{ item }">
+                <Chip
+                  :label="
+                    String(
+                      item.is_active ? 'Active' : checkCodeExpiry(item) ? 'Expired' : 'Inactive',
+                    )
+                  "
+                  :color="item.is_active ? 'success' : checkCodeExpiry(item) ? 'error' : 'alt'"
+                  class="!rounded-lg"
+                />
+              </template>
+
+              <template #mobile-card="{ item }">
+                <DiscountCodeCard
+                  :item="item"
+                  @toggle="() => (selectedCode = item)"
+                  @edit="() => (openAddCode = true)"
+                  @deactivate="() => (openDeactivate = true)"
+                  @delete="() => (openDelete = true)"
+                />
+              </template>
+            </DataTable>
+          </div>
+        </template>
       </Tabs>
     </section>
 
@@ -248,6 +414,41 @@ const actionMenu = computed(() => {
       :is-edit-mode="true"
       :event="details"
       @refresh="refetch"
+    />
+
+    <ExportRegVendorsModal
+      :open="openExport"
+      :event-id="Number(eventId)"
+      @close="openExport = false"
+    />
+
+    <CreateDiscountCodeModal
+      v-if="details"
+      :open="openAddCode"
+      @close="
+        () => {
+          openAddCode = false
+          selectedCode = undefined
+        }
+      "
+      :code="selectedCode"
+      :is-edit-mode="!!selectedCode"
+      :event="details"
+      @refresh="refetchCodes"
+    />
+
+    <DeleteDeactivateCodeModal
+      v-if="selectedCode"
+      :open="openDelete || openDeactivate"
+      :action="openDelete ? 'delete' : 'deactivate'"
+      :item="selectedCode!"
+      @close="
+        () => {
+          openDelete = false
+          openDeactivate = false
+          selectedCode = undefined
+        }
+      "
     />
   </div>
 </template>

@@ -6,9 +6,9 @@
     ]"
   >
     <!-- Brand -->
-    <div class="flex items-center gap-3 px-4 py-4">
+    <router-link to="/" class="flex items-center gap-3 px-4 py-4">
       <img src="/LYW.svg?url" alt="Leyyow" class="h-8 w-auto" />
-    </div>
+    </router-link>
 
     <!-- User Info -->
     <div class="bg-gray-50 px-4 py-4">

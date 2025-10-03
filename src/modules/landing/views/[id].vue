@@ -100,7 +100,7 @@ const getFirst3Initials = (name: string) => {
         </div>
       </div>
 
-      <section class="flex gap-6">
+      <section class="flex flex-col gap-6 md:flex-row">
         <div class="flex-1">
           <div class="mb-3 flex items-center gap-2">
             <h3 class="truncate text-xl font-semibold capitalize">{{ orgEvent?.event_name }}</h3>
@@ -127,12 +127,6 @@ const getFirst3Initials = (name: string) => {
               {{ orgEvent?.location || "N/A" }}
             </p>
 
-            <!-- <div
-                      class="mt-2 inline-flex items-center gap-4 rounded-md border border-white/20 bg-green-200/20 px-2 py-1 text-sm"
-                    >
-                      <p>www.leyyow.com/popup/slug</p>
-                      <Icon name="copy" size="16" class="text-primary-600" />
-                    </div> -->
             <div class="flex items-center gap-2">
               <Icon name="dollar-circle" size="20" />
               <p class="mr-2 text-sm">
@@ -189,9 +183,22 @@ const getFirst3Initials = (name: string) => {
     </section>
 
     <section
-      class="mt-12 flex flex-col items-center justify-center rounded-xl bg-white py-12 shadow-xs"
+      class="relative mt-12 flex min-h-80 flex-col items-center justify-center overflow-hidden rounded-xl bg-white py-12 shadow-xs"
     >
-      <div class="mx-auto max-w-screen-sm">
+      <!-- Background Images -->
+      <img
+        src="/images/left-ellipse.svg"
+        alt=""
+        class="pointer-events-none absolute top-0 -left-1/4 h-full object-contain opacity-20 md:left-0"
+      />
+      <img
+        src="/images/right-ellipse.svg"
+        alt=""
+        class="pointer-events-none absolute top-0 -right-1/4 h-full object-contain opacity-20 md:right-0"
+      />
+
+      <!-- Content -->
+      <div class="relative z-10 mx-auto max-w-screen-sm px-6">
         <h2 class="mb-2 text-center text-2xl font-semibold md:text-3xl">
           Get notified about future events like this.
         </h2>
@@ -205,6 +212,6 @@ const getFirst3Initials = (name: string) => {
       </div>
     </section>
 
-    <ShareEventModal :open="openShare" @close="openShare = false" :event="orgEvent as TEvent" />
+    <ShareEventModal :open="openShare" @close="openShare = false" :event="orgEvent" />
   </AppSection>
 </template>

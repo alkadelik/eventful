@@ -1,6 +1,14 @@
 import baseApi, { useApiQuery } from "@/composables/baseApi"
 import type { MaybeRefOrGetter } from "vue"
-import { EventDashboardStats, EventPayload, TEvent, TEventResponse } from "./types"
+import {
+  DiscountCodePayload,
+  EventDashboardStats,
+  EventPayload,
+  IExportPayload,
+  TDiscountCode,
+  TEvent,
+  TEventResponse,
+} from "./types"
 import { useMutation } from "@tanstack/vue-query"
 
 /** Fetch user profile */
@@ -43,15 +51,28 @@ export function useGetOrganizerEventStats() {
 /** create an event */
 export function useCreateEvent() {
   return useMutation({
-    mutationFn: (body: EventPayload) => baseApi.post("/inventory/organizer/events/", body),
+    mutationFn: (body: EventPayload | FormData) => {
+      if (body instanceof FormData) {
+        return baseApi.post("/inventory/organizer/events/", body, {
+          headers: { "Content-Type": "multipart/form-data" },
+        })
+      }
+      return baseApi.post("/inventory/organizer/events/", body)
+    },
   })
 }
 
 /** edit an event */
 export function useUpdateEvent() {
   return useMutation({
-    mutationFn: ({ id, body }: { id: number; body: Partial<EventPayload> }) =>
-      baseApi.patch(`/inventory/organizer/events/${id}/`, body),
+    mutationFn: ({ id, body }: { id: number; body: Partial<EventPayload> | FormData }) => {
+      if (body instanceof FormData) {
+        return baseApi.patch(`/inventory/organizer/events/${id}/`, body, {
+          headers: { "Content-Type": "multipart/form-data" },
+        })
+      }
+      return baseApi.patch(`/inventory/organizer/events/${id}/`, body)
+    },
   })
 }
 
@@ -80,5 +101,58 @@ export function useGetSingleEventStatistics(id: string) {
     url: `/inventory/organizer/events/${id}/statistics/`,
     key: `eventSingleStats_${id}`,
     refetchOnMount: "always",
+  })
+}
+
+/** Export registered vendors api request */
+export function useExportRegVendors() {
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: IExportPayload }) =>
+      baseApi.post(`/inventory/organizer/events/${id}/export/`, payload),
+  })
+}
+
+/** create a discount code */
+export function useCreateDiscountCode() {
+  return useMutation({
+    mutationFn: (body: DiscountCodePayload) =>
+      baseApi.post("/inventory/organizer/discount-codes/", body),
+  })
+}
+
+/** update a discount code */
+export function useUpdateDiscountCode() {
+  return useMutation({
+    mutationFn: ({ id, body }: { id: number; body: Partial<DiscountCodePayload> }) =>
+      baseApi.patch(`/inventory/organizer/discount-codes/${id}/`, body),
+  })
+}
+
+/** Fetch discount codes for an event */
+export function useGetOrganizerEventDiscountCodes(
+  // eventId: string,
+  enabled = true,
+) {
+  return useApiQuery<TDiscountCode[]>({
+    url: `/inventory/organizer/discount-codes/`,
+    // key: `eventDiscountCodes_${eventId}`,
+    key: `eventDiscountCodes`,
+    enabled,
+    selectData: true,
+  })
+}
+
+/** deactivate a discount code */
+export function useDeactivateDiscountCode() {
+  return useMutation({
+    mutationFn: (id: number) =>
+      baseApi.post(`/inventory/organizer/organizer/code-activation/`, { code: id }),
+  })
+}
+
+/** delete a discount code */
+export function useDeleteDiscountCode() {
+  return useMutation({
+    mutationFn: (id: number) => baseApi.delete(`/inventory/organizer/code-activation/${id}/`),
   })
 }

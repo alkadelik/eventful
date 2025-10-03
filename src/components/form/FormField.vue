@@ -15,6 +15,28 @@
       :hint="hintText"
       :variant="variant"
       :size="size"
+      :placement="placement"
+      @update:model-value="field.value = $event"
+    />
+
+    <!-- Select Tags Field -->
+    <SelectTagsField
+      v-else-if="type === 'tags'"
+      v-bind="{ ...field, ...$attrs }"
+      :model-value="field.value"
+      :label="hideLabel ? '' : label || startCase(name)"
+      :options="normalizedTagOptions"
+      :placeholder="placeholder"
+      :required="required"
+      :disabled="disabled"
+      :readonly="readonly"
+      :error="fieldErrors[0]"
+      :hint="hintText"
+      :variant="variant"
+      :size="size"
+      :searchable="searchable"
+      :clearable="clearable"
+      :placement="placement"
       @update:model-value="field.value = $event"
     />
 
@@ -107,6 +129,7 @@ import OtpField from "./OtpField.vue"
 import { startCase } from "@/utils/format-strings"
 import { computed } from "vue"
 import FileUploader from "./FileUploader.vue"
+import SelectTagsField, { TChipColor } from "./SelectTagsField.vue"
 
 /**
  * Form field types supported by the dynamic FormField component
@@ -128,6 +151,7 @@ export type FormFieldType =
   | "textarea"
   | "otp"
   | "file"
+  | "tags"
 
 /**
  * Option value type for select fields (matches SelectField component)
@@ -177,9 +201,15 @@ interface FormFieldProps {
   /** Prefix text */
   prefix?: string
 
-  // Select specific props
-  /** Options for select fields */
+  // Select and Tags specific props
+  /** Options for select fields - now accepts ISelectOption[] */
   options?: OptionValue[]
+  /** Enable search functionality for tags field */
+  searchable?: boolean
+  /** Show clear button for tags field */
+  clearable?: boolean
+  /** Placement of the dropdown menu (for select fields) */
+  placement?: "top" | "bottom" | "auto"
 
   // Textarea specific props
   /** Number of rows for textarea */
@@ -245,4 +275,79 @@ const {
 
 const optionsData = computed(() => props.options ?? [])
 const hintText = computed(() => props.hint ?? "")
+
+// OptionWithClass type that matches SelectTagsField expectations
+type OptionWithClass = {
+  value: string | number | Record<string, unknown>
+  label: string
+  class?: string
+  color?: TChipColor
+}
+
+interface ISelectOption {
+  label: string
+  value: string | number
+  color?: string
+  [key: string]: unknown // This makes it compatible with Record<string, unknown>
+}
+
+// Enhanced normalization function for SelectTagsField
+const normalizedTagOptions = computed<OptionWithClass[]>(() => {
+  if (!props.options) return []
+
+  return props.options.map((opt) => {
+    // Handle ISelectOption objects
+    if (typeof opt === "object" && opt !== null && "label" in opt && "value" in opt) {
+      const selectOption = opt as ISelectOption
+      // Ensure color is TChipColor or undefined
+      let color: TChipColor = undefined
+      if (selectOption.color !== undefined) {
+        color = selectOption.color as TChipColor
+      }
+      return {
+        value: selectOption.value,
+        label: String(selectOption.label),
+        color,
+        // Spread any additional properties
+        ...Object.fromEntries(
+          Object.entries(selectOption).filter(
+            ([key]) => !["label", "value", "color"].includes(key),
+          ),
+        ),
+      }
+    }
+
+    // Handle primitive values
+    if (typeof opt === "string" || typeof opt === "number") {
+      return { value: opt, label: String(opt) }
+    }
+
+    // Handle generic objects
+    if (typeof opt === "object" && opt !== null) {
+      // If it already has the right structure
+      if ("value" in opt && "label" in opt) {
+        // Ensure color is TChipColor or undefined
+        let color: TChipColor = undefined
+        if ("color" in opt && opt.color !== undefined) {
+          color = opt.color as TChipColor
+        }
+        return {
+          value: opt.value as string | number | Record<string, unknown>,
+          label: String(opt.label),
+          color,
+          ...opt,
+        }
+      }
+
+      // Try to extract meaningful label/value from generic object
+      return {
+        value: opt,
+        label: JSON.stringify(opt),
+      }
+    }
+
+    // Fallback
+    return { value: opt, label: String(opt) }
+  })
+})
 </script>

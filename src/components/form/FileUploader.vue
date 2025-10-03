@@ -169,13 +169,13 @@ const imagePreview = computed(() => {
         </button>
       </div>
       <div v-else class="flex w-full flex-col items-center justify-center gap-1 py-2 text-center">
-        <Icon name="folder" size="32" class="text-core-400" />
-        <p>
+        <Icon name="folder" size="24" class="text-core-400" />
+        <p class="text-sm">
           Drag and drop file here or
           <span class="text-primary-500 cursor-pointer">choose file</span>
         </p>
-        <div class="space-y-1">
-          <span class="text-core-600 text-sm">{{ placeholder }}</span>
+        <div class="space-x-1 text-xs">
+          <span class="text-core-600">{{ placeholder }}</span> {{ " | " }}
           <span class="text-core-400 text-xs">Max size: {{ maxSize }}MB</span>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { TableColumn } from "@components/DataTable.vue"
-import { TEvent, TVendor } from "./types"
+import { TDiscountCode, TEvent, TVendor } from "./types"
 import { formatCurrency } from "@/utils/format-currency"
 
 export const EVENT_COLUMN: TableColumn<TEvent>[] = [
@@ -35,4 +35,37 @@ export const VENDORS_COLUMN: TableColumn<TVendor>[] = [
   { header: "Name", accessor: "name" },
   { header: "Email", accessor: "email" },
   { header: "Phone", accessor: "phone" },
+  { header: "Code", accessor: "code" },
+  { header: "Amount Paid", accessor: "amount_paid" },
+]
+
+export const CODES_COLUMN: TableColumn<TDiscountCode>[] = [
+  { header: "Code", accessor: "code" },
+  { header: "Discount", accessor: "amount", cell: ({ value }) => formatCurrency(value as number) },
+  // { header: "Max Uses", accessor: "max_uses" },
+  { header: "Usage Count", accessor: "usage_count" },
+  {
+    header: "Expiry Date",
+    accessor: "expiry_date",
+    cell: ({ value }) => (value ? new Date(value as string).toLocaleDateString("en-GB") : "--"),
+  },
+  { header: "Status", accessor: "status" },
+  { header: "", accessor: "action" },
+]
+
+export const EXPORT_FIELD_OPTIONS = [
+  { label: "Name", value: "name" },
+  { label: "Email", value: "email" },
+  { label: "Phone", value: "phone" },
+  { label: "Code", value: "code" },
+  { label: "Amount Paid", value: "amount_paid" },
+]
+
+export const EXPORT_PERIOD_OPTIONS = [
+  { label: "All", value: "all" },
+  { label: "This month", value: "this_month" },
+  { label: "Last month", value: "last_month" },
+  { label: "Last 30 days", value: "last_30_days" },
+  { label: "Last 90 days", value: "last_90_days" },
+  { label: "Custom", value: "custom" },
 ]

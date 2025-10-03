@@ -9,7 +9,11 @@
     >
       <!-- Modal Card -->
       <Transition name="modal-content">
-        <div v-if="open" class="relative bg-white shadow-lg" :class="modalClasses" @click.stop>
+        <div
+          v-if="open"
+          :class="['relative bg-white shadow-lg', modalClasses, props.modalClass]"
+          @click.stop
+        >
           <!-- Header -->
           <slot name="header">
             <div class="flex items-center justify-between px-6 py-4">
@@ -72,6 +76,8 @@ interface Props {
   maxWidth?: string
   /** Additional classes for the modal body */
   bodyClass?: string
+  /** Additional classes for the modal container */
+  modalClass?: string
 }
 
 // Define props with defaults
@@ -138,7 +144,7 @@ const modalClasses = computed(() => {
       break
     case "centered":
     default:
-      baseClasses.push("rounded-2xl")
+      baseClasses.push("rounded-2xl m-4")
       break
   }
 

@@ -82,9 +82,10 @@ const isEmpty = computed(() => !myEvents?.value?.results?.length)
           @row-click="(item) => $router.push(`/events/${item.id}`)"
         >
           <template #cell:action="{ item }">
-            <div class="inline-flex gap-3">
-              <Icon name="eye" @click.stop="() => $router.push(`/events/${item.id}`)" />
+            <div class="flex justify-end gap-3">
+              <!-- <Icon name="eye" @click.stop="() => $router.push(`/events/${item.id}`)" /> -->
               <Icon
+                v-if="!item.registration_count"
                 name="edit"
                 @click.stop="
                   () => {

@@ -13,3 +13,11 @@ export const getEventStatus = (event: TEvent | null): "upcoming" | "ongoing" | "
 
   return "ended"
 }
+
+/** Check if discount code is expired */
+export const checkCodeExpiry = (code: { expires_at: string | null }) => {
+  if (!code.expires_at) return false
+  const now = new Date()
+  const expiryDate = new Date(code.expires_at)
+  return now > expiryDate
+}

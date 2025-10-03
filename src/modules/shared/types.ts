@@ -30,6 +30,20 @@ export type TVendor = {
   name: string
   email: string
   phone?: string
+  code: string
+  amount_paid: number
+}
+
+export type TDiscountCode = {
+  id: number
+  code: string
+  event: number
+  amount: number
+  max_uses: number
+  usage_count: number
+  expires_at: string
+  status: "active" | "inactive" | "expired"
+  is_active: boolean
 }
 
 export interface EventDashboardStats {
@@ -61,4 +75,24 @@ export interface EventPayload {
   start_date: string
   end_date: string
   participant_fee: number
+  eventInstructions?: string
+  event_flier?: File
+  terms_and_conditions?: File
+}
+
+export interface IExportPayload {
+  export_fields: string[]
+  period: string
+  activity: string
+  start_date?: string
+  end_date?: string
+}
+
+export interface DiscountCodePayload {
+  event: number
+  code: string
+  amount: number
+  max_uses: number
+  per_user_limit?: number
+  expires_at?: string
 }

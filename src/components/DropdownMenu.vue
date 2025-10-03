@@ -1,104 +1,97 @@
 <template>
-  <Dropdown
-    :placement="props.placement"
-    :triggers="['click']"
-    :auto-placement="props.placement === 'auto'"
-    :auto-hide="closeOnClickOutside"
-  >
-    <template #default="{ toggle, shown }">
-      <!-- Trigger Button -->
-      <button
-        type="button"
-        :class="$slots.trigger ? triggerClass : triggerClasses"
-        :disabled="disabled"
-        @click.stop="handleToggle(toggle, shown)"
-      >
-        <slot name="trigger" :open="shown" :disabled="disabled">
-          <div v-if="leftIcon" class="text-core-400 flex items-center">
-            <Icon :name="leftIcon" :class="iconSizeClasses" />
+  <div>
+    <Dropdown
+      :placement="props.placement"
+      :triggers="['click']"
+      :auto-placement="props.placement === 'auto'"
+      :auto-hide="closeOnClickOutside"
+    >
+      <template #default="{ toggle, shown }">
+        <!-- Trigger Button -->
+        <button
+          type="button"
+          :class="$slots.trigger ? triggerClass : ''"
+          :disabled="disabled"
+          @click.stop="
+            () => {
+              emit('toggle', !shown)
+              toggle
+            }
+          "
+        >
+          <slot name="trigger" :open="shown" :disabled="disabled">
+            <Icon name="dots-vertical" size="20" />
+          </slot>
+        </button>
+      </template>
+
+      <template #popper="{ hide }">
+        <div :class="dropdownClasses">
+          <!-- Header Slot -->
+          <div v-if="$slots.header" class="border-core-100 border-b p-3">
+            <slot name="header" :close="() => handleClose(hide)" />
           </div>
 
-          <div :class="contentClasses">
-            <span v-if="label" class="flex-1 truncate text-left">{{ label }}</span>
-            <span v-else class="text-core-400 flex-1 truncate text-left">{{ placeholder }}</span>
-          </div>
+          <!-- Menu Items -->
+          <div :class="menuContainerClasses">
+            <slot name="prepend" :close="() => handleClose(hide)" />
 
-          <div v-if="rightIcon || showChevron" class="text-core-400 ml-3 flex items-center">
-            <Icon
-              :name="rightIcon || 'arrow-down-double'"
-              :class="[iconSizeClasses, shown ? 'rotate-180 transform' : '']"
-            />
-          </div>
-        </slot>
-      </button>
-    </template>
-
-    <template #popper="{ hide }">
-      <div :class="dropdownClasses">
-        <!-- Header Slot -->
-        <div v-if="$slots.header" class="border-core-100 border-b p-3">
-          <slot name="header" :close="() => handleClose(hide)" />
-        </div>
-
-        <!-- Menu Items -->
-        <div :class="menuContainerClasses">
-          <slot name="prepend" :close="() => handleClose(hide)" />
-
-          <template v-if="items && items.length > 0">
-            <div
-              v-for="(item, index) in items"
-              :key="getItemKey(item, index)"
-              :class="getItemWrapperClasses(item)"
-            >
-              <!-- Divider -->
-              <hr v-if="item.divider" class="border-core-100 my-1" />
-
-              <!-- Menu Item -->
-              <button
-                v-else
-                type="button"
-                :class="getItemClasses(item)"
-                :disabled="item.disabled"
-                @click="handleItemClick(item, hide)"
+            <template v-if="items && items.length > 0">
+              <div
+                v-for="(item, index) in items"
+                :key="getItemKey(item, index)"
+                :class="getItemWrapperClasses(item)"
               >
-                <Icon v-if="item.icon" :name="item.icon" :class="getItemIconClasses(item)" />
+                <!-- Divider -->
+                <hr v-if="item.divider" class="border-core-100 my-1" />
 
-                <slot
-                  name="item"
-                  :item="item"
-                  :index="index"
-                  :close="() => handleClose(hide)"
+                <!-- Menu Item -->
+                <button
+                  v-else
+                  type="button"
+                  :class="getItemClasses(item)"
                   :disabled="item.disabled"
+                  @click="handleItemClick(item, hide)"
                 >
-                  <span class="flex-1 truncate text-left">{{ item.label }}</span>
-                </slot>
+                  <Icon v-if="item.icon" :name="item.icon" :class="getItemIconClasses(item)" />
 
-                <Icon
-                  v-if="item.appendIcon"
-                  :name="item.appendIcon"
-                  :class="getItemIconClasses(item)"
-                />
+                  <slot
+                    name="item"
+                    :item="item"
+                    :index="index"
+                    :close="() => handleClose(hide)"
+                    :disabled="item.disabled"
+                  >
+                    <span class="flex-1 truncate text-left">{{ item.label }}</span>
+                  </slot>
 
-                <!-- Keyboard shortcut -->
-                <span v-if="item.shortcut" class="text-core-400 ml-2 font-mono text-xs">
-                  {{ item.shortcut }}
-                </span>
-              </button>
-            </div>
-          </template>
+                  <Icon
+                    v-if="item.appendIcon"
+                    :name="item.appendIcon"
+                    :class="getItemIconClasses(item)"
+                  />
 
-          <slot v-if="!items || items.length === 0" :close="() => handleClose(hide)" />
+                  <!-- Keyboard shortcut -->
+                  <span v-if="item.shortcut" class="text-core-400 ml-2 font-mono text-xs">
+                    {{ item.shortcut }}
+                  </span>
+                </button>
+              </div>
+            </template>
 
-          <slot name="append" :close="() => handleClose(hide)" />
+            <slot v-if="!items || items.length === 0" :close="() => handleClose(hide)" />
+
+            <slot name="append" :close="() => handleClose(hide)" />
+          </div>
+
+          <!-- Footer Slot -->
+          <div v-if="$slots.footer" class="border-core-100 border-t px-3 py-2">
+            <slot name="footer" :close="() => handleClose(hide)" />
+          </div>
         </div>
-
-        <!-- Footer Slot -->
-        <div v-if="$slots.footer" class="border-core-100 border-t px-3 py-2">
-          <slot name="footer" :close="() => handleClose(hide)" />
-        </div>
-      </div>
-    </template>
-  </Dropdown>
+      </template>
+    </Dropdown>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -188,29 +181,23 @@ const emit = defineEmits<{
 }>()
 
 // Styling computed properties
-const triggerClasses = computed(() => {
-  const baseClasses =
-    "inline-flex items-center justify-between w-full rounded-xl border transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2" +
-    " bg-core-25 border-core-50 text-core-800 hover:bg-core-50 focus:border-primary-300 focus:ring-primary-300"
+// const triggerClasses = computed(() => {
+//   const baseClasses =
+//     "inline-flex items-center justify-between w-full rounded-xl border transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2" +
+//     " bg-core-25 border-core-50 text-core-800 hover:bg-core-50 focus:border-primary-300 focus:ring-primary-300"
 
-  const sizeClasses = {
-    sm: "min-h-[36px] px-3 py-1.5 text-sm",
-    md: "min-h-[44px] px-3 py-2 text-sm",
-    lg: "min-h-[48px] px-4 py-2.5 text-base",
-  }
+//   const sizeClasses = {
+//     sm: "min-h-[36px] px-3 py-1.5 text-sm",
+//     md: "min-h-[44px] px-3 py-2 text-sm",
+//     lg: "min-h-[48px] px-4 py-2.5 text-base",
+//   }
 
-  const disabledClasses = props.disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+//   const disabledClasses = props.disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
 
-  return [baseClasses, sizeClasses[props.size], disabledClasses, props.triggerClass || ""]
-    .filter(Boolean)
-    .join(" ")
-})
-
-const contentClasses = computed(() => {
-  const base = "flex flex-1 items-center gap-2 min-w-0"
-  const padding = props.leftIcon ? "pl-2" : ""
-  return [base, padding].filter(Boolean).join(" ")
-})
+//   return [baseClasses, sizeClasses[props.size], disabledClasses, props.triggerClass || ""]
+//     .filter(Boolean)
+//     .join(" ")
+// })
 
 const iconSizeClasses = computed(() => {
   const sizeClasses = {
@@ -267,18 +254,18 @@ const getItemIconClasses = (item: DropdownItem): string => {
 }
 
 // Actions - updated for Floating Vue
-const handleToggle = (toggle: () => void, shown: boolean) => {
-  if (props.disabled) return
+// const handleToggle = (toggle: () => void, shown: boolean) => {
+//   if (props.disabled) return
 
-  toggle()
-  emit("toggle", !shown)
+//   toggle()
+//   emit("toggle", !shown)
 
-  if (!shown) {
-    emit("open")
-  } else {
-    emit("close")
-  }
-}
+//   if (!shown) {
+//     emit("open")
+//   } else {
+//     emit("close")
+//   }
+// }
 
 const handleClose = (hide: () => void) => {
   hide()

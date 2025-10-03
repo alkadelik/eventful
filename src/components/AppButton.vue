@@ -158,7 +158,7 @@ const buttonClasses = computed(() => {
       primary: "bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500/50",
       error: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500/50",
       success: "bg-green-600 text-white hover:bg-green-700 focus:ring-green-500/50",
-      alt: "bg-white text-core-600 border border-core-200 hover:bg-core-25 focus:ring-core-500/50",
+      alt: "bg-white text-gray-600 border border-gray-200 hover:bg-gray-100 focus:ring-gray-500/50",
     },
     outlined: {
       primary:
