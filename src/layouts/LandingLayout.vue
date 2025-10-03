@@ -77,7 +77,7 @@ const footerLinks: Record<string, FooterLink[]> = {
         <div class="flex flex-col">
           <h1 class="text-primary-600 mb-1 text-2xl font-bold">Eventful</h1>
           <div class="flex items-center gap-2 text-gray-600">
-            Powered by <img src="/LYW.svg" alt="Leyyow Logo" class="h-5 grayscale filter" />
+            Powered by <img src="/LYW.svg?url" alt="Leyyow Logo" class="h-5 grayscale filter" />
           </div>
 
           <div class="mt-8 flex flex-col gap-3 lg:mt-auto">

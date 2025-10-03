@@ -187,12 +187,12 @@ const getFirst3Initials = (name: string) => {
     >
       <!-- Background Images -->
       <img
-        src="/images/left-ellipse.svg"
+        src="/images/left-ellipse.svg?url"
         alt=""
         class="pointer-events-none absolute top-0 -left-1/4 h-full object-contain opacity-20 md:left-0"
       />
       <img
-        src="/images/right-ellipse.svg"
+        src="/images/right-ellipse.svg?url"
         alt=""
         class="pointer-events-none absolute top-0 -right-1/4 h-full object-contain opacity-20 md:right-0"
       />
