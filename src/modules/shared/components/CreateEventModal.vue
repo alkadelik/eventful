@@ -51,12 +51,12 @@ const getInitialValues = (): Partial<EventFormData> => {
       startDate: props.event.start_date,
       endDate: props.event.end_date,
       venueAddress: props.event.location,
-      registrationCost: props.event.participant_fee,
+      registrationCost: Number(props.event.event_fee),
       capacity: parseInt(props.event.capacity),
       description: props.event.description,
       eventInstructions: props.event.eventInstructions || "",
-      event_flier: null, // Files cannot be pre-populated from server
-      terms_and_conditions: null, // Files cannot be pre-populated from server
+      event_flier: null,
+      terms_and_conditions: null,
     }
     initialValues.value = { ...values }
     return values
@@ -78,7 +78,7 @@ const prepareFormData = (currentData: Partial<EventFormData>): FormData => {
     formData.append("capacity", currentData.capacity!.toString())
     formData.append("start_date", currentData.startDate!)
     formData.append("end_date", currentData.endDate!)
-    formData.append("participant_fee", currentData.registrationCost!.toString())
+    formData.append("event_fee", currentData.registrationCost!.toString())
 
     // Add optional fields
     if (currentData.eventInstructions) {
@@ -111,7 +111,7 @@ const prepareFormData = (currentData: Partial<EventFormData>): FormData => {
       formData.append("end_date", currentData.endDate!)
     }
     if (currentData.registrationCost !== initialValues.value.registrationCost) {
-      formData.append("participant_fee", currentData.registrationCost!.toString())
+      formData.append("event_fee", currentData.registrationCost!.toString())
     }
     if (currentData.eventInstructions !== initialValues.value.eventInstructions) {
       formData.append("event_instructions", currentData.eventInstructions || "")

@@ -129,14 +129,10 @@ export function useUpdateDiscountCode() {
 }
 
 /** Fetch discount codes for an event */
-export function useGetOrganizerEventDiscountCodes(
-  // eventId: string,
-  enabled = true,
-) {
+export function useGetOrganizerEventDiscountCodes(eventId: string, enabled = true) {
   return useApiQuery<TDiscountCode[]>({
-    url: `/inventory/organizer/discount-codes/`,
-    // key: `eventDiscountCodes_${eventId}`,
-    key: `eventDiscountCodes`,
+    url: `/inventory/organizer/discount-codes/event/${eventId}/`,
+    key: `eventDiscountCodes_${eventId}`,
     enabled,
     selectData: true,
   })

@@ -45,7 +45,7 @@ const { data: stats } = useGetSingleEventStatistics(eventId)
 
 const otherInfo = computed(() => {
   return {
-    registrationCost: formatCurrency(details?.value?.participant_fee || 0),
+    registrationCost: formatCurrency(details?.value?.event_fee || 0),
     maximumCapacity: details?.value?.capacity || "N/A",
     description: details?.value?.description || "",
     eventInstructions: details?.value?.eventInstructions || "",
@@ -121,7 +121,7 @@ const {
   data: discountCodes,
   isPending: isFetchingDiscountCodes,
   refetch: refetchCodes,
-} = useGetOrganizerEventDiscountCodes()
+} = useGetOrganizerEventDiscountCodes(route.params.id as string)
 
 const eventDiscountCodes = computed(() => {
   if (!discountCodes.value) return []
@@ -166,7 +166,7 @@ const eventDiscountCodes = computed(() => {
               </p>
 
               <div class="mt-1 inline-flex items-center gap-4 text-base font-semibold">
-                {{ details?.participant_fee ? formatCurrency(details?.participant_fee) : "Free" }}
+                {{ Number(details?.event_fee) ? formatCurrency(details?.event_fee) : "Free" }}
               </div>
             </div>
           </div>
@@ -192,7 +192,9 @@ const eventDiscountCodes = computed(() => {
       <Tabs
         v-model="activeTab"
         :tabs="
-          ['overview', 'vendors', 'codes'].filter((x) => x !== 'codes' || details?.participant_fee)
+          ['overview', 'vendors', 'codes'].filter(
+            (x) => x !== 'codes' || Number(details?.event_fee),
+          )
         "
         class="max-w-md"
       >
@@ -289,7 +291,7 @@ const eventDiscountCodes = computed(() => {
           </div>
         </template>
 
-        <template v-if="details?.participant_fee" #codes>
+        <template v-if="Number(details?.event_fee)" #codes>
           <EmptyState
             v-if="!eventDiscountCodes?.length"
             title="No discount codes yet!"

@@ -16,15 +16,6 @@ interface EventCardProps {
 const props = defineProps<EventCardProps>()
 
 const emit = defineEmits<{ (e: "click"): void }>()
-
-const getFirst3Initials = (name: string) => {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .slice(0, 3)
-    .toUpperCase()
-}
 </script>
 
 <template>
@@ -40,11 +31,13 @@ const getFirst3Initials = (name: string) => {
         class="h-40 w-full rounded-t-lg bg-amber-600 object-cover"
       />
 
-      <div
-        class="absolute top-0 bottom-0 flex w-full items-center justify-center text-4xl font-black text-white"
+      <span
+        class="absolute top-4 left-0 flex items-center justify-center rounded-r bg-white px-3 py-1 text-sm font-medium shadow"
       >
-        {{ getFirst3Initials(event.event_name) }}
-      </div>
+        {{ event.event_fee ? formatCurrency(event.event_fee) : "Free" }}
+      </span>
+
+      <img src="/images/logos/leyyow-icon-1.svg?url" class="absolute right-2 bottom-2 size-8" />
     </div>
 
     <div class="p-3">
@@ -62,19 +55,22 @@ const getFirst3Initials = (name: string) => {
           "
         />
       </div>
-      <div class="space-y-1.5">
+      <div>
         <p class="flex items-center gap-2 text-sm">
-          <Icon name="calendar" size="20" />
+          <Icon name="calendar" size="20" class="text-primary-600" />
           {{ formatDate(event.start_date) }} - {{ formatDate(event.end_date) }}
         </p>
-        <p class="flex items-center gap-2 text-sm">
-          <Icon name="location" size="20" />
+        <p class="my-2 flex items-center gap-2 text-sm">
+          <Icon name="location" size="20" class="text-primary-600" />
           {{ event.location }}
         </p>
-        <p class="flex items-center gap-2 text-sm">
-          <Icon name="dollar-circle" size="20" />
-          {{ event.participant_fee ? formatCurrency(event.participant_fee) : "Free" }}
-        </p>
+        <button
+          type="button"
+          class="text-primary-600 mt-3 flex items-center gap-2 text-sm font-medium"
+        >
+          Register
+          <Icon name="arrow-right" size="16" />
+        </button>
       </div>
     </div>
   </div>

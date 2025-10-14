@@ -4,11 +4,10 @@ export type TEvent = {
   event_slug: string
   start_date: string
   end_date: string
-  participant_fee: number
+  event_fee: number
   description: string
   location: string
   capacity: string
-  is_free: boolean
   eventInstructions?: string
   termsAndConditions?: string
   registered_merchants?: TVendor[]
@@ -74,7 +73,7 @@ export interface EventPayload {
   capacity: string
   start_date: string
   end_date: string
-  participant_fee: number
+  event_fee: number
   eventInstructions?: string
   event_flier?: File
   terms_and_conditions?: File

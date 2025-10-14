@@ -28,8 +28,8 @@ const openShare = ref(false)
 
 const otherInfo = computed(() => {
   return {
-    registrationCost: orgEvent.value?.participant_fee
-      ? formatCurrency(orgEvent.value?.participant_fee)
+    registrationCost: orgEvent.value?.event_fee
+      ? formatCurrency(orgEvent.value?.event_fee)
       : "Free",
     description: orgEvent.value?.description || "N/A",
     eventInstructions: orgEvent.value?.eventInstructions || "N/A",
@@ -63,15 +63,6 @@ const filteredEvents = computed(() => {
     ) || []
   )
 })
-
-const getFirst3Initials = (name: string) => {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .slice(0, 3)
-    .toUpperCase()
-}
 </script>
 
 <template>
@@ -93,11 +84,13 @@ const getFirst3Initials = (name: string) => {
           class="h-40 w-full rounded-xl bg-amber-600 object-cover"
         />
 
-        <div
-          class="absolute top-0 bottom-0 flex w-full items-center justify-center text-7xl font-black tracking-wider text-white"
+        <span
+          class="absolute top-4 left-0 flex items-center justify-center rounded-r bg-white px-3 py-1 text-sm font-medium shadow"
         >
-          {{ getFirst3Initials(orgEvent?.event_name || "") }}
-        </div>
+          {{ orgEvent?.event_fee ? formatCurrency(orgEvent?.event_fee) : "Free" }}
+        </span>
+
+        <img src="/images/logos/leyyow-icon-1.svg?url" class="absolute right-2 bottom-2 size-8" />
       </div>
 
       <section class="flex flex-col gap-6 md:flex-row">
@@ -130,7 +123,7 @@ const getFirst3Initials = (name: string) => {
             <div class="flex items-center gap-2">
               <Icon name="dollar-circle" size="20" />
               <p class="mr-2 text-sm">
-                {{ orgEvent?.participant_fee ? formatCurrency(orgEvent?.participant_fee) : "Free" }}
+                {{ orgEvent?.event_fee ? formatCurrency(orgEvent?.event_fee) : "Free" }}
               </p>
               <Chip
                 v-if="slotsRemaining < 30"

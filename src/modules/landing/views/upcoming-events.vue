@@ -66,7 +66,6 @@ const openEvent = (event: TEvent) => {
           v-for="evt in filteredEvents"
           :key="evt.id"
           :event="evt"
-          class="cursor-pointer rounded-2xl border border-gray-200 bg-white p-4 md:p-5"
           @click="openEvent(evt)"
         />
       </div>

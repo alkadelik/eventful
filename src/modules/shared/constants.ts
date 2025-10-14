@@ -6,16 +6,16 @@ export const EVENT_COLUMN: TableColumn<TEvent>[] = [
   { header: "Event name", accessor: "event_name", class: "font-medium text-core-800" },
   {
     header: "Price",
-    accessor: "participant_fee",
-    cell: ({ value }) => (value ? formatCurrency(value as number) : "Free"),
+    accessor: "event_fee",
+    cell: ({ value }) => (Number(value) ? formatCurrency(value as number) : "Free"),
   },
   { header: "Merchants", accessor: "merchants", cell: ({ item }) => item?.registration_count || 0 },
   {
     header: "Revenue",
     accessor: "revenue",
     cell: ({ item }) =>
-      item.participant_fee && item.registration_count
-        ? formatCurrency(item.participant_fee * item.registration_count)
+      Number(item.event_fee) && item.registration_count
+        ? formatCurrency(Number(item.event_fee) * item.registration_count)
         : "--",
   },
   {
@@ -42,8 +42,7 @@ export const VENDORS_COLUMN: TableColumn<TVendor>[] = [
 export const CODES_COLUMN: TableColumn<TDiscountCode>[] = [
   { header: "Code", accessor: "code" },
   { header: "Discount", accessor: "amount", cell: ({ value }) => formatCurrency(value as number) },
-  // { header: "Max Uses", accessor: "max_uses" },
-  { header: "Usage Count", accessor: "usage_count" },
+  { header: "Usage Count", accessor: "times_used" },
   {
     header: "Expiry Date",
     accessor: "expiry_date",
