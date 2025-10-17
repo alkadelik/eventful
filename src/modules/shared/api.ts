@@ -4,7 +4,6 @@ import {
   DiscountCodePayload,
   EventDashboardStats,
   EventPayload,
-  IExportPayload,
   TDiscountCode,
   TEvent,
   TEventResponse,
@@ -95,20 +94,10 @@ export function useGetPublicOrganizerEventById(id: string) {
   })
 }
 
-/** Fetch statistics of a particular event */
-export function useGetSingleEventStatistics(id: string) {
-  return useApiQuery<EventDashboardStats>({
-    url: `/inventory/organizer/events/${id}/statistics/`,
-    key: `eventSingleStats_${id}`,
-    refetchOnMount: "always",
-  })
-}
-
 /** Export registered vendors api request */
 export function useExportRegVendors() {
   return useMutation({
-    mutationFn: ({ id, payload }: { id: number; payload: IExportPayload }) =>
-      baseApi.post(`/inventory/organizer/events/${id}/export/`, payload),
+    mutationFn: (id: string) => baseApi.get(`/organizer/events/${id}/download_emails/`),
   })
 }
 

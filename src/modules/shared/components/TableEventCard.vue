@@ -33,8 +33,8 @@ const emit = defineEmits<{ (e: "click"): void; (e: "share"): void; (e: "edit"): 
         {{ event.event_name }}
       </h3>
 
-      <span v-if="event.participant_fee && event.registration_count" class="font-medium">
-        {{ formatCurrency(event.participant_fee * event.registration_count) }}
+      <span v-if="Number(event.event_fee) && event.registration_count" class="font-medium">
+        {{ formatCurrency(event.event_fee * event.registration_count) }}
       </span>
 
       <DropdownMenu
@@ -54,7 +54,7 @@ const emit = defineEmits<{ (e: "click"): void; (e: "share"): void; (e: "edit"): 
     </div>
     <div class="space-y-1.5">
       <p class="flex items-center gap-2 text-sm">
-        {{ event.participant_fee ? formatCurrency(event.participant_fee) : "Free" }}
+        {{ Number(event.event_fee) ? formatCurrency(event.event_fee) : "Free" }}
         <span>&middot;</span>
         {{ Number(event.capacity).toLocaleString() }}
       </p>

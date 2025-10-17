@@ -18,8 +18,8 @@ const emit = defineEmits<{ (e: "close"): void }>()
 
 const otherInfo = computed(() => {
   return {
-    registrationCost: props.event?.participant_fee
-      ? formatCurrency(props.event?.participant_fee)
+    registrationCost: Number(props.event?.event_fee)
+      ? formatCurrency(props.event?.event_fee)
       : "Free",
     description: props.event?.description || "N/A",
     eventInstructions: props.event?.eventInstructions || "N/A",
@@ -28,12 +28,17 @@ const otherInfo = computed(() => {
 })
 
 const openRegisterPage = () => {
+  const isSuiteV2 = import.meta.env.VITE_SUITE_VERSION === "V2"
   // https://suite-staging-branch.vercel.app
   const baseUrl = window.location.origin.includes("localhost")
-    ? "http://localhost:5173"
-    : "https://suite-staging-branch.vercel.app"
+    ? `http://localhost:${isSuiteV2 ? 8080 : 5173}`
+    : `https://${isSuiteV2 ? "suite-v2" : "staging-suite-branch"}.vercel.app`
 
-  window.open(`${baseUrl}/dashboard/sales/upcoming-events/${props.event?.id}`, "_blank")
+  if (isSuiteV2) {
+    window.open(`${baseUrl}/dashboard/sales/upcoming-events/${props.event?.id}`, "_blank")
+  } else {
+    window.open(`${baseUrl}/dashboard/sales/upcoming-events/${props.event?.id}`, "_blank")
+  }
 }
 
 const slotsRemaining = computed(() => {
@@ -80,7 +85,7 @@ const slotsRemaining = computed(() => {
           <div class="flex items-center gap-2">
             <Icon name="dollar-circle" size="20" />
             <p class="mr-2 text-sm">
-              {{ event?.participant_fee ? formatCurrency(event?.participant_fee) : "Free" }}
+              {{ Number(event?.event_fee) ? formatCurrency(event?.event_fee) : "Free" }}
             </p>
             <Chip
               v-if="slotsRemaining < 30"

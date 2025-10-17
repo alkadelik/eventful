@@ -8,6 +8,7 @@ export type TEvent = {
   description: string
   location: string
   capacity: string
+  revenue?: number
   eventInstructions?: string
   termsAndConditions?: string
   registered_merchants?: TVendor[]

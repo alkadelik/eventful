@@ -14,11 +14,7 @@ import { CODES_COLUMN, VENDORS_COLUMN } from "@modules/shared/constants"
 import Avatar from "@components/Avatar.vue"
 import CreateEventModal from "@modules/shared/components/CreateEventModal.vue"
 import { useRoute } from "vue-router"
-import {
-  useGetOrganizerEventDetails,
-  useGetOrganizerEventDiscountCodes,
-  useGetSingleEventStatistics,
-} from "@modules/shared/api"
+import { useGetOrganizerEventDetails, useGetOrganizerEventDiscountCodes } from "@modules/shared/api"
 import { TDiscountCode, TEvent } from "@modules/shared/types"
 import EmptyState from "@components/EmptyState.vue"
 import { useMediaQuery } from "@vueuse/core"
@@ -41,7 +37,6 @@ const route = useRoute()
 
 const eventId = route.params.id as string
 const { data: details, isPending, refetch } = useGetOrganizerEventDetails(eventId)
-const { data: stats } = useGetSingleEventStatistics(eventId)
 
 const otherInfo = computed(() => {
   return {
@@ -81,24 +76,22 @@ const formatDate = (dateStr: string) => {
 const isMobile = useMediaQuery("(max-width: 768px)")
 
 const STATS = computed(() => {
-  const { events, revenue, registrations } = stats?.value || {}
-  const totalRevenue = Number(revenue?.total) || 0
   return [
     {
       title: "Total Registrations",
-      value: registrations?.successful || 0,
+      value: details.value?.registered_merchants?.length || 0,
       icon: "shop",
       iconClass: "green" as const,
     },
     {
       title: "Total Revenue",
-      value: totalRevenue || 0,
+      value: details.value?.revenue ? formatCurrency(details.value?.revenue) : 0,
       icon: "shop",
       iconClass: "green" as const,
     },
     {
       title: "Avg. Revenue / Vendor",
-      value: totalRevenue && events?.total ? formatCurrency(totalRevenue / (events.total || 1)) : 0,
+      value: details.value?.event_fee ? formatCurrency(details.value?.event_fee) : 0,
       icon: "shop",
       iconClass: "green" as const,
     },
@@ -112,7 +105,7 @@ const actionMenu = computed(() => {
     { label: "Share Event", icon: "share", action: () => (openShare.value = true) },
   ].filter((item) =>
     isMobile.value
-      ? item.icon !== "edit" || !stats.value?.registrations.successful
+      ? item.icon !== "edit" || !details.value?.registered_merchants?.length
       : item.icon === "share",
   )
 })
@@ -127,6 +120,36 @@ const eventDiscountCodes = computed(() => {
   if (!discountCodes.value) return []
   return discountCodes.value?.filter((code) => code.event === Number(eventId)) || []
 })
+
+const isExporting = ref(false)
+
+const handleExport = () => {
+  isExporting.value = true
+  setTimeout(() => {
+    // formatted vendors data
+    const data = details.value?.registered_merchants?.map((vendor) => ({
+      Name: vendor.name,
+      Email: vendor.email,
+      Phone: vendor.phone || "N/A",
+      Code: vendor.code || "N/A",
+      Amount: details.value?.event_fee ? formatCurrency(details.value?.event_fee) : "Free",
+    }))
+    // csv data
+    const headers = Object.keys(data?.[0] || {}).join(",")
+    const values = data?.map((item) => Object.values(item).join(",")).join("\n")
+    const csvContent = "data:text/csv;charset=utf-8," + [headers, values ? values : ""].join("\n")
+    // Trigger CSV download
+    const encodedUri = encodeURI(csvContent)
+    const link = document.createElement("a")
+    link.setAttribute("href", encodedUri)
+    link.setAttribute("download", `Register_Vendors_${details.value?.event_slug}.csv`)
+    document.body.appendChild(link)
+    // clean up
+    link.click()
+    document.body.removeChild(link)
+    isExporting.value = false
+  }, 1000)
+}
 </script>
 
 <template>
@@ -172,7 +195,7 @@ const eventDiscountCodes = computed(() => {
           </div>
 
           <AppButton
-            v-if="!stats?.registrations.successful && eventStatus !== 'past'"
+            v-if="!details?.registered_merchants?.length && eventStatus !== 'past'"
             label="Edit Event"
             icon="edit"
             class="!hidden md:!inline-flex"
@@ -233,7 +256,7 @@ const eventDiscountCodes = computed(() => {
             description="Once people start registering, you'll see them here. Share your event to kick things off!"
             action-label="Share Event"
             action-icon="share"
-            :loading="isPending"
+            :loading="isExporting"
             @action="openShare = true"
           />
 
@@ -248,7 +271,8 @@ const eventDiscountCodes = computed(() => {
                 class="ml-auto"
                 variant="outlined"
                 icon="download-cloud"
-                @click="openExport = true"
+                :loading="isExporting"
+                @click="handleExport"
               />
             </div>
             <DataTable
@@ -263,6 +287,15 @@ const eventDiscountCodes = computed(() => {
               <template #cell:code="{ value }">
                 <Chip v-if="value" :label="String(value)" class="!rounded-lg" />
                 <span v-else>--</span>
+              </template>
+
+              <template #cell:amount_paid="{ value, item }">
+                <span v-if="item.code" class="text-red-400">
+                  {{ formatCurrency(Number(value)) }}
+                </span>
+                <span v-else>
+                  {{ Number(details?.event_fee) ? formatCurrency(details?.event_fee) : "--" }}
+                </span>
               </template>
 
               <template #mobile-card="{ item }">

@@ -90,8 +90,8 @@ const { handleSubmit, resetForm, meta } = useForm({
       .typeError("Discount must be a number")
       .positive("Discount must be positive")
       .max(
-        props.event.participant_fee,
-        `Discount cannot exceed participation fee - ${formatCurrency(props.event.participant_fee)}`,
+        Number(props.event.event_fee),
+        `Discount cannot exceed participation fee - ${formatCurrency(props.event.event_fee)}`,
       )
       .required("Discount value is required"),
     max_uses: yup
@@ -173,7 +173,7 @@ watch(
         type="number"
         required
         placeholder="e.g. N5,000"
-        :hint="`The participation fee is: ${formatCurrency(event.participant_fee)}`"
+        :hint="`The participation fee is: ${formatCurrency(event.event_fee)}`"
       />
 
       <FormField
