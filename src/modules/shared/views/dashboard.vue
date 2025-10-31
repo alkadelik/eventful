@@ -16,13 +16,14 @@ import TableEventCard from "../components/TableEventCard.vue"
 
 const { user } = useAuthStore()
 const { data: recentEvents, isPending, refetch } = useGetOrganizerEvents({ limit: 5 })
-const { data: evtStats } = useGetOrganizerEventStats()
+const { data: evtStats, refetch: refetchStats } = useGetOrganizerEventStats()
 
 const openCreate = ref(false)
 const openShare = ref(false)
 
 const STATS = computed(() => {
   const { events, revenue, registrations } = evtStats?.value || {}
+
   const totalRevenue = Number(revenue?.total) || 0
   return [
     {
@@ -125,18 +126,18 @@ const isEmpty = computed(() => !recentEvents.value?.results?.length)
           :columns="EVENT_COLUMN"
           :loading="isPending"
           :show-pagination="false"
-          @row-click="(item) => $router.push(`/events/${item.id}`)"
+          @row-click="(item) => $router.push(`/events/${item.id || item.uid}`)"
         >
           <template #cell:action="{ item }">
             <div class="inline-flex gap-3">
-              <Icon name="eye" @click.stop="() => $router.push(`/events/${item.id}`)" />
+              <Icon name="eye" @click.stop="() => $router.push(`/events/${item.id || item.uid}`)" />
 
               <DropdownMenu
                 :items="[
                   {
                     label: 'View Event',
                     icon: 'eye',
-                    action: () => $router.push(`/events/${item.id}`),
+                    action: () => $router.push(`/events/${item.id || item.uid}`),
                   },
                   { divider: true },
                   { label: 'Share Event', icon: 'share', action: () => (openShare = true) },
@@ -161,6 +162,15 @@ const isEmpty = computed(() => !recentEvents.value?.results?.length)
     </template>
 
     <!-- Create Event Modal -->
-    <CreateEventModal v-model:open="openCreate" @close="openCreate = false" @refresh="refetch" />
+    <CreateEventModal
+      v-model:open="openCreate"
+      @close="openCreate = false"
+      @refresh="
+        () => {
+          refetch()
+          refetchStats()
+        }
+      "
+    />
   </section>
 </template>

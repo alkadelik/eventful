@@ -28,7 +28,7 @@ const otherInfo = computed(() => {
 })
 
 const openRegisterPage = () => {
-  const isSuiteV2 = import.meta.env.VITE_SUITE_VERSION === "V2"
+  const isSuiteV2 = import.meta.env.VITE_API_VERSION === "V2"
   // https://suite-staging-branch.vercel.app
   const baseUrl = window.location.origin.includes("localhost")
     ? `http://localhost:${isSuiteV2 ? 8080 : 5173}`

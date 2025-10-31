@@ -35,17 +35,17 @@ const actions = [
       <h3 class="line-clamp-1 text-base font-semibold uppercase">{{ item.code }}</h3>
       <p class="flex items-center gap-2 text-sm">
         <Icon name="discount" size="20" />
-        {{ formatCurrency(item.amount) }}
+        {{ formatCurrency(item.amount || item.discount_value) }}
       </p>
-      <p v-if="item.max_uses" class="flex items-center gap-2 text-sm">
+      <p v-if="item.max_uses || item.usage_limit" class="flex items-center gap-2 text-sm">
         <Icon name="people" size="20" />
-        {{ item.max_uses }} Users
+        {{ item.max_uses || item.usage_limit }} Users
       </p>
       <p class="flex items-center gap-2 text-sm">
         <Chip
-          v-if="item.max_uses"
+          v-if="item.max_uses || item.usage_limit"
           color="blue"
-          :label="`${((item.usage_count || 0) / item.max_uses || 0) * 100}% usage`"
+          :label="`${((item.usage_count || item.used_count || 0) / (item.max_uses || item.usage_limit || 1)) * 100}% usage`"
         />
         <Chip color="success" label="Active" />
       </p>

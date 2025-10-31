@@ -3,19 +3,27 @@ import { TDiscountCode, TEvent, TVendor } from "./types"
 import { formatCurrency } from "@/utils/format-currency"
 
 export const EVENT_COLUMN: TableColumn<TEvent>[] = [
-  { header: "Event name", accessor: "event_name", class: "font-medium text-core-800" },
+  {
+    header: "Event name",
+    accessor: "event_name",
+    class: "font-medium text-core-800",
+    cell: ({ item }) => item?.event_name || item.name || "",
+  },
   {
     header: "Price",
     accessor: "event_fee",
-    cell: ({ value }) => (Number(value) ? formatCurrency(value as number) : "Free"),
+    cell: ({ item }) =>
+      Number(item.event_fee || item.participant_fee)
+        ? formatCurrency(Number(item.event_fee || item.participant_fee))
+        : "Free",
   },
-  { header: "Merchants", accessor: "merchants", cell: ({ item }) => item?.registration_count || 0 },
+  { header: "Merchants", accessor: "registration_count" },
   {
     header: "Revenue",
     accessor: "revenue",
     cell: ({ item }) =>
-      Number(item.event_fee) && item.registration_count
-        ? formatCurrency(Number(item.event_fee) * item.registration_count)
+      Number(item.event_fee || item.participant_fee) && item.registration_count
+        ? formatCurrency(Number(item.event_fee || item.participant_fee) * item.registration_count)
         : "--",
   },
   {
@@ -41,12 +49,19 @@ export const VENDORS_COLUMN: TableColumn<TVendor>[] = [
 
 export const CODES_COLUMN: TableColumn<TDiscountCode>[] = [
   { header: "Code", accessor: "code" },
-  { header: "Discount", accessor: "amount", cell: ({ value }) => formatCurrency(value as number) },
-  { header: "Usage Count", accessor: "times_used" },
+  {
+    header: "Discount",
+    accessor: "amount",
+    cell: ({ item }) => formatCurrency(Number(item.amount || item.discount_value)),
+  },
+  { header: "Usage Count", accessor: "used_count" },
   {
     header: "Expiry Date",
     accessor: "expiry_date",
-    cell: ({ value }) => (value ? new Date(value as string).toLocaleDateString("en-GB") : "--"),
+    cell: ({ item }) =>
+      item.expires_at || item.valid_until
+        ? new Date((item.expires_at || item.valid_until) as string).toLocaleDateString("en-GB")
+        : "--",
   },
   { header: "Status", accessor: "status" },
   { header: "", accessor: "action" },

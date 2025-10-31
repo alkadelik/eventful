@@ -32,5 +32,5 @@ const props = defineProps<Props>()
 const route = useRoute()
 const isMobile = useMediaQuery("(max-width: 1024px)")
 
-const isActive = computed(() => route.path === props.to)
+const isActive = computed(() => route.path.includes(props.to))
 </script>

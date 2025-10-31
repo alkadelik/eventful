@@ -30,7 +30,7 @@ const emit = defineEmits<{ (e: "click"): void; (e: "share"): void; (e: "edit"): 
   >
     <div class="mb-2 flex items-center justify-between gap-2">
       <h3 class="flex-1 truncate text-base font-semibold">
-        {{ event.event_name }}
+        {{ event.event_name || event.name }}
       </h3>
 
       <span v-if="Number(event.event_fee) && event.registration_count" class="font-medium">

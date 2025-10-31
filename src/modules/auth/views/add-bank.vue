@@ -56,6 +56,7 @@ import { useForm } from "vee-validate"
 import { displayError } from "@/utils/error-handler"
 import { onInvalidSubmit } from "@/utils/validations"
 import { useAuthStore } from "../store"
+import { isV2Api } from "@/utils/others"
 
 const router = useRouter()
 const { user, updateAuthUser } = useAuthStore()
@@ -92,8 +93,8 @@ const validateAccountNumber = (account_number: string, bank_code: string) => {
   resolveAccount(
     { account_number, bank_code },
     {
-      onSuccess: (res) => {
-        const acct_name = res.data?.data?.account_name
+      onSuccess: ({ data }) => {
+        const acct_name = isV2Api ? data?.data?.data?.account_name : data?.data?.account_name
         if (acct_name) {
           accountName.value = acct_name
           setValues({ account_name: acct_name })

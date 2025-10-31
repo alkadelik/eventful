@@ -14,6 +14,7 @@ import { displayError } from "@/utils/error-handler"
 import { useQueryClient } from "@tanstack/vue-query"
 import { createEventSchema, eventDetailsSchema } from "../validationSchemas"
 import { onInvalidSubmit } from "@/utils/validations"
+import { isV2Api } from "@/utils/others"
 
 const emit = defineEmits<{ (e: "close"): void; (e: "refresh"): void }>()
 const props = defineProps<{ open: boolean; event?: TEvent; isEditMode?: boolean }>()
@@ -47,11 +48,11 @@ const initialValues = ref<Partial<EventFormData>>({})
 const getInitialValues = (): Partial<EventFormData> => {
   if (props.isEditMode && props.event) {
     const values: Partial<EventFormData> = {
-      event_name: props.event.event_name,
+      event_name: props.event.event_name || props.event.name,
       startDate: props.event.start_date,
       endDate: props.event.end_date,
       venueAddress: props.event.location,
-      registrationCost: Number(props.event.event_fee),
+      registrationCost: Number(props.event.event_fee || props.event.participant_fee),
       capacity: parseInt(props.event.capacity),
       description: props.event.description,
       eventInstructions: props.event.eventInstructions || "",
@@ -72,13 +73,16 @@ const prepareFormData = (currentData: Partial<EventFormData>): FormData => {
   if (!props.isEditMode || !props.event) {
     // For create mode, include all required fields
     formData.append("organizer", String(user?.account_id ?? user?.id ?? 0))
-    formData.append("event_name", currentData.event_name!)
+    formData.append(isV2Api ? "name" : "event_name", currentData.event_name!)
     formData.append("location", currentData.venueAddress!)
     formData.append("description", currentData.description || "")
     formData.append("capacity", currentData.capacity!.toString())
     formData.append("start_date", currentData.startDate!)
     formData.append("end_date", currentData.endDate!)
-    formData.append("event_fee", currentData.registrationCost!.toString())
+    formData.append(
+      isV2Api ? "participant_fee" : "event_fee",
+      currentData.registrationCost!.toString(),
+    )
 
     // Add optional fields
     if (currentData.eventInstructions) {
@@ -93,7 +97,7 @@ const prepareFormData = (currentData: Partial<EventFormData>): FormData => {
   } else {
     // For edit mode, only include changed fields
     if (currentData.event_name !== initialValues.value.event_name) {
-      formData.append("event_name", currentData.event_name!)
+      formData.append(isV2Api ? "name" : "event_name", currentData.event_name!)
     }
     if (currentData.venueAddress !== initialValues.value.venueAddress) {
       formData.append("location", currentData.venueAddress!)
@@ -111,7 +115,10 @@ const prepareFormData = (currentData: Partial<EventFormData>): FormData => {
       formData.append("end_date", currentData.endDate!)
     }
     if (currentData.registrationCost !== initialValues.value.registrationCost) {
-      formData.append("event_fee", currentData.registrationCost!.toString())
+      formData.append(
+        isV2Api ? "participant_fee" : "event_fee",
+        currentData.registrationCost!.toString(),
+      )
     }
     if (currentData.eventInstructions !== initialValues.value.eventInstructions) {
       formData.append("event_instructions", currentData.eventInstructions || "")

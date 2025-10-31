@@ -3,8 +3,17 @@ import { useAuthStore } from "@modules/auth/store"
 import { useQuery } from "@tanstack/vue-query"
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios"
 import { toast } from "./useToast"
+import { toValue, MaybeRefOrGetter } from "vue"
+import { isV2Api } from "@/utils/others"
 
-const baseURL = (import.meta.env.VITE_API_URL as string) || ""
+const isLocalhost =
+  window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+
+const localApiURL = isV2Api ? "https://bpi.leyyow.com/api/v2" : "https://legacy-staging.leyyow.com"
+
+const apiUrl = import.meta.env.VITE_API_URL as string
+
+const baseURL = isLocalhost ? localApiURL : apiUrl.includes("legacy") ? apiUrl : apiUrl + "/api/v2"
 
 const baseApi = axios.create({
   baseURL,
@@ -21,8 +30,14 @@ baseApi.interceptors.request.use((config) => {
 
 const refreshToken = async (): Promise<string> => {
   const { refreshToken, setTokens } = useAuthStore()
-  const response = await baseApi.post("/auth/refresh/", { refreshToken })
-  const { access, refresh } = response.data as { access: string; refresh: string }
+  const response = await baseApi.post(
+    isV2Api ? "/token/refresh/" : "/auth/refresh/",
+    isV2Api ? { refresh: refreshToken } : { refreshToken },
+    { baseURL: isV2Api ? apiUrl : undefined },
+  )
+  const { access, refresh } = isV2Api
+    ? response.data.data
+    : (response.data as { access: string; refresh: string })
   setTokens({ access, refresh })
   return access
 }
@@ -70,9 +85,6 @@ baseApi.interceptors.response.use(
     return Promise.reject(error)
   },
 )
-
-import type { MaybeRefOrGetter } from "vue"
-import { toValue } from "vue"
 
 export type TQueryArg = {
   url: string

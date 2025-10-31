@@ -42,7 +42,8 @@ export const useAuthStore = defineStore(
 
     const logout = () => {
       clearAuth()
-      localStorage.clear()
+      // Clear only auth-related items, preserve user_consent and other non-auth data
+      localStorage.removeItem("auth")
       window.location.href = "/login"
     }
 

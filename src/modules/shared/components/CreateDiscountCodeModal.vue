@@ -11,6 +11,7 @@ import { toast } from "@/composables/useToast"
 import { displayError } from "@/utils/error-handler"
 import { formatCurrency } from "@/utils/format-currency"
 import * as yup from "yup"
+import { isV2Api } from "@/utils/others"
 
 const emit = defineEmits<{ (e: "close"): void; (e: "refresh"): void }>()
 const props = defineProps<{
@@ -90,8 +91,8 @@ const { handleSubmit, resetForm, meta } = useForm({
       .typeError("Discount must be a number")
       .positive("Discount must be positive")
       .max(
-        Number(props.event.event_fee),
-        `Discount cannot exceed participation fee - ${formatCurrency(props.event.event_fee)}`,
+        Number(props.event.event_fee || props.event.participant_fee),
+        `Discount cannot exceed participation fee - ${formatCurrency(props.event.event_fee || props.event.participant_fee)}`,
       )
       .required("Discount value is required"),
     max_uses: yup
@@ -136,7 +137,19 @@ const onSubmit = handleSubmit((data) => {
 
     updateDiscountCode({ id: props.code.id, body: payload }, onSuccessError)
   } else {
-    createDiscountCode(payload as DiscountCodePayload, onSuccessError)
+    const finalPayload = isV2Api
+      ? {
+          code: payload.code,
+          discount_type: "flat_rate",
+          discount_value: payload.amount,
+          valid_from: new Date().toISOString().slice(0, 10),
+          valid_until:
+            payload.expires_at || new Date(props.event.end_date).toISOString().slice(0, 10),
+          usage_limit: payload.max_uses || null,
+          events: [props.event.uid],
+        }
+      : payload
+    createDiscountCode(finalPayload as DiscountCodePayload, onSuccessError)
   }
 })
 
@@ -173,7 +186,7 @@ watch(
         type="number"
         required
         placeholder="e.g. N5,000"
-        :hint="`The participation fee is: ${formatCurrency(event.event_fee)}`"
+        :hint="`The participation fee is: ${formatCurrency(event.event_fee || event.participant_fee)}`"
       />
 
       <FormField

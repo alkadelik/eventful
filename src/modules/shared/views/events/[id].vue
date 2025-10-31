@@ -5,7 +5,7 @@ import AppButton from "@components/AppButton.vue"
 import Chip from "@components/Chip.vue"
 import Icon from "@components/Icon.vue"
 import SummaryCard from "@components/SummaryCard.vue"
-import { computed, ref } from "vue"
+import { computed, ref, watch } from "vue"
 import DropdownMenu from "@components/DropdownMenu.vue"
 import Tabs from "@components/Tabs.vue"
 import ShareEventModal from "@modules/landing/components/ShareEventModal.vue"
@@ -40,11 +40,14 @@ const { data: details, isPending, refetch } = useGetOrganizerEventDetails(eventI
 
 const otherInfo = computed(() => {
   return {
-    registrationCost: formatCurrency(details?.value?.event_fee || 0),
-    maximumCapacity: details?.value?.capacity || "N/A",
-    description: details?.value?.description || "",
-    eventInstructions: details?.value?.eventInstructions || "",
-    "Terms & Conditions": details?.value?.termsAndConditions || "",
+    registrationCost: Number(details.value?.event_fee || details.value?.participant_fee)
+      ? formatCurrency(details.value?.event_fee || details.value?.participant_fee)
+      : "Free",
+    maximumCapacity: Number(details.value?.capacity).toLocaleString() || "N/A",
+    description: details.value?.description || "",
+    eventInstructions: details.value?.eventInstructions || details.value?.event_instructions || "",
+    "Terms & Conditions":
+      details?.value?.termsAndConditions || details.value?.terms_and_conditions || "",
   }
 })
 
@@ -118,6 +121,9 @@ const {
 
 const eventDiscountCodes = computed(() => {
   if (!discountCodes.value) return []
+  if (discountCodes.value?.results) {
+    return discountCodes.value?.results
+  }
   return discountCodes.value?.filter((code) => code.event === Number(eventId)) || []
 })
 
@@ -174,7 +180,9 @@ const handleExport = () => {
         <div class="flex w-full flex-1 gap-3">
           <div class="flex-1 truncate">
             <div class="mb-3 flex items-center gap-2">
-              <h3 class="truncate text-xl font-semibold">{{ details?.event_name }}</h3>
+              <h3 class="truncate text-xl font-semibold">
+                {{ details?.event_name || details?.name }}
+              </h3>
               <Chip :label="eventStatus" class="capitalize" size="sm" :color="chipColor" />
             </div>
             <div class="space-y-2">
@@ -189,7 +197,11 @@ const handleExport = () => {
               </p>
 
               <div class="mt-1 inline-flex items-center gap-4 text-base font-semibold">
-                {{ Number(details?.event_fee) ? formatCurrency(details?.event_fee) : "Free" }}
+                {{
+                  Number(details?.event_fee || details.participant_fee)
+                    ? formatCurrency(details?.event_fee || details.participant_fee)
+                    : "Free"
+                }}
               </div>
             </div>
           </div>
@@ -216,7 +228,7 @@ const handleExport = () => {
         v-model="activeTab"
         :tabs="
           ['overview', 'vendors', 'codes'].filter(
-            (x) => x !== 'codes' || Number(details?.event_fee),
+            (x) => x !== 'codes' || Number(details?.event_fee || details?.participant_fee),
           )
         "
         class="max-w-md"
@@ -251,7 +263,7 @@ const handleExport = () => {
 
         <template #vendors>
           <EmptyState
-            v-if="!details?.registered_merchants?.length"
+            v-if="!details?.registered_merchants?.length && !details?.participants?.length"
             title="No attendee yet!"
             description="Once people start registering, you'll see them here. Share your event to kick things off!"
             action-label="Share Event"
@@ -324,7 +336,7 @@ const handleExport = () => {
           </div>
         </template>
 
-        <template v-if="Number(details?.event_fee)" #codes>
+        <template v-if="Number(details?.event_fee || details?.participant_fee)" #codes>
           <EmptyState
             v-if="!eventDiscountCodes?.length"
             title="No discount codes yet!"
@@ -349,6 +361,7 @@ const handleExport = () => {
                 <AppButton label="Add Code" size="sm" icon="add" @click="openAddCode = true" />
               </div>
             </div>
+
             <DataTable
               :data="eventDiscountCodes ?? []"
               :columns="CODES_COLUMN"
@@ -395,9 +408,10 @@ const handleExport = () => {
                   />
 
                   <DropdownMenu
+                    @toggle="() => (selectedCode = item)"
                     :items="[
                       {
-                        label: 'Deactivate Code',
+                        label: item.is_active ? 'Deactivate Code' : 'Activate Code',
                         icon: 'close-circle',
                         action: () => (openDeactivate = true),
                       },
@@ -484,6 +498,7 @@ const handleExport = () => {
           selectedCode = undefined
         }
       "
+      @refresh="refetchCodes"
     />
   </div>
 </template>

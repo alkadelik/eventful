@@ -5,7 +5,8 @@ export interface IUser {
   first_name: string
   last_name: string
   email: string
-  email_confirmed: boolean
+  email_confirmed?: boolean
+  is_email_verified?: boolean
   phone?: string | null
   company_name?: string | null
   has_payment_account?: boolean

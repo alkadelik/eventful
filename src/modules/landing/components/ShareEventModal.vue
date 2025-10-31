@@ -27,7 +27,7 @@ const eventUrl = computed(() => {
   const baseUrl = window.location.origin.includes("localhost")
     ? "http://localhost:8082"
     : "https://eventful.leyyow.com"
-  return `${baseUrl}/upcoming-events/${props.event?.id}`
+  return `${baseUrl}/upcoming-events/${props.event?.id || props.event?.uid}`
 })
 
 // ====== TODO: configure open graph meta tags for better sharing

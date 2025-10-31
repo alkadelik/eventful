@@ -15,6 +15,7 @@
       :hint="hintText"
       :variant="variant"
       :size="size"
+      :searchable="searchable"
       :placement="placement"
       @update:model-value="field.value = $event"
     />

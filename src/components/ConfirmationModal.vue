@@ -118,7 +118,7 @@ const headerIconContainerClasses = computed(() => {
   const variantClasses = {
     warning: "border-warning-100 bg-warning-200 ring-warning-100 text-warning-700",
     error: "border-red-100 bg-red-200 ring-red-100 text-red-700",
-    success: "border-success-100 bg-success-200 ring-success-100 text-success-700",
+    success: "border-green-100 bg-green-200 ring-green-100 text-green-700",
   }
 
   return [
@@ -132,7 +132,7 @@ const infoBoxClasses = computed(() => {
   const variantClasses = {
     warning: "border-warning-300 bg-warning-50 text-warning-700",
     error: "border-red-300 bg-red-50 text-red-700",
-    success: "border-success-300 bg-success-50 text-success-700",
+    success: "border-green-300 bg-green-50 text-green-700",
   }
 
   return ["my-3 flex items-center gap-3 rounded-xl border p-3", variantClasses[props.variant]]
@@ -142,7 +142,7 @@ const infoIconContainerClasses = computed(() => {
   const variantClasses = {
     warning: "border-warning-200 ring-warning-100 text-warning-600",
     error: "border-red-200 ring-red-100 text-red-600",
-    success: "border-success-200 ring-success-100 text-success-600",
+    success: "border-green-200 ring-green-100 text-green-600",
   }
   return [
     "rounded-full border-2 p-0.5 size-6 flex items-center justify-center ring-2 ring-offset-2",
@@ -155,7 +155,7 @@ const actionButtonClasses = computed(() => {
   const variantClasses = {
     warning: "!bg-warning-600 hover:!bg-warning-500",
     error: "!bg-red-600 hover:!bg-red-500",
-    success: "!bg-success-600 hover:!bg-success-500",
+    success: "!bg-green-600 hover:!bg-green-500",
   }
 
   return ["flex-1", variantClasses[props.variant]]

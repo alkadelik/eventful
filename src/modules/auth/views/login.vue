@@ -66,7 +66,7 @@ import { useLogin } from "../api"
 import * as yup from "yup"
 import { displayError } from "@/utils/error-handler"
 import { useAuthStore } from "../store"
-import { TLoginPayload } from "../types"
+import { ILoginResponse, TLoginPayload } from "../types"
 import { toast } from "@/composables/useToast"
 import AppForm from "@components/form/AppForm.vue"
 import FormField from "@components/form/FormField.vue"
@@ -74,6 +74,7 @@ import SectionHeader from "@components/SectionHeader.vue"
 import { ref } from "vue"
 import AppButton from "@components/AppButton.vue"
 import Chip from "@components/Chip.vue"
+import { isV2Api } from "@/utils/others"
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -88,12 +89,15 @@ const loginSchema = yup.object({
 const onSubmit = (values: TLoginPayload) => {
   loginFn(values, {
     onSuccess: (res) => {
-      const { access, refresh, ...user } = res.data || {}
+      console.log("Login response:", res)
+      const authData = (isV2Api ? res.data.data : res.data) as ILoginResponse["data"]
+      const { access, refresh, ...user } = authData
       authStore.setTokens({ access, refresh })
       authStore.setAuthUser({
         ...user,
+        email_confirmed: user.email_confirmed || user.is_email_verified,
         email: values.email,
-        // has_payment_account: true, /// TEMPORARY FIX
+        has_payment_account: true, /// TEMPORARY FIX
       })
       toast.success("Your login was successful!")
       // check for redirect query param

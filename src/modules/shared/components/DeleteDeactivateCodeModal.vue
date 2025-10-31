@@ -41,9 +41,9 @@ const handleConfirm = () => {
       amount: props.item.amount,
       is_active: !props.item.is_active,
     }
-    updateCode({ id: props.item.id, body }, onSuccessError)
+    updateCode({ id: (props.item.id || props.item.uid) as string, body }, onSuccessError)
   } else {
-    deleteCode(props.item.id, onSuccessError)
+    deleteCode((props.item.id || props.item.uid) as string, onSuccessError)
   }
 }
 </script>
@@ -57,9 +57,11 @@ const handleConfirm = () => {
     :subtitle="`This code will ${computedAction === 'delete' ? 'no longer be usable' : 'temporarily be unusable'} by anyone.`"
     :loading="isUpdating || isDeleting"
     :info-message="
-      computedAction === 'delete' ? '' : `You can always reactivate the code when you come back.`
+      computedAction === 'delete'
+        ? ''
+        : `You can always ${computedAction === 'deactivate' ? 're-activate' : 'de-activate'} the code when you come back.`
     "
-    :action-label="startCase(action)"
+    :action-label="startCase(computedAction)"
     @confirm="handleConfirm"
   >
     <template #content>

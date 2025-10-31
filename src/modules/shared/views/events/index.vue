@@ -36,7 +36,7 @@ onMounted(() => {
   if (route.query.open === "create") openCreate.value = true
 })
 
-const isEmpty = computed(() => !myEvents?.value?.results?.length)
+const isEmpty = computed(() => !myEvents?.value?.results?.length && status.value === "all")
 </script>
 
 <template>
@@ -60,7 +60,6 @@ const isEmpty = computed(() => !myEvents?.value?.results?.length)
 
     <template v-else>
       <Tabs
-        v-if="myEvents?.results?.length"
         v-model="status"
         :tabs="[
           { title: 'All', key: 'all' },
@@ -79,11 +78,14 @@ const isEmpty = computed(() => !myEvents?.value?.results?.length)
           :columns="EVENT_COLUMN"
           :loading="isPending"
           :show-pagination="true"
-          @row-click="(item) => $router.push(`/events/${item.id}`)"
+          @row-click="(item) => $router.push(`/events/${item.id || item.uid}`)"
+          :empty-state="{
+            title: `No ${status} events found`,
+            description: 'Try adjusting your filters or create a new event.',
+          }"
         >
           <template #cell:action="{ item }">
             <div class="flex justify-end gap-3">
-              <!-- <Icon name="eye" @click.stop="() => $router.push(`/events/${item.id}`)" /> -->
               <Icon
                 v-if="!item.registration_count"
                 name="edit"
@@ -96,11 +98,12 @@ const isEmpty = computed(() => !myEvents?.value?.results?.length)
               />
 
               <DropdownMenu
+                @toggle="selectedEvent = item"
                 :items="[
                   {
                     label: 'View Event',
                     icon: 'eye',
-                    action: () => $router.push(`/events/${item.id}`),
+                    action: () => $router.push(`/events/${item.id || item.uid}`),
                   },
                   { divider: true },
                   { label: 'Share Event', icon: 'share', action: () => (openShare = true) },
