@@ -89,7 +89,6 @@ const loginSchema = yup.object({
 const onSubmit = (values: TLoginPayload) => {
   loginFn(values, {
     onSuccess: (res) => {
-      console.log("Login response:", res)
       const authData = (isV2Api ? res.data.data : res.data) as ILoginResponse["data"]
       const { access, refresh, ...user } = authData
       authStore.setTokens({ access, refresh })

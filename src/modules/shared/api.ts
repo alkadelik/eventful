@@ -35,11 +35,11 @@ export function useGetOrganizerEvents(
 export function useGetOrganizerEventsPublic(
   params?: MaybeRefOrGetter<Record<string, string | number | boolean> | undefined>,
 ) {
-  return useApiQuery<TEvent[]>({
+  return useApiQuery<TEventResponse>({
     url: isV2Api ? "/eventful/events/" : "/inventory/organizer/public-events/",
     params,
     key: "organizerEventsPublic",
-    // selectData: true,
+    selectData: !!isV2Api,
   })
 }
 
