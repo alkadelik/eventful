@@ -4,6 +4,9 @@ import AppSection from "@components/AppSection.vue"
 import { useAuthStore } from "@modules/auth/store"
 import { computed } from "vue"
 
+const appVersion = __APP_VERSION__
+console.log("App Version:", appVersion)
+
 const isAuthenticated = computed(() => useAuthStore().isAuthenticated)
 
 type FooterLink = {

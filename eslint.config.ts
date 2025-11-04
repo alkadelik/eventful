@@ -34,6 +34,8 @@ export default tseslint.config(
       globals: {
         ...globals.browser,
         ...globals.node,
+        // Define global constants here
+        __APP_VERSION__: "readonly",
       },
     },
     plugins: { prettier },
