@@ -9,6 +9,7 @@ import { useRouter } from "vue-router"
 import { useGetOrganizerEventsPublic } from "@modules/shared/api"
 import { isV2Api } from "@/utils/others"
 import { TEvent } from "@modules/shared/types"
+import ConsentBanner from "@modules/shared/components/ConsentBanner.vue"
 
 const router = useRouter()
 
@@ -21,13 +22,10 @@ const { data: orgEvents } = useGetOrganizerEventsPublic()
 // events that are upcoming or ongoing
 const filteredEvents = computed(() => {
   const events = (isV2Api ? orgEvents.value?.results : orgEvents.value) as TEvent[] | undefined
-  console.log("Fetched Events:", events)
-  // return events || []
-  return (
-    events?.filter(
-      (evt) => new Date(evt.start_date) >= new Date() || new Date(evt.end_date) >= new Date(),
-    ) || []
+  const isUpcomingOrOngoing = events?.filter(
+    (evt) => new Date(evt.start_date) >= new Date() || new Date(evt.end_date) >= new Date(),
   )
+  return isUpcomingOrOngoing?.length ? isUpcomingOrOngoing : events || []
 })
 </script>
 
@@ -139,7 +137,7 @@ const filteredEvents = computed(() => {
         <h2 class="mb-2 text-2xl font-semibold md:text-4xl">Upcoming Pop-Up Events</h2>
         <p class="text-lg md:text-xl">Discover events near you and book a booth today.</p>
       </div>
-      {{ filteredEvents }}
+
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
         <EventCard
           v-for="evt in filteredEvents.slice(0, 6)"
@@ -226,5 +224,8 @@ const filteredEvents = computed(() => {
         </div>
       </div>
     </AppSection>
+
+    <!-- Consent Banner -->
+    <ConsentBanner />
   </div>
 </template>
