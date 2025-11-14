@@ -57,6 +57,14 @@ export type TDiscountCode = {
   is_active: boolean
 }
 
+// Paginated response for discount codes (v2 API)
+export type TDiscountCodeResponse = {
+  results: TDiscountCode[]
+  count: number
+  next: string | null
+  previous: string | null
+}
+
 export interface EventDashboardStats {
   events: {
     total: number

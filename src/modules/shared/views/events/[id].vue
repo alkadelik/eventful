@@ -5,7 +5,7 @@ import AppButton from "@components/AppButton.vue"
 import Chip from "@components/Chip.vue"
 import Icon from "@components/Icon.vue"
 import SummaryCard from "@components/SummaryCard.vue"
-import { computed, ref, watch } from "vue"
+import { computed, ref } from "vue"
 import DropdownMenu from "@components/DropdownMenu.vue"
 import Tabs from "@components/Tabs.vue"
 import ShareEventModal from "@modules/landing/components/ShareEventModal.vue"
@@ -15,7 +15,7 @@ import Avatar from "@components/Avatar.vue"
 import CreateEventModal from "@modules/shared/components/CreateEventModal.vue"
 import { useRoute } from "vue-router"
 import { useGetOrganizerEventDetails, useGetOrganizerEventDiscountCodes } from "@modules/shared/api"
-import { TDiscountCode, TEvent } from "@modules/shared/types"
+import { TDiscountCode, TDiscountCodeResponse, TEvent } from "@modules/shared/types"
 import EmptyState from "@components/EmptyState.vue"
 import { useMediaQuery } from "@vueuse/core"
 import TextField from "@components/form/TextField.vue"
@@ -119,12 +119,16 @@ const {
   refetch: refetchCodes,
 } = useGetOrganizerEventDiscountCodes(route.params.id as string)
 
-const eventDiscountCodes = computed(() => {
-  if (!discountCodes.value) return []
-  if (discountCodes.value?.results) {
-    return discountCodes.value?.results
-  }
-  return discountCodes.value?.filter((code) => code.event === Number(eventId)) || []
+function isPaginatedDiscountCodes(
+  data: TDiscountCodeResponse | TDiscountCode[] | undefined,
+): data is TDiscountCodeResponse {
+  return !!data && typeof data === "object" && "results" in data && Array.isArray(data.results)
+}
+
+const eventDiscountCodes = computed<TDiscountCode[]>(() => {
+  const data = discountCodes.value
+  if (!data) return []
+  return isPaginatedDiscountCodes(data) ? data.results : data
 })
 
 const isExporting = ref(false)
@@ -263,7 +267,7 @@ const handleExport = () => {
 
         <template #vendors>
           <EmptyState
-            v-if="!details?.registered_merchants?.length && !details?.participants?.length"
+            v-if="!details?.registered_merchants?.length && !details?.registered_merchants?.length"
             title="No attendee yet!"
             description="Once people start registering, you'll see them here. Share your event to kick things off!"
             action-label="Share Event"

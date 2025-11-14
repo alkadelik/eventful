@@ -135,15 +135,12 @@ const onSubmit = (values: FormValues) => {
   }
 
   console.log("Submitting export payload:", payload)
-  exportVendors(
-    { id: props.eventId, payload },
-    {
-      onSuccess: () => {
-        toast.success("Registered vendors CSV sent to mail!")
-        emit("close")
-      },
-      onError: displayError,
+  exportVendors(String(props.eventId), {
+    onSuccess: () => {
+      toast.success("Registered vendors CSV sent to mail!")
+      emit("close")
     },
-  )
+    onError: displayError,
+  })
 }
 </script>

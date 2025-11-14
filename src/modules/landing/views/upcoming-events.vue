@@ -8,6 +8,7 @@ import Tabs from "@components/Tabs.vue"
 import BackButton from "@components/BackButton.vue"
 import EmptyState from "@components/EmptyState.vue"
 import { useRouter } from "vue-router"
+import { isV2Api } from "@/utils/others"
 
 const tabs = [
   { title: "Ongoing", key: "ongoing" },
@@ -15,23 +16,26 @@ const tabs = [
 ]
 
 const { data: orgEvents, isPending } = useGetOrganizerEventsPublic()
+
 // events that are upcoming or ongoing
 const filteredEvents = computed(() => {
-  if (!orgEvents.value) return []
+  const events = (isV2Api ? orgEvents.value?.results : orgEvents.value) as TEvent[] | undefined
+
+  if (!events) return []
 
   if (activeTab.value === "ongoing") {
     return (
-      orgEvents.value?.filter(
+      events?.filter(
         (evt) => new Date(evt.start_date) <= new Date() && new Date(evt.end_date) >= new Date(),
       ) || []
     )
   }
 
   if (activeTab.value === "upcoming") {
-    return orgEvents.value?.filter((evt) => new Date(evt.start_date) > new Date()) || []
+    return events.filter((evt) => new Date(evt.start_date) > new Date()) || []
   }
 
-  return orgEvents.value
+  return events
 })
 
 const activeTab = ref("ongoing")

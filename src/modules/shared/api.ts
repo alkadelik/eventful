@@ -5,6 +5,7 @@ import {
   EventDashboardStats,
   EventPayload,
   TDiscountCode,
+  TDiscountCodeResponse,
   TEvent,
   TEventResponse,
 } from "./types"
@@ -142,7 +143,8 @@ export function useUpdateDiscountCode() {
 
 /** Fetch discount codes for an event */
 export function useGetOrganizerEventDiscountCodes(eventId: string, enabled = true) {
-  return useApiQuery<TDiscountCode[]>({
+  // V2 returns paginated discount codes, legacy returns plain array
+  return useApiQuery<TDiscountCodeResponse | TDiscountCode[]>({
     url: isV2Api
       ? `/eventful/discounts/?event=${eventId}`
       : `/inventory/organizer/discount-codes/event/${eventId}/`,

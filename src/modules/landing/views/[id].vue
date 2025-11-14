@@ -16,6 +16,7 @@ import { TEvent } from "@modules/shared/types"
 import EmptyState from "@components/EmptyState.vue"
 import EventCard from "../components/EventCard.vue"
 import TextField from "@components/form/TextField.vue"
+import { isV2Api } from "@/utils/others"
 
 const route = useRoute()
 
@@ -57,11 +58,11 @@ const { data: orgEvents } = useGetOrganizerEventsPublic()
 
 // events that are upcoming or ongoing
 const filteredEvents = computed(() => {
-  return (
-    orgEvents.value?.filter(
-      (evt) => new Date(evt.start_date) >= new Date() || new Date(evt.end_date) >= new Date(),
-    ) || []
+  const events = (isV2Api ? orgEvents.value?.results : orgEvents.value) as TEvent[] | undefined
+  const isUpcomingOrOngoing = events?.filter(
+    (evt) => new Date(evt.start_date) >= new Date() || new Date(evt.end_date) >= new Date(),
   )
+  return isUpcomingOrOngoing?.length ? isUpcomingOrOngoing : []
 })
 </script>
 
