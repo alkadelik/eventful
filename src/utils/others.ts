@@ -14,4 +14,4 @@ export function clipboardCopy(text: string) {
   )
 }
 
-export const isV2Api = import.meta.env.VITE_API_VERSION === "V2"
+export const isV2Api = true // import.meta.env.VITE_API_VERSION === "V2"
