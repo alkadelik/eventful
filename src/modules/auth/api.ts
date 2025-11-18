@@ -65,7 +65,7 @@ export function useResendVerificationCode() {
   return useMutation({
     mutationFn: (email: string) =>
       baseApi.post(
-        isV2Api ? "/accounts/verification/resend-email-token/" : "/account/resend-verification/",
+        isV2Api ? "/accounts/verifications/resend-email-token/" : "/account/resend-verification/",
         { email },
       ),
   })
