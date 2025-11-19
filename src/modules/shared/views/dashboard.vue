@@ -13,6 +13,8 @@ import { formatCurrency } from "@/utils/format-currency"
 import EmptyState from "@components/EmptyState.vue"
 import DropdownMenu from "@components/DropdownMenu.vue"
 import TableEventCard from "../components/TableEventCard.vue"
+import { TEvent } from "../types"
+import ShareEventModal from "@modules/landing/components/ShareEventModal.vue"
 
 const { user } = useAuthStore()
 const { data: recentEvents, isPending, refetch } = useGetOrganizerEvents({ limit: 5 })
@@ -20,6 +22,7 @@ const { data: evtStats, refetch: refetchStats } = useGetOrganizerEventStats()
 
 const openCreate = ref(false)
 const openShare = ref(false)
+const selectedEvent = ref<TEvent>()
 
 const STATS = computed(() => {
   const { events, revenue, registrations } = evtStats?.value || {}
@@ -133,6 +136,7 @@ const isEmpty = computed(() => !recentEvents.value?.results?.length)
               <Icon name="eye" @click.stop="() => $router.push(`/events/${item.id || item.uid}`)" />
 
               <DropdownMenu
+                @toggle="selectedEvent = item"
                 :items="[
                   {
                     label: 'View Event',
@@ -151,7 +155,15 @@ const isEmpty = computed(() => !recentEvents.value?.results?.length)
           </template>
 
           <template #mobile-card="{ item }">
-            <TableEventCard :event="item" @share="openShare = true" />
+            <TableEventCard
+              :event="item"
+              @share="
+                () => {
+                  selectedEvent = item
+                  openShare = true
+                }
+              "
+            />
           </template>
         </DataTable>
 
@@ -172,5 +184,7 @@ const isEmpty = computed(() => !recentEvents.value?.results?.length)
         }
       "
     />
+
+    <ShareEventModal :open="openShare" @close="openShare = false" :event="selectedEvent" />
   </section>
 </template>
