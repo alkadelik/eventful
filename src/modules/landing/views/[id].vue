@@ -4,7 +4,7 @@ import { startCase } from "@/utils/format-strings"
 import AppButton from "@components/AppButton.vue"
 import Chip from "@components/Chip.vue"
 import Icon from "@components/Icon.vue"
-import { computed, onMounted, ref } from "vue"
+import { computed, ref } from "vue"
 import { getEventStatus } from "@modules/shared/utils"
 import { formatDate } from "@/utils/format-date"
 import ShareEventModal from "../components/ShareEventModal.vue"
@@ -16,14 +16,10 @@ import { TEvent } from "@modules/shared/types"
 import EmptyState from "@components/EmptyState.vue"
 import EventCard from "../components/EventCard.vue"
 import TextField from "@components/form/TextField.vue"
-import { isV2Api } from "@/utils/others"
 
 const route = useRoute()
 
 const { data: orgEvent, isLoading } = useGetPublicOrganizerEventById(route.params.id as string)
-onMounted(() => {
-  console.log("data", orgEvent.value)
-})
 
 const openShare = ref(false)
 
@@ -39,12 +35,11 @@ const otherInfo = computed(() => {
 })
 
 const openRegisterPage = () => {
-  // https://suite-staging-branch.vercel.app
   const baseUrl = window.location.origin.includes("localhost")
-    ? "http://localhost:5173"
-    : "https://suite-staging-branch.vercel.app"
+    ? "http://localhost:8080"
+    : "https://suite.leyyow.com"
 
-  window.open(`${baseUrl}/dashboard/sales/upcoming-events/${orgEvent.value?.id}`, "_blank")
+  window.open(`${baseUrl}/popups/eventful/${orgEvent.value?.id}`, "_blank")
 }
 
 const slotsRemaining = computed(() => {
@@ -58,7 +53,7 @@ const { data: orgEvents } = useGetOrganizerEventsPublic()
 
 // events that are upcoming or ongoing
 const filteredEvents = computed(() => {
-  const events = (isV2Api ? orgEvents.value?.results : orgEvents.value) as TEvent[] | undefined
+  const events = orgEvents.value?.results
   const isUpcomingOrOngoing = events?.filter(
     (evt) => new Date(evt.start_date) >= new Date() || new Date(evt.end_date) >= new Date(),
   )

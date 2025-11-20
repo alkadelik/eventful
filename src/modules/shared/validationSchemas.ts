@@ -26,8 +26,7 @@ export const eventDetailsSchema = yup.object({
   registrationCost: yup
     .number()
     .typeError("Must be a number")
-    .min(0, "Registration cost cannot be negative")
-    .required("Registration cost is required"),
+    .min(0, "Registration cost cannot be negative"),
 
   capacity: yup
     .number()

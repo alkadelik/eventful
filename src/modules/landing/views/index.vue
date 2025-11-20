@@ -7,8 +7,6 @@ import EventCard from "../components/EventCard.vue"
 import { computed } from "vue"
 import { useRouter } from "vue-router"
 import { useGetOrganizerEventsPublic } from "@modules/shared/api"
-import { isV2Api } from "@/utils/others"
-import { TEvent } from "@modules/shared/types"
 import ConsentBanner from "@modules/shared/components/ConsentBanner.vue"
 
 const router = useRouter()
@@ -21,7 +19,7 @@ const { data: orgEvents } = useGetOrganizerEventsPublic()
 
 // events that are upcoming or ongoing
 const filteredEvents = computed(() => {
-  const events = (isV2Api ? orgEvents.value?.results : orgEvents.value) as TEvent[] | undefined
+  const events = orgEvents.value?.results
   const isUpcomingOrOngoing = events?.filter(
     (evt) => new Date(evt.start_date) >= new Date() || new Date(evt.end_date) >= new Date(),
   )

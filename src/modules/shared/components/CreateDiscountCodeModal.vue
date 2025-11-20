@@ -11,7 +11,6 @@ import { toast } from "@/composables/useToast"
 import { displayError } from "@/utils/error-handler"
 import { formatCurrency } from "@/utils/format-currency"
 import * as yup from "yup"
-import { isV2Api } from "@/utils/others"
 
 const emit = defineEmits<{ (e: "close"): void; (e: "refresh"): void }>()
 const props = defineProps<{
@@ -137,19 +136,16 @@ const onSubmit = handleSubmit((data) => {
 
     updateDiscountCode({ id: props.code.id, body: payload }, onSuccessError)
   } else {
-    const finalPayload = isV2Api
-      ? {
-          code: payload.code,
-          discount_type: "flat_rate",
-          discount_value: payload.amount,
-          valid_from: new Date().toISOString().slice(0, 10),
-          valid_until:
-            payload.expires_at || new Date(props.event.end_date).toISOString().slice(0, 10),
-          usage_limit: payload.max_uses || null,
-          events: [props.event.uid],
-        }
-      : payload
-    createDiscountCode(finalPayload as DiscountCodePayload, onSuccessError)
+    const finalPayload = {
+      code: payload.code,
+      discount_type: "flat_rate",
+      discount_value: payload.amount,
+      valid_from: new Date().toISOString().slice(0, 10),
+      valid_until: payload.expires_at || new Date(props.event.end_date).toISOString().slice(0, 10),
+      usage_limit: payload.max_uses || null,
+      events: [props.event.uid],
+    }
+    createDiscountCode(finalPayload as unknown as DiscountCodePayload, onSuccessError)
   }
 })
 

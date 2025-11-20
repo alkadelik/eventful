@@ -14,7 +14,6 @@ import { displayError } from "@/utils/error-handler"
 import { useQueryClient } from "@tanstack/vue-query"
 import { createEventSchema, eventDetailsSchema } from "../validationSchemas"
 import { onInvalidSubmit } from "@/utils/validations"
-import { isV2Api } from "@/utils/others"
 
 const emit = defineEmits<{ (e: "close"): void; (e: "refresh"): void }>()
 const props = defineProps<{ open: boolean; event?: TEvent; isEditMode?: boolean }>()
@@ -73,16 +72,13 @@ const prepareFormData = (currentData: Partial<EventFormData>): FormData => {
   if (!props.isEditMode || !props.event) {
     // For create mode, include all required fields
     formData.append("organizer", String(user?.account_id ?? user?.id ?? 0))
-    formData.append(isV2Api ? "name" : "event_name", currentData.event_name!)
+    formData.append("name", currentData.event_name!)
     formData.append("location", currentData.venueAddress!)
     formData.append("description", currentData.description || "")
     formData.append("capacity", currentData.capacity!.toString())
     formData.append("start_date", currentData.startDate!)
     formData.append("end_date", currentData.endDate!)
-    formData.append(
-      isV2Api ? "participant_fee" : "event_fee",
-      currentData.registrationCost!.toString(),
-    )
+    formData.append("participant_fee", currentData.registrationCost!.toString())
 
     // Add optional fields
     if (currentData.eventInstructions) {
@@ -97,7 +93,7 @@ const prepareFormData = (currentData: Partial<EventFormData>): FormData => {
   } else {
     // For edit mode, only include changed fields
     if (currentData.event_name !== initialValues.value.event_name) {
-      formData.append(isV2Api ? "name" : "event_name", currentData.event_name!)
+      formData.append("name", currentData.event_name!)
     }
     if (currentData.venueAddress !== initialValues.value.venueAddress) {
       formData.append("location", currentData.venueAddress!)
@@ -115,10 +111,7 @@ const prepareFormData = (currentData: Partial<EventFormData>): FormData => {
       formData.append("end_date", currentData.endDate!)
     }
     if (currentData.registrationCost !== initialValues.value.registrationCost) {
-      formData.append(
-        isV2Api ? "participant_fee" : "event_fee",
-        currentData.registrationCost!.toString(),
-      )
+      formData.append("participant_fee", currentData.registrationCost!.toString())
     }
     if (currentData.eventInstructions !== initialValues.value.eventInstructions) {
       formData.append("event_instructions", currentData.eventInstructions || "")
@@ -291,7 +284,7 @@ onUnmounted(() => {
           <FormField name="venueAddress" required />
 
           <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            <FormField name="registrationCost" type="number" required />
+            <FormField name="registrationCost" type="number" />
             <FormField name="capacity" label="Maximum No. of Registrants" type="number" required />
           </div>
 

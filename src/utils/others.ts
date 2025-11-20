@@ -13,5 +13,3 @@ export function clipboardCopy(text: string) {
     () => toast.error("Failed to copy to clipboard"),
   )
 }
-
-export const isV2Api = true // import.meta.env.VITE_API_VERSION === "V2"

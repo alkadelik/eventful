@@ -8,7 +8,6 @@ import Tabs from "@components/Tabs.vue"
 import BackButton from "@components/BackButton.vue"
 import EmptyState from "@components/EmptyState.vue"
 import { useRouter } from "vue-router"
-import { isV2Api } from "@/utils/others"
 
 const tabs = [
   { title: "Ongoing", key: "ongoing" },
@@ -19,10 +18,8 @@ const { data: orgEvents, isPending } = useGetOrganizerEventsPublic()
 
 // events that are upcoming or ongoing
 const filteredEvents = computed(() => {
-  const events = (isV2Api ? orgEvents.value?.results : orgEvents.value) as TEvent[] | undefined
-
+  const events = orgEvents.value?.results
   if (!events) return []
-
   if (activeTab.value === "ongoing") {
     return (
       events?.filter(
@@ -54,6 +51,8 @@ const openEvent = (event: TEvent) => {
       <p class="text-lg md:text-xl">Discover events near you and book a booth today.</p>
     </div>
 
+    <Tabs v-model="activeTab" :tabs="tabs" class="max-w-md" />
+
     <EmptyState
       v-if="!filteredEvents.length"
       icon="calendar"
@@ -62,17 +61,8 @@ const openEvent = (event: TEvent) => {
       description="There are no events available at the moment. Please check back later."
     />
 
-    <template v-else>
-      <Tabs v-model="activeTab" :tabs="tabs" class="max-w-md" />
-
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
-        <EventCard
-          v-for="evt in filteredEvents"
-          :key="evt.id"
-          :event="evt"
-          @click="openEvent(evt)"
-        />
-      </div>
-    </template>
+    <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+      <EventCard v-for="evt in filteredEvents" :key="evt.id" :event="evt" @click="openEvent(evt)" />
+    </div>
   </AppSection>
 </template>

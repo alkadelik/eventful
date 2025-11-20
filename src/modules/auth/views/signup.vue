@@ -103,7 +103,7 @@ import * as yup from "yup"
 import { passwordSchema } from "@/utils/validationSchemas"
 import { useRegister } from "../api"
 import { displayError } from "@/utils/error-handler"
-// import { useAuthStore } from "../store"
+import { useAuthStore } from "../store"
 import { TSignupPayload } from "../types"
 import { toast } from "@/composables/useToast"
 import AppForm from "@components/form/AppForm.vue"
@@ -112,7 +112,7 @@ import SectionHeader from "@components/SectionHeader.vue"
 import AppButton from "@components/AppButton.vue"
 
 const { mutate: signupFn, isPending } = useRegister()
-// const authStore = useAuthStore()
+const authStore = useAuthStore()
 const router = useRouter()
 
 const validationSchema = yup.object().shape({
@@ -143,19 +143,11 @@ const onSubmit = (values: TSignupPayload) => {
     },
     {
       onSuccess: (res) => {
-        console.log("res", res.data)
-        // const { token, ...user } = res.data?.data || {}
-
-        // ==== SIGNUP SUCCESS response is missing important data ====
-        // authStore.setTokens(token)
-        // authStore.setAuthUser({ ...user, account_id: user.id })
-        // toast.success("Please check your email for verification", { title: "Account Created" })
-        // router.push({ path: "/confirm-email", query: { email: values.email } })
-
-        // ==== TEMPORARY WORKAROUND ====
-        toast.success("Account created! Please login to continue")
-        router.push("/login")
-        // ==== TEMPORARY WORKAROUND ====
+        const { access, refresh, ...user } = res.data?.data || {}
+        authStore.setTokens({ access, refresh })
+        authStore.setAuthUser({ ...user, account_id: user.id })
+        toast.success("Please check your email for verification", { title: "Account Created" })
+        router.push({ path: "/confirm-email", query: { email: values.email } })
       },
       onError: displayError,
     },

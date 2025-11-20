@@ -10,12 +10,11 @@ import {
   TEventResponse,
 } from "./types"
 import { useMutation } from "@tanstack/vue-query"
-import { isV2Api } from "@/utils/others"
 
 /** Fetch user profile */
 export function useGetProfile() {
   return useApiQuery({
-    url: isV2Api ? "/accounts/profile" : "/account/user/basic-info/",
+    url: "/accounts/profile",
     key: "userProfile",
   })
 }
@@ -25,7 +24,7 @@ export function useGetOrganizerEvents(
   params?: MaybeRefOrGetter<Record<string, string | number | boolean> | undefined>,
 ) {
   return useApiQuery<TEventResponse>({
-    url: isV2Api ? "/eventful/organizer/events/" : "/inventory/organizer/events/",
+    url: "/eventful/organizer/events/",
     params,
     key: "organizerEvents",
     selectData: true,
@@ -37,21 +36,19 @@ export function useGetOrganizerEventsPublic(
   params?: MaybeRefOrGetter<Record<string, string | number | boolean> | undefined>,
 ) {
   return useApiQuery<TEventResponse>({
-    url: isV2Api ? "/eventful/events/" : "/inventory/organizer/public-events/",
+    url: "/eventful/events/",
     params,
     key: "organizerEventsPublic",
-    selectData: !!isV2Api,
+    selectData: true,
   })
 }
 
 /** Fetch organizer events */
 export function useGetOrganizerEventStats() {
   return useApiQuery<EventDashboardStats>({
-    url: isV2Api
-      ? "/eventful/organizer/events/statistics/"
-      : "/inventory/organizer/events/statistics/",
+    url: "/eventful/organizer/events/statistics/",
     key: "eventStats",
-    selectData: isV2Api,
+    selectData: true,
   })
 }
 
@@ -59,18 +56,10 @@ export function useGetOrganizerEventStats() {
 export function useCreateEvent() {
   return useMutation({
     mutationFn: (body: EventPayload | FormData) => {
-      if (body instanceof FormData) {
-        return baseApi.post(
-          isV2Api ? "/eventful/organizer/events/" : "/inventory/organizer/events/",
-          body,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          },
-        )
-      }
       return baseApi.post(
-        isV2Api ? "/eventful/organizer/events/" : "/inventory/organizer/events/",
+        "/eventful/organizer/events/",
         body,
+        body instanceof FormData ? { headers: { "Content-Type": "multipart/form-data" } } : {},
       )
     },
   })
@@ -80,14 +69,10 @@ export function useCreateEvent() {
 export function useUpdateEvent() {
   return useMutation({
     mutationFn: ({ id, body }: { id: number; body: Partial<EventPayload> | FormData }) => {
-      if (body instanceof FormData) {
-        return baseApi.patch(`/inventory/organizer/events/${id}/`, body, {
-          headers: { "Content-Type": "multipart/form-data" },
-        })
-      }
       return baseApi.patch(
-        isV2Api ? `/eventful/organizer/events/${id}/` : `/inventory/organizer/events/${id}/`,
+        `/eventful/organizer/events/${id}/`,
         body,
+        body instanceof FormData ? { headers: { "Content-Type": "multipart/form-data" } } : {},
       )
     },
   })
@@ -96,19 +81,17 @@ export function useUpdateEvent() {
 /** Fetch organizer event details by ID */
 export function useGetOrganizerEventDetails(id: string) {
   return useApiQuery<TEvent>({
-    url: isV2Api
-      ? `/eventful/organizer/events/${id}/details/`
-      : `/inventory/organizer/events/${id}/details/`,
+    url: `/eventful/organizer/events/${id}/details/`,
     key: `eventDetails_${id}`,
     refetchOnMount: "always",
-    selectData: isV2Api,
+    selectData: true,
   })
 }
 
 /** Fetch public organizer event details by ID */
 export function useGetPublicOrganizerEventById(id: string) {
   return useApiQuery<TEvent>({
-    url: isV2Api ? `/eventful/events/${id}/` : `/inventory/public/events/${id}/`,
+    url: `/eventful/events/${id}/`,
     key: `publicEventById_${id}`,
     selectData: true,
     refetchOnMount: "always",
@@ -125,8 +108,7 @@ export function useExportRegVendors() {
 /** create a discount code */
 export function useCreateDiscountCode() {
   return useMutation({
-    mutationFn: (body: DiscountCodePayload) =>
-      baseApi.post(isV2Api ? "/eventful/discounts/" : "/inventory/organizer/discount-codes/", body),
+    mutationFn: (body: DiscountCodePayload) => baseApi.post("/eventful/discounts/", body),
   })
 }
 
@@ -134,10 +116,7 @@ export function useCreateDiscountCode() {
 export function useUpdateDiscountCode() {
   return useMutation({
     mutationFn: ({ id, body }: { id: number | string; body: Partial<DiscountCodePayload> }) =>
-      baseApi.patch(
-        isV2Api ? `/eventful/discounts/${id}/` : `/inventory/organizer/discount-codes/${id}/`,
-        body,
-      ),
+      baseApi.patch(`/eventful/discounts/${id}/`, body),
   })
 }
 
@@ -145,9 +124,7 @@ export function useUpdateDiscountCode() {
 export function useGetOrganizerEventDiscountCodes(eventId: string, enabled = true) {
   // V2 returns paginated discount codes, legacy returns plain array
   return useApiQuery<TDiscountCodeResponse | TDiscountCode[]>({
-    url: isV2Api
-      ? `/eventful/discounts/?event=${eventId}`
-      : `/inventory/organizer/discount-codes/event/${eventId}/`,
+    url: `/eventful/discounts/?event=${eventId}`,
     key: `eventDiscountCodes_${eventId}`,
     enabled,
     selectData: true,
@@ -158,21 +135,13 @@ export function useGetOrganizerEventDiscountCodes(eventId: string, enabled = tru
 export function useDeactivateDiscountCode() {
   return useMutation({
     mutationFn: (id: number | string) =>
-      baseApi.post(
-        isV2Api
-          ? `/eventful/discounts/${id}/toggle_active/`
-          : `/inventory/organizer/organizer/code-activation/`,
-        isV2Api ? {} : { code: id },
-      ),
+      baseApi.post(`/eventful/discounts/${id}/toggle_active/`, {}),
   })
 }
 
 /** delete a discount code */
 export function useDeleteDiscountCode() {
   return useMutation({
-    mutationFn: (id: number | string) =>
-      baseApi.delete(
-        isV2Api ? `/eventful/discounts/${id}/` : `/inventory/organizer/code-activation/${id}/`,
-      ),
+    mutationFn: (id: number | string) => baseApi.delete(`/eventful/discounts/${id}/`),
   })
 }

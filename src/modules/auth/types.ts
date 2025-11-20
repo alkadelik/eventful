@@ -24,7 +24,7 @@ export interface ILoginResponse {
 }
 
 export interface ISignupResponse {
-  data: IUser & { token: IAuthTokens }
+  data: IUser & IAuthTokens
 }
 
 export type TSignupPayload = {
