@@ -201,8 +201,8 @@ const { data: orgEvents } = useGetOrganizerEventsPublic(params)
         <p class="mb-8 text-center text-lg md:text-xl">
           Create your pop-up or book a booth in minutes.
         </p>
-        <form class="grid gap-4">
-          <TextField type="email" placeholder="e.g. Adebola99@gmail.com" />
+        <form @submit.prevent="console.log" class="grid gap-4">
+          <TextField type="email" placeholder="e.g. Adebola99@gmail.com" required />
           <AppButton type="submit" label="Subscribe Now" size="lg" class="w-full" />
         </form>
       </div>
