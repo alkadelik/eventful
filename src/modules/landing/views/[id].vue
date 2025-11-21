@@ -26,8 +26,8 @@ const openShare = ref(false)
 
 const otherInfo = computed(() => {
   return {
-    registrationCost: orgEvent.value?.event_fee
-      ? formatCurrency(orgEvent.value?.event_fee)
+    registrationCost: Number(orgEvent.value?.participant_fee)
+      ? formatCurrency(Number(orgEvent.value?.participant_fee), { kobo: true })
       : "Free",
     description: orgEvent.value?.description || "N/A",
     eventInstructions: orgEvent.value?.eventInstructions || "N/A",
@@ -69,7 +69,7 @@ const { data: orgEvents } = useGetOrganizerEventsPublic(params)
       <div class="relative z-[1] rounded-xl">
         <img
           :src="orgEvent?.image || fallbackImage"
-          :alt="orgEvent?.event_name"
+          :alt="orgEvent?.name"
           class="h-40 w-full rounded-xl bg-amber-600 object-cover"
         />
 
@@ -87,7 +87,7 @@ const { data: orgEvents } = useGetOrganizerEventsPublic(params)
       <section class="flex flex-col gap-6 md:flex-row">
         <div class="flex-1">
           <div class="mb-3 flex items-center gap-2">
-            <h3 class="truncate text-xl font-semibold capitalize">{{ orgEvent?.event_name }}</h3>
+            <h3 class="truncate text-xl font-semibold capitalize">{{ orgEvent?.name }}</h3>
             <Chip
               :label="getEventStatus(orgEvent as TEvent)"
               size="sm"

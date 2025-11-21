@@ -37,7 +37,7 @@ interface EventFormData {
   description: string
   eventInstructions: string
   image: File | string | null
-  terms_and_conditions: File | null
+  terms_and_conditions: File | string | null
 }
 
 // Store initial values for comparison
@@ -47,16 +47,16 @@ const initialValues = ref<Partial<EventFormData>>({})
 const getInitialValues = (): Partial<EventFormData> => {
   if (props.isEditMode && props.event) {
     const values: Partial<EventFormData> = {
-      event_name: props.event.event_name || props.event.name,
+      event_name: props.event.name,
       startDate: props.event.start_date,
       endDate: props.event.end_date,
       venueAddress: props.event.location,
-      registrationCost: Number(props.event.event_fee || props.event.participant_fee),
+      registrationCost: Number(props.event.participant_fee),
       capacity: parseInt(props.event.capacity),
       description: props.event.description,
       eventInstructions: props.event.eventInstructions || "",
       image: props.event.image || null,
-      terms_and_conditions: null,
+      terms_and_conditions: props.event.terms_and_conditions || null,
     }
     initialValues.value = { ...values }
     return values

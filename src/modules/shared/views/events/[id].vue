@@ -40,14 +40,13 @@ const { data: details, isPending, refetch } = useGetOrganizerEventDetails(eventI
 
 const otherInfo = computed(() => {
   return {
-    registrationCost: Number(details.value?.event_fee || details.value?.participant_fee)
-      ? formatCurrency(details.value?.event_fee || details.value?.participant_fee)
+    registrationCost: Number(details.value?.participant_fee)
+      ? formatCurrency(details.value?.participant_fee)
       : "Free",
     maximumCapacity: Number(details.value?.capacity).toLocaleString() || "N/A",
     description: details.value?.description || "",
     eventInstructions: details.value?.eventInstructions || details.value?.event_instructions || "",
-    "Terms & Conditions":
-      details?.value?.termsAndConditions || details.value?.terms_and_conditions || "",
+    "Terms & Conditions": details.value?.terms_and_conditions || "",
   }
 })
 
@@ -94,7 +93,9 @@ const STATS = computed(() => {
     },
     {
       title: "Avg. Revenue / Vendor",
-      value: details.value?.event_fee ? formatCurrency(details.value?.event_fee) : 0,
+      value: Number(details.value?.participant_fee)
+        ? formatCurrency(details.value?.participant_fee)
+        : 0,
       icon: "shop",
       iconClass: "green" as const,
     },
@@ -142,7 +143,9 @@ const handleExport = () => {
       Email: vendor.email,
       Phone: vendor.phone || "N/A",
       Code: vendor.code || "N/A",
-      Amount: details.value?.event_fee ? formatCurrency(details.value?.event_fee) : "Free",
+      Amount: Number(details.value?.participant_fee)
+        ? formatCurrency(details.value?.participant_fee)
+        : "Free",
     }))
     // csv data
     const headers = Object.keys(data?.[0] || {}).join(",")
@@ -185,7 +188,7 @@ const handleExport = () => {
           <div class="flex-1 truncate">
             <div class="mb-3 flex items-center gap-2">
               <h3 class="truncate text-xl font-semibold">
-                {{ details?.event_name || details?.name }}
+                {{ details?.name }}
               </h3>
               <Chip :label="eventStatus" class="capitalize" size="sm" :color="chipColor" />
             </div>
@@ -202,8 +205,8 @@ const handleExport = () => {
 
               <div class="mt-1 inline-flex items-center gap-4 text-base font-semibold">
                 {{
-                  Number(details?.event_fee || details.participant_fee)
-                    ? formatCurrency(details?.event_fee || details.participant_fee)
+                  Number(details.participant_fee)
+                    ? formatCurrency(details.participant_fee, { kobo: true })
                     : "Free"
                 }}
               </div>
@@ -232,7 +235,7 @@ const handleExport = () => {
         v-model="activeTab"
         :tabs="
           ['overview', 'vendors', 'codes'].filter(
-            (x) => x !== 'codes' || Number(details?.event_fee || details?.participant_fee),
+            (x) => x !== 'codes' || Number(details?.participant_fee),
           )
         "
         class="max-w-md"
@@ -310,7 +313,11 @@ const handleExport = () => {
                   {{ formatCurrency(Number(value)) }}
                 </span>
                 <span v-else>
-                  {{ Number(details?.event_fee) ? formatCurrency(details?.event_fee) : "--" }}
+                  {{
+                    Number(details?.participant_fee)
+                      ? formatCurrency(details?.participant_fee)
+                      : "--"
+                  }}
                 </span>
               </template>
 
@@ -340,7 +347,7 @@ const handleExport = () => {
           </div>
         </template>
 
-        <template v-if="Number(details?.event_fee || details?.participant_fee)" #codes>
+        <template v-if="Number(details?.participant_fee)" #codes>
           <EmptyState
             v-if="!eventDiscountCodes?.length"
             title="No discount codes yet!"

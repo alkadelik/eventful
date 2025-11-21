@@ -1,20 +1,17 @@
 export type TEvent = {
   id: number
   uid?: string
-  event_name: string
-  name?: string
+  name: string
   event_slug: string
   start_date: string
   end_date: string
-  event_fee: number
-  participant_fee?: number
+  participant_fee: string
   description: string
   location: string
   capacity: string
   revenue?: number
   eventInstructions?: string
   event_instructions?: string
-  termsAndConditions?: string
   terms_and_conditions?: string
   registered_merchants?: TVendor[]
   registration_stats?: {

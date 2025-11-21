@@ -5,16 +5,15 @@ import { formatCurrency } from "@/utils/format-currency"
 export const EVENT_COLUMN: TableColumn<TEvent>[] = [
   {
     header: "Event name",
-    accessor: "event_name",
+    accessor: "name",
     class: "font-medium text-core-800",
-    cell: ({ item }) => item?.event_name || item.name || "",
   },
   {
     header: "Price",
-    accessor: "event_fee",
+    accessor: "participant_fee",
     cell: ({ item }) =>
-      Number(item.event_fee || item.participant_fee)
-        ? formatCurrency(Number(item.event_fee || item.participant_fee))
+      Number(item.participant_fee)
+        ? formatCurrency(Number(item.participant_fee), { kobo: true })
         : "Free",
   },
   { header: "Merchants", accessor: "registration_count" },
@@ -22,8 +21,8 @@ export const EVENT_COLUMN: TableColumn<TEvent>[] = [
     header: "Revenue",
     accessor: "revenue",
     cell: ({ item }) =>
-      Number(item.event_fee || item.participant_fee) && item.registration_count
-        ? formatCurrency(Number(item.event_fee || item.participant_fee) * item.registration_count)
+      Number(item.participant_fee) && item.registration_count
+        ? formatCurrency(Number(item.participant_fee) * item.registration_count)
         : "--",
   },
   {
