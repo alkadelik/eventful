@@ -34,7 +34,7 @@ const eventUrl = computed(() => {
 // ================================================================
 const handleShareSocial = (platform: string) => {
   const url = encodeURIComponent(eventUrl.value)
-  const title = encodeURIComponent(props.event?.event_name || "")
+  const title = encodeURIComponent(props.event?.name || "")
   const description = encodeURIComponent(props.event?.description || "")
 
   let shareUrl = ""

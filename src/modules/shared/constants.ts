@@ -39,11 +39,15 @@ export const EVENT_COLUMN: TableColumn<TEvent>[] = [
 ]
 
 export const VENDORS_COLUMN: TableColumn<TVendor>[] = [
-  { header: "Name", accessor: "name" },
-  { header: "Email", accessor: "email" },
+  { header: "Name", accessor: "user_name" },
+  { header: "Email", accessor: "user_email" },
   { header: "Phone", accessor: "phone" },
-  { header: "Code", accessor: "code" },
-  { header: "Amount Paid", accessor: "amount_paid" },
+  // { header: "Code", accessor: "code" },
+  {
+    header: "Amount Paid",
+    accessor: "payment_amount",
+    cell: ({ item }) => formatCurrency(Number(item.payment_amount)),
+  },
 ]
 
 export const CODES_COLUMN: TableColumn<TDiscountCode>[] = [

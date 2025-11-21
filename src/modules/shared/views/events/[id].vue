@@ -45,7 +45,7 @@ const otherInfo = computed(() => {
       : "Free",
     maximumCapacity: Number(details.value?.capacity).toLocaleString() || "N/A",
     description: details.value?.description || "",
-    eventInstructions: details.value?.eventInstructions || details.value?.event_instructions || "",
+    eventInstructions: details.value?.event_instructions || "",
     "Terms & Conditions": details.value?.terms_and_conditions || "",
   }
 })
@@ -81,7 +81,7 @@ const STATS = computed(() => {
   return [
     {
       title: "Total Registrations",
-      value: details.value?.registered_merchants?.length || 0,
+      value: details.value?.registration_count || 0,
       icon: "shop",
       iconClass: "green" as const,
     },
@@ -138,13 +138,13 @@ const handleExport = () => {
   isExporting.value = true
   setTimeout(() => {
     // formatted vendors data
-    const data = details.value?.registered_merchants?.map((vendor) => ({
-      Name: vendor.name,
-      Email: vendor.email,
+    const data = details.value?.participants?.map((vendor) => ({
+      Name: vendor.user_name,
+      Email: vendor.user_email,
       Phone: vendor.phone || "N/A",
       Code: vendor.code || "N/A",
       Amount: Number(details.value?.participant_fee)
-        ? formatCurrency(details.value?.participant_fee)
+        ? formatCurrency(vendor?.payment_amount)
         : "Free",
     }))
     // csv data
@@ -155,7 +155,7 @@ const handleExport = () => {
     const encodedUri = encodeURI(csvContent)
     const link = document.createElement("a")
     link.setAttribute("href", encodedUri)
-    link.setAttribute("download", `Register_Vendors_${details.value?.event_slug}.csv`)
+    link.setAttribute("download", `Registered_Vendors_${details.value?.event_slug}.csv`)
     document.body.appendChild(link)
     // clean up
     link.click()
@@ -214,7 +214,7 @@ const handleExport = () => {
           </div>
 
           <AppButton
-            v-if="!details?.registered_merchants?.length && eventStatus !== 'past'"
+            v-if="!details?.participants?.length && eventStatus !== 'past'"
             label="Edit Event"
             icon="edit"
             class="!hidden md:!inline-flex"
@@ -262,7 +262,15 @@ const handleExport = () => {
                 class="flex flex-col gap-1 text-sm md:flex-row md:gap-1"
               >
                 <p class="text-core-600 font-semibold md:flex-1">{{ startCase(key) }}</p>
-                <p class="font-medium md:flex-3">{{ value || "N/A" }}</p>
+                <p v-if="key === 'Terms & Conditions'" class="font-medium md:flex-3">
+                  <a
+                    :href="value"
+                    target="_blank"
+                    class="text-primary-600 hover:text-primary-800 underline"
+                    >View Terms & Conditions</a
+                  >
+                </p>
+                <p v-else class="font-medium md:flex-3">{{ value || "N/A" }}</p>
               </div>
             </div>
           </div>
@@ -270,7 +278,7 @@ const handleExport = () => {
 
         <template #vendors>
           <EmptyState
-            v-if="!details?.registered_merchants?.length && !details?.registered_merchants?.length"
+            v-if="!details?.participants?.length && !details?.participants?.length"
             title="No attendee yet!"
             description="Once people start registering, you'll see them here. Share your event to kick things off!"
             action-label="Share Event"
@@ -282,7 +290,7 @@ const handleExport = () => {
           <div v-else class="rounded-2xl border border-gray-100 bg-white shadow-sm">
             <div class="flex items-center gap-2 py-4 md:px-4">
               <h2 class="text-lg font-semibold">Registered Vendors</h2>
-              <Chip :label="details?.registered_merchants?.length?.toLocaleString()" size="sm" />
+              <Chip :label="details?.participants?.length?.toLocaleString()" size="sm" />
 
               <AppButton
                 label="Export"
@@ -294,13 +302,14 @@ const handleExport = () => {
                 @click="handleExport"
               />
             </div>
+
             <DataTable
-              :data="details?.registered_merchants ?? []"
+              :data="details?.participants ?? []"
               :columns="VENDORS_COLUMN"
               :loading="isPending"
             >
-              <template #cell:name="{ value }">
-                <Avatar :name="String(value)" :extra-text="true" />
+              <template #cell:user_name="{ item }">
+                <Avatar :name="String(item.user_name)" :extra-text="true" />
               </template>
 
               <template #cell:code="{ value }">
@@ -308,7 +317,7 @@ const handleExport = () => {
                 <span v-else>--</span>
               </template>
 
-              <template #cell:amount_paid="{ value, item }">
+              <!-- <template #cell:payment_amount="{ value, item }">
                 <span v-if="item.code" class="text-red-400">
                   {{ formatCurrency(Number(value)) }}
                 </span>
@@ -319,23 +328,23 @@ const handleExport = () => {
                       : "--"
                   }}
                 </span>
-              </template>
+              </template> -->
 
               <template #mobile-card="{ item }">
                 <div
                   class="bg-core-25 border-core-300 flex items-start gap-3 rounded-2xl border px-4 py-5"
                 >
                   <Avatar
-                    :name="item.name"
+                    :name="item.user_name"
                     background-color="#edd5d8"
                     text-color="var(--color-core-600)"
                   />
                   <div class="text-core-600 flex-1">
                     <h3 class="text-core-700 mb-1.5 text-base font-semibold capitalize">
-                      {{ item.name }}
+                      {{ item.user_name }}
                     </h3>
                     <p class="mb-1 flex items-center gap-2">
-                      <Icon name="sms" size="14" /> {{ item.email }}
+                      <Icon name="sms" size="14" /> {{ item.user_email }}
                     </p>
                     <p class="flex items-center gap-2">
                       <Icon name="call" size="14" /> {{ item.phone }}

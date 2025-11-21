@@ -18,12 +18,12 @@ const emit = defineEmits<{ (e: "close"): void }>()
 
 const otherInfo = computed(() => {
   return {
-    registrationCost: Number(props.event?.event_fee)
-      ? formatCurrency(props.event?.event_fee)
+    registrationCost: Number(props.event?.participant_fee)
+      ? formatCurrency(props.event?.participant_fee)
       : "Free",
     description: props.event?.description || "N/A",
     eventInstructions: props.event?.eventInstructions || "N/A",
-    "Terms & Conditions": props.event?.termsAndConditions || "N/A",
+    "Terms & Conditions": props.event?.terms_and_conditions || "N/A",
   }
 })
 
@@ -52,7 +52,7 @@ const slotsRemaining = computed(() => {
     <section class="space-y-6">
       <div class="rounded-2xl border border-gray-200 bg-green-950 p-5 text-white">
         <div class="mb-2 flex items-center gap-2">
-          <h3 class="truncate text-xl font-semibold capitalize">{{ event?.event_name }}</h3>
+          <h3 class="truncate text-xl font-semibold capitalize">{{ event?.name }}</h3>
           <Chip
             :label="getEventStatus(event as TEvent)"
             size="sm"
@@ -85,7 +85,7 @@ const slotsRemaining = computed(() => {
           <div class="flex items-center gap-2">
             <Icon name="dollar-circle" size="20" />
             <p class="mr-2 text-sm">
-              {{ Number(event?.event_fee) ? formatCurrency(event?.event_fee) : "Free" }}
+              {{ Number(event?.participant_fee) ? formatCurrency(event?.participant_fee) : "Free" }}
             </p>
             <Chip
               v-if="slotsRemaining < 30"

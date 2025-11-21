@@ -19,6 +19,7 @@ export type TEvent = {
   }
   registration_count?: number
   image: string | null
+  participants?: TVendor[]
 }
 
 export type TEventResponse = {
@@ -30,11 +31,12 @@ export type TEventResponse = {
 
 export type TVendor = {
   id: number
-  name: string
-  email: string
+  user_name: string
+  user_email: string
   phone?: string
   code: string
   amount_paid: number
+  payment_amount: number
 }
 
 export type TDiscountCode = {
