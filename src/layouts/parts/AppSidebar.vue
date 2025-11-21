@@ -14,7 +14,7 @@
     <div class="bg-gray-50 px-4 py-4">
       <div class="flex items-center gap-4">
         <Avatar
-          :name="getFullName(user as TNameObj)"
+          :name="user?.first_name + ' ' + user?.last_name"
           :extraText="user?.email"
           clickable
           class="truncate"
@@ -40,7 +40,6 @@
 
 <script setup lang="ts">
 import { useAuthStore } from "@modules/auth/store"
-import { getFullName, TNameObj } from "@/utils/format-strings"
 import Avatar from "@components/Avatar.vue"
 import SidebarLink from "./SidebarLink.vue"
 import { computed } from "vue"

@@ -16,6 +16,7 @@ import { TEvent } from "@modules/shared/types"
 import EmptyState from "@components/EmptyState.vue"
 import EventCard from "../components/EventCard.vue"
 import TextField from "@components/form/TextField.vue"
+import fallbackImage from "@/assets/images/eventful-noise-grid.svg?url"
 
 const route = useRoute()
 
@@ -30,7 +31,7 @@ const otherInfo = computed(() => {
       : "Free",
     description: orgEvent.value?.description || "N/A",
     eventInstructions: orgEvent.value?.eventInstructions || "N/A",
-    "Terms & Conditions": orgEvent.value?.termsAndConditions || "N/A",
+    "Terms & Conditions": orgEvent.value?.terms_and_conditions || "N/A",
   }
 })
 
@@ -49,16 +50,8 @@ const slotsRemaining = computed(() => {
   )
 })
 
-const { data: orgEvents } = useGetOrganizerEventsPublic()
-
-// events that are upcoming or ongoing
-const filteredEvents = computed(() => {
-  const events = orgEvents.value?.results
-  const isUpcomingOrOngoing = events?.filter(
-    (evt) => new Date(evt.start_date) >= new Date() || new Date(evt.end_date) >= new Date(),
-  )
-  return isUpcomingOrOngoing?.length ? isUpcomingOrOngoing : []
-})
+const params = computed(() => ({ limit: 4, status: "upcoming" }))
+const { data: orgEvents } = useGetOrganizerEventsPublic(params)
 </script>
 
 <template>
@@ -75,7 +68,7 @@ const filteredEvents = computed(() => {
     <section class="space-y-6">
       <div class="relative z-[1] rounded-xl">
         <img
-          src="@/assets/images/eventful-noise-grid.svg?url"
+          :src="orgEvent?.image || fallbackImage"
           :alt="orgEvent?.event_name"
           class="h-40 w-full rounded-xl bg-amber-600 object-cover"
         />
@@ -83,7 +76,9 @@ const filteredEvents = computed(() => {
         <span
           class="absolute top-4 left-0 flex items-center justify-center rounded-r bg-white px-3 py-1 text-sm font-medium shadow"
         >
-          {{ orgEvent?.event_fee ? formatCurrency(orgEvent?.event_fee) : "Free" }}
+          {{
+            Number(orgEvent?.participant_fee) ? formatCurrency(orgEvent?.participant_fee) : "Free"
+          }}
         </span>
 
         <img src="/images/logos/leyyow-icon-1.svg?url" class="absolute right-2 bottom-2 size-8" />
@@ -119,7 +114,11 @@ const filteredEvents = computed(() => {
             <div class="flex items-center gap-2">
               <Icon name="dollar-circle" size="20" />
               <p class="mr-2 text-sm">
-                {{ orgEvent?.event_fee ? formatCurrency(orgEvent?.event_fee) : "Free" }}
+                {{
+                  Number(orgEvent?.participant_fee)
+                    ? formatCurrency(orgEvent?.participant_fee)
+                    : "Free"
+                }}
               </p>
               <Chip
                 v-if="slotsRemaining < 30"
@@ -148,7 +147,15 @@ const filteredEvents = computed(() => {
             class="flex flex-col gap-1 py-3 text-sm"
           >
             <p class="text-core-600 flex-1 font-semibold">{{ startCase(key) }}</p>
-            <p class="flex-2 font-medium">{{ value }}</p>
+            <p v-if="key === 'Terms & Conditions'" class="flex-2 font-medium">
+              <a
+                :href="value"
+                target="_blank"
+                class="text-primary-600 hover:text-primary-800 underline"
+                >View Terms & Conditions</a
+              >
+            </p>
+            <p v-else class="flex-2 font-medium">{{ value }}</p>
           </div>
         </div>
       </div>
@@ -159,12 +166,12 @@ const filteredEvents = computed(() => {
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
         <EventCard
-          v-for="evt in filteredEvents.slice(0, 3)"
+          v-for="evt in orgEvents?.results.slice(0, 3)"
           :key="evt.id"
           :event="evt"
           @click="
             () => {
-              $router.push(`/upcoming-events/${evt.id}`)
+              $router.push(`/upcoming-events/${evt.uid}`)
             }
           "
         />

@@ -21,6 +21,7 @@ export type TEvent = {
     total_registered: number
   }
   registration_count?: number
+  image: string | null
 }
 
 export type TEventResponse = {

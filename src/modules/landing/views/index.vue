@@ -8,6 +8,7 @@ import { computed } from "vue"
 import { useRouter } from "vue-router"
 import { useGetOrganizerEventsPublic } from "@modules/shared/api"
 import ConsentBanner from "@modules/shared/components/ConsentBanner.vue"
+import EmptyState from "@components/EmptyState.vue"
 
 const router = useRouter()
 
@@ -15,16 +16,8 @@ const openCreateEvent = () => {
   router.push("/events?open=create")
 }
 
-const { data: orgEvents } = useGetOrganizerEventsPublic()
-
-// events that are upcoming or ongoing
-const filteredEvents = computed(() => {
-  const events = orgEvents.value?.results
-  const isUpcomingOrOngoing = events?.filter(
-    (evt) => new Date(evt.start_date) >= new Date() || new Date(evt.end_date) >= new Date(),
-  )
-  return isUpcomingOrOngoing?.length ? isUpcomingOrOngoing : events || []
-})
+const params = computed(() => ({ status: "upcoming", limit: 6 }))
+const { data: orgEvents } = useGetOrganizerEventsPublic(params)
 </script>
 
 <template>
@@ -136,18 +129,29 @@ const filteredEvents = computed(() => {
         <p class="text-lg md:text-xl">Discover events near you and book a booth today.</p>
       </div>
 
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+      <div
+        v-if="orgEvents?.count"
+        class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6"
+      >
         <EventCard
-          v-for="evt in filteredEvents.slice(0, 6)"
+          v-for="evt in orgEvents?.results"
           :key="evt.id"
           :event="evt"
           @click="
             () => {
-              $router.push(`/upcoming-events/${evt.id}`)
+              $router.push(`/upcoming-events/${evt.uid}`)
             }
           "
         />
       </div>
+
+      <EmptyState
+        v-else
+        icon="calendar"
+        title="No Upcoming Events Found"
+        description="There are no upcoming events available at the moment. Please check back later."
+        class="min-h-max! bg-transparent! shadow-none!"
+      />
     </AppSection>
 
     <AppSection background="bg-white" class="py-12 md:py-20">

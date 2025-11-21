@@ -10,36 +10,21 @@ import EmptyState from "@components/EmptyState.vue"
 import { useRouter } from "vue-router"
 
 const tabs = [
-  { title: "Ongoing", key: "ongoing" },
+  { title: "Ongoing", key: "active" },
   { title: "Upcoming", key: "upcoming" },
 ]
 
-const { data: orgEvents, isPending } = useGetOrganizerEventsPublic()
-
-// events that are upcoming or ongoing
-const filteredEvents = computed(() => {
-  const events = orgEvents.value?.results
-  if (!events) return []
-  if (activeTab.value === "ongoing") {
-    return (
-      events?.filter(
-        (evt) => new Date(evt.start_date) <= new Date() && new Date(evt.end_date) >= new Date(),
-      ) || []
-    )
-  }
-
-  if (activeTab.value === "upcoming") {
-    return events.filter((evt) => new Date(evt.start_date) > new Date()) || []
-  }
-
-  return events
+const activeTab = ref("active")
+const activeTabTitle = computed(() => {
+  return tabs.find((t) => t.key === activeTab.value)?.title || ""
 })
+const params = computed(() => ({ status: activeTab.value, limit: 20 }))
+const { data: orgEvents, isPending } = useGetOrganizerEventsPublic(params)
 
-const activeTab = ref("ongoing")
 const router = useRouter()
 
 const openEvent = (event: TEvent) => {
-  router.push(`/upcoming-events/${event.id}`)
+  router.push(`/upcoming-events/${event.uid}`)
 }
 </script>
 
@@ -54,15 +39,20 @@ const openEvent = (event: TEvent) => {
     <Tabs v-model="activeTab" :tabs="tabs" class="max-w-md" />
 
     <EmptyState
-      v-if="!filteredEvents.length"
+      v-if="!orgEvents?.results.length"
       icon="calendar"
-      title="No Events Found"
+      :title="`No ${activeTabTitle} Events Found`"
       :loading="isPending"
-      description="There are no events available at the moment. Please check back later."
+      :description="`There are current no ${activeTabTitle} events available at the moment. Please check back later.`"
     />
 
     <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
-      <EventCard v-for="evt in filteredEvents" :key="evt.id" :event="evt" @click="openEvent(evt)" />
+      <EventCard
+        v-for="evt in orgEvents.results"
+        :key="evt.id"
+        :event="evt"
+        @click="openEvent(evt)"
+      />
     </div>
   </AppSection>
 </template>

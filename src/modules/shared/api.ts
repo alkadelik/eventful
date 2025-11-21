@@ -16,6 +16,7 @@ export function useGetProfile() {
   return useApiQuery({
     url: "/accounts/profile",
     key: "userProfile",
+    selectData: true,
   })
 }
 
@@ -68,7 +69,7 @@ export function useCreateEvent() {
 /** edit an event */
 export function useUpdateEvent() {
   return useMutation({
-    mutationFn: ({ id, body }: { id: number; body: Partial<EventPayload> | FormData }) => {
+    mutationFn: ({ id, body }: { id: string; body: Partial<EventPayload> | FormData }) => {
       return baseApi.patch(
         `/eventful/organizer/events/${id}/`,
         body,

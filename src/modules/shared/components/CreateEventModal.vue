@@ -36,7 +36,7 @@ interface EventFormData {
   capacity: number
   description: string
   eventInstructions: string
-  event_flier: File | null
+  image: File | string | null
   terms_and_conditions: File | null
 }
 
@@ -55,7 +55,7 @@ const getInitialValues = (): Partial<EventFormData> => {
       capacity: parseInt(props.event.capacity),
       description: props.event.description,
       eventInstructions: props.event.eventInstructions || "",
-      event_flier: null,
+      image: props.event.image || null,
       terms_and_conditions: null,
     }
     initialValues.value = { ...values }
@@ -78,14 +78,17 @@ const prepareFormData = (currentData: Partial<EventFormData>): FormData => {
     formData.append("capacity", currentData.capacity!.toString())
     formData.append("start_date", currentData.startDate!)
     formData.append("end_date", currentData.endDate!)
-    formData.append("participant_fee", currentData.registrationCost!.toString())
+    formData.append(
+      "participant_fee",
+      currentData.registrationCost ? currentData.registrationCost.toString() : "",
+    )
 
     // Add optional fields
     if (currentData.eventInstructions) {
       formData.append("eventInstructions", currentData.eventInstructions)
     }
-    if (currentData.event_flier) {
-      formData.append("event_flier", currentData.event_flier)
+    if (currentData.image) {
+      formData.append("image", currentData.image)
     }
     if (currentData.terms_and_conditions) {
       formData.append("terms_and_conditions", currentData.terms_and_conditions)
@@ -117,8 +120,8 @@ const prepareFormData = (currentData: Partial<EventFormData>): FormData => {
       formData.append("event_instructions", currentData.eventInstructions || "")
     }
     // Always include files if they are present (they might be new uploads)
-    if (currentData.event_flier) {
-      formData.append("event_flier", currentData.event_flier)
+    if (currentData.image) {
+      formData.append("image", currentData.image)
     }
     if (currentData.terms_and_conditions) {
       formData.append("terms_and_conditions", currentData.terms_and_conditions)
@@ -176,7 +179,7 @@ const queryClient = useQueryClient()
 
 // Computed properties for file previews
 const eventFlierPreview = computed(() => {
-  const file = values.event_flier as File | null
+  const file = values.image as File | null
   if (file && file.type.startsWith("image/")) {
     return URL.createObjectURL(file)
   }
@@ -202,7 +205,7 @@ const onSubmit = handleSubmit((data) => {
 
     // Update existing event with FormData
     updateEvent(
-      { id: props.event.id, body: formData },
+      { id: props.event.uid || "", body: formData },
       {
         onSuccess: () => {
           toast.success("Event updated successfully")
@@ -321,7 +324,7 @@ onUnmounted(() => {
 
           <div class="space-y-4">
             <FormField
-              name="event_flier"
+              name="image"
               label="Event Flier"
               placeholder="Supported formats: PNG, JPG"
               accept="image/png,image/jpeg,image/jpg"
