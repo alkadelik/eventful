@@ -120,7 +120,7 @@ const prepareFormData = (currentData: Partial<EventFormData>): FormData => {
       formData.append("event_instructions", currentData.eventInstructions || "")
     }
     // Always include files if they are present (they might be new uploads)
-    if (currentData.image) {
+    if (currentData.image && typeof currentData.image !== "string") {
       formData.append("image", currentData.image)
     }
     if (currentData.terms_and_conditions) {
@@ -217,6 +217,7 @@ const onSubmit = handleSubmit((data) => {
       },
     )
   } else {
+    formData.append("is_active", "true")
     // Create new event with FormData
     createEvent(formData, {
       onSuccess: () => {
