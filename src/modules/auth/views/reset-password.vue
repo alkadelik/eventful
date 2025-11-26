@@ -26,9 +26,9 @@
 
         <p class="text-core-600 text-center text-sm">
           Didn't get the code?
-          <button to="/forgot-password" class="btn btn-ghost text-primary-600 font-medium">
+          <RouterLink to="/forgot-password" class="btn btn-ghost text-primary-600 font-medium">
             Resend Code
-          </button>
+          </RouterLink>
         </p>
       </div>
 
