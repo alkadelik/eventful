@@ -35,7 +35,7 @@ const initialValues = ref<Partial<DiscountCodePayload>>({})
 const getInitialValues = (): Partial<DiscountCodePayload> => {
   if (props.isEditMode && props.code) {
     const values: DiscountCodePayload = {
-      event: props.event.id,
+      event: props.event.uid || "",
       code: props.code.code,
       amount: props.code.amount,
       max_uses: props.code.max_uses,
@@ -113,7 +113,7 @@ const onSubmit = handleSubmit((data) => {
   const payload = {
     ...getChangedValues(data),
     amount: data.amount,
-    event: props.event.id,
+    event: props.event.uid || "",
     per_user_limit: 1,
   }
 

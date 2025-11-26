@@ -49,7 +49,7 @@ const openEvent = (event: TEvent) => {
     <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
       <EventCard
         v-for="evt in orgEvents.results"
-        :key="evt.id"
+        :key="evt.uid"
         :event="evt"
         @click="openEvent(evt)"
       />

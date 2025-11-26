@@ -28,17 +28,12 @@ const otherInfo = computed(() => {
 })
 
 const openRegisterPage = () => {
-  const isSuiteV2 = import.meta.env.VITE_API_VERSION === "V2"
   // https://suite-staging-branch.vercel.app
   const baseUrl = window.location.origin.includes("localhost")
-    ? `http://localhost:${isSuiteV2 ? 8080 : 5173}`
-    : `https://${isSuiteV2 ? "suite-v2" : "staging-suite-branch"}.vercel.app`
+    ? `http://localhost:8080`
+    : `https://suite.leyyow.com`
 
-  if (isSuiteV2) {
-    window.open(`${baseUrl}/dashboard/sales/upcoming-events/${props.event?.id}`, "_blank")
-  } else {
-    window.open(`${baseUrl}/dashboard/sales/upcoming-events/${props.event?.id}`, "_blank")
-  }
+  window.open(`${baseUrl}/popups/eventful/${props.event?.uid}`, "_blank")
 }
 
 const slotsRemaining = computed(() => {

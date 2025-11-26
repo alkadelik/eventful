@@ -135,7 +135,7 @@ const { data: orgEvents } = useGetOrganizerEventsPublic(params)
       >
         <EventCard
           v-for="evt in orgEvents?.results"
-          :key="evt.id"
+          :key="evt.uid"
           :event="evt"
           @click="
             () => {

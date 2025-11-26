@@ -40,7 +40,7 @@ const openRegisterPage = () => {
     ? "http://localhost:8080"
     : "https://suite.leyyow.com"
 
-  window.open(`${baseUrl}/popups/eventful/${orgEvent.value?.id}`, "_blank")
+  window.open(`${baseUrl}/popups/eventful/${orgEvent.value?.uid}`, "_blank")
 }
 
 const slotsRemaining = computed(() => {
@@ -167,7 +167,7 @@ const { data: orgEvents } = useGetOrganizerEventsPublic(params)
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
         <EventCard
           v-for="evt in orgEvents?.results.slice(0, 3)"
-          :key="evt.id"
+          :key="evt.uid"
           :event="evt"
           @click="
             () => {

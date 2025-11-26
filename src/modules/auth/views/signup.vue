@@ -145,7 +145,7 @@ const onSubmit = (values: TSignupPayload) => {
       onSuccess: (res) => {
         const { access, refresh, ...user } = res.data?.data || {}
         authStore.setTokens({ access, refresh })
-        authStore.setAuthUser({ ...user, account_id: user.id })
+        authStore.setAuthUser(user)
         toast.success("Please check your email for verification", { title: "Account Created" })
         router.push({ path: "/confirm-email", query: { email: values.email } })
       },
