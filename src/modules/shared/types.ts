@@ -108,7 +108,7 @@ export interface IExportPayload {
 }
 
 export interface DiscountCodePayload {
-  event: string
+  event: string | number
   code: string
   amount: number
   max_uses: number
