@@ -85,7 +85,7 @@ const prepareFormData = (currentData: Partial<EventFormData>): FormData => {
 
     // Add optional fields
     if (currentData.eventInstructions) {
-      formData.append("eventInstructions", currentData.eventInstructions)
+      formData.append("event_instructions", currentData.eventInstructions)
     }
     if (currentData.image) {
       formData.append("image", currentData.image)
