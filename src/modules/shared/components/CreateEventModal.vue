@@ -54,7 +54,7 @@ const getInitialValues = (): Partial<EventFormData> => {
       registrationCost: Number(props.event.participant_fee),
       capacity: parseInt(props.event.capacity),
       description: props.event.description,
-      eventInstructions: props.event.eventInstructions || "",
+      eventInstructions: props.event.event_instructions || "",
       image: props.event.image || null,
       terms_and_conditions: props.event.terms_and_conditions || null,
     }

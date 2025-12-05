@@ -30,7 +30,7 @@ const otherInfo = computed(() => {
       ? formatCurrency(Number(orgEvent.value?.participant_fee), { kobo: true })
       : "Free",
     description: orgEvent.value?.description || "N/A",
-    eventInstructions: orgEvent.value?.eventInstructions || "N/A",
+    eventInstructions: orgEvent.value?.event_instructions || "N/A",
     "Terms & Conditions": orgEvent.value?.terms_and_conditions || "N/A",
   }
 })

@@ -22,7 +22,7 @@ const otherInfo = computed(() => {
       ? formatCurrency(props.event?.participant_fee)
       : "Free",
     description: props.event?.description || "N/A",
-    eventInstructions: props.event?.eventInstructions || "N/A",
+    eventInstructions: props.event?.event_instructions || "N/A",
     "Terms & Conditions": props.event?.terms_and_conditions || "N/A",
   }
 })
