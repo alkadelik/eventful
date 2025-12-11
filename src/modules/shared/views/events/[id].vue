@@ -78,6 +78,10 @@ const formatDate = (dateStr: string) => {
 const isMobile = useMediaQuery("(max-width: 768px)")
 
 const STATS = computed(() => {
+  const totalRevenue = details.value?.participants?.reduce((acc, curr) => {
+    return acc + (curr.payment_amount || 0)
+  }, 0)
+
   return [
     {
       title: "Total Registrations",
@@ -87,7 +91,9 @@ const STATS = computed(() => {
     },
     {
       title: "Total Revenue",
-      value: details.value?.revenue ? formatCurrency(details.value?.revenue) : 0,
+      value: details.value?.revenue
+        ? formatCurrency(details.value?.revenue)
+        : formatCurrency(totalRevenue) || 0,
       icon: "shop",
       iconClass: "green" as const,
     },

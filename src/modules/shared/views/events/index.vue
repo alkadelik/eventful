@@ -119,6 +119,8 @@ const isEmpty = computed(() => !myEvents?.value?.results?.length && status.value
           <template #mobile-card="{ item }">
             <TableEventCard
               :event="item"
+              @view="() => $router.push(`/events/${item.id || item.uid}`)"
+              @click="() => $router.push(`/events/${item.id || item.uid}`)"
               @share="
                 () => {
                   openShare = true

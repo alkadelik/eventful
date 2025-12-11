@@ -64,7 +64,7 @@ const handleShareSocial = (platform: string) => {
 </script>
 
 <template>
-  <Modal :open="open" @close="emit('close')" title="Share Event Link">
+  <Modal :open="open" @close="emit('close')" variant="centered" title="Share Event Link">
     <div
       class="bg-primary-50 border-primary-600 flex items-center justify-between gap-2 rounded-xl border px-3 py-2 text-base"
     >
