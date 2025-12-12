@@ -7,7 +7,7 @@
   >
     <!-- Brand -->
     <router-link to="/" class="flex items-center gap-3 px-4 py-4">
-      <img src="/LYW.svg?url" alt="Leyyow" class="h-8 w-auto" />
+      <img src="/logo.svg" alt="Eventful" class="h-8 w-auto" />
     </router-link>
 
     <!-- User Info -->
