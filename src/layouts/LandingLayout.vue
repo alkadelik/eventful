@@ -49,7 +49,7 @@ const footerLinks: Record<string, FooterLink[]> = {
     >
       <AppSection class="flex items-center justify-between gap-3 !py-0">
         <router-link to="/">
-          <img src="/LYW.svg?url" class="h-6 md:h-8" alt="leyyow logo" />
+          <img src="/logo.svg?url" class="h-6 md:h-8" alt="leyyow logo" />
         </router-link>
 
         <div v-if="!isAuthenticated" class="flex gap-2">
