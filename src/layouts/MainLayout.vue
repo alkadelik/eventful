@@ -13,7 +13,7 @@
         ]"
       >
         <!-- Topbar -->
-        <AppHeader />
+        <AppHeader :show-logo="isMobile" @logout="logout = true" />
 
         <!-- Content -->
         <main>
