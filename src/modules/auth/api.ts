@@ -28,7 +28,7 @@ export function useRegister() {
 export function useForgotPassword() {
   return useMutation({
     mutationFn: (body: { email: string }) =>
-      baseApi.post("/accounts/auth/password/request-token", body),
+      baseApi.post("/accounts/auth/password/request-token/", body),
   })
 }
 
